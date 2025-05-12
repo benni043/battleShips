@@ -3,6 +3,7 @@ import handleLobbyEvents from "~/server/utils/handlers/lobby";
 
 export default function registerConnectionHandlers(socket: Socket, io: Server) {
     console.log(`User connected: ${socket.id}`);
+    socket.join("lobby")
 
     handleLobbyEvents(socket, io);
 
