@@ -16,6 +16,7 @@ export default function handleLobbyEvents(socket: Socket, io: Server) {
             socket.join(gameName);
 
             cb({success: true, errorType: undefined} as LobbyCreationResponse);
+            io.to("lobby").emit("new-lobby", lobby);
         }
     });
 }
