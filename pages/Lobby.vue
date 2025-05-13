@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {GameCreationError, type LobbyCreationResponse} from "#shared/types";
-import {ref} from "vue";
 import {useSocket} from "~/utils/useSocketIO";
 import LobbyForm from "~/components/LobbyForm.vue";
 
@@ -38,7 +37,6 @@ onBeforeUnmount(() => {
 })
 
 function createGame(gameName: string) {
-  console.log(gameName)
   socket.emit("create-game", gameName, lobbyCreationResponse);
 }
 
