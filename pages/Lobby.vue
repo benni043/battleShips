@@ -11,25 +11,25 @@ function createGame(gameName: string) {
 }
 
 function lobbyCreationResponse(gameCreationResponse: GameCreationResponse) {
-  if (!gameCreationResponse.success) {
-    switch (gameCreationResponse.errorType) {
-      case GameCreationError.ALREADY_TAKEN: {
-        console.error("Dieser Lobbyname wird bereits verwendet!")
-        break;
-      }
-      case GameCreationError.INVALID: {
-        console.error("Dieser Lobbyname ist nicht erlaubt!")
-        break;
-      }
-      default: {
-        console.error("Unbekannter Fehler")
-        break;
-      }
-    }
+  if (gameCreationResponse.success) {
+    console.log(gameCreationResponse);
     return;
   }
 
-  console.log(gameCreationResponse);
+  switch (gameCreationResponse.errorType) {
+    case GameCreationError.ALREADY_TAKEN: {
+      console.error("Dieser Lobbyname wird bereits verwendet!")
+      break;
+    }
+    case GameCreationError.INVALID: {
+      console.error("Dieser Lobbyname ist nicht erlaubt!")
+      break;
+    }
+    default: {
+      console.error("Unbekannter Fehler")
+      break;
+    }
+  }
 }
 
 function joinGame(gameName: string) {
@@ -37,6 +37,11 @@ function joinGame(gameName: string) {
 }
 
 function gameJoinResponse(gameJoinResponse: GameJoinResponse) {
+  if (gameJoinResponse.success) {
+    console.log(gameJoinResponse);
+    return;
+  }
+
   switch (gameJoinResponse.errorType) {
     case GameJoinError.FULL: {
       console.error("Dieses Spiel ist bereits voll!");
@@ -47,8 +52,6 @@ function gameJoinResponse(gameJoinResponse: GameJoinResponse) {
       break;
     }
   }
-
-  console.log(gameJoinResponse);
 }
 
 onBeforeUnmount(() => {
