@@ -2,6 +2,7 @@
 import {GameCreationError, type LobbyCreationResponse} from "#shared/types";
 import {useSocket} from "~/utils/useSocketIO";
 import LobbyForm from "~/components/LobbyForm.vue";
+import LobbyList from "~/components/LobbyList.vue";
 
 const socket = useSocket();
 
@@ -27,9 +28,6 @@ function lobbyCreationResponse(lobbyCreationResponse: LobbyCreationResponse) {
   console.log(lobbyCreationResponse);
 }
 
-socket.on("new-game", (gameName: string) => {
-  console.log("new-game", gameName);
-})
 
 onBeforeUnmount(() => {
   console.log(`Disconnect ${socket.id}`);
@@ -43,7 +41,10 @@ function createGame(gameName: string) {
 </script>
 
 <template>
-  <LobbyForm @submit="args => createGame(args)"/>
+  <div>
+    <LobbyForm @submit="args => createGame(args)"/>
+    <LobbyList/>
+  </div>
 </template>
 
 <style scoped>

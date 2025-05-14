@@ -1,11 +1,16 @@
 import type {Server, Socket} from 'socket.io';
-import {createGame} from "~/server/utils/services/lobby.service";
-import type {GameLobby, LobbyCreationResponse} from "~/shared/types";
+import {lobbyService} from "~/server/utils/services/lobby.service";
+import type {LobbyCreationResponse} from "~/shared/types";
 import {GameCreationError} from "~/shared/types";
 
 export default function handleLobbyEvents(socket: Socket, io: Server) {
-    socket.on("create-game", async (gameName, cb) => {
-        const lobby = await createGame(gameName, socket);
+    console.log(`User: ${socket.id} connected to lobby`);
+
+    socket.join("lobby")
+    socket.to("lobby").emit("get-all-games", lobbyService.getAllGameNames());
+
+    socket.on("create-game", (gameName, cb) => {
+        const lobby = lobbyService.createGame(gameName, socket);
 
         if (lobby == GameCreationError.ALREADY_TAKEN) {
             cb({success: false, errorType: GameCreationError.ALREADY_TAKEN} as LobbyCreationResponse)

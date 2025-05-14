@@ -1,24 +1,32 @@
-import {createGameInMemory, getAllGames} from "~/server/utils/persistence/lobby.repository";
 import {GameCreationError} from "~/shared/types";
 import type {Socket} from "socket.io";
+import {lobbyRepository} from "~/server/utils/persistence/lobby.repository";
 
-export async function createGame(gameName: string, socket: Socket) {
-    if (!isGameNameAvailable(gameName)) return GameCreationError.ALREADY_TAKEN;
-    if (!isGameNameValid(gameName)) return GameCreationError.INVALID;
+export class LobbyService {
+    getAllGameNames() {
+        return lobbyRepository.getAllGameNames();
+    }
 
-    return createGameInMemory(gameName, socket);
+    createGame(gameName: string, socket: Socket) {
+        if (!this.isGameNameAvailable(gameName)) return GameCreationError.ALREADY_TAKEN;
+        if (!this.isGameNameValid(gameName)) return GameCreationError.INVALID;
+
+        return lobbyRepository.createGame(gameName, socket);
+    }
+
+    isGameNameAvailable(gameName: string) {
+        const lobbies = lobbyRepository.getAllGames();
+
+        return !lobbies.has(gameName);
+    }
+
+    isGameNameValid(gameName: string): boolean {
+        const minLength = 3
+        const maxLength = 20
+        const validNameRegex = /^[a-zA-Z0-9]+$/
+
+        return (gameName.length >= minLength && gameName.length <= maxLength && validNameRegex.test(gameName))
+    }
 }
 
-function isGameNameAvailable(gameName: string) {
-    const lobbies = getAllGames();
-
-    return !lobbies.has(gameName);
-}
-
-function isGameNameValid(gameName: string): boolean {
-    const minLength = 3
-    const maxLength = 20
-    const validNameRegex = /^[a-zA-Z0-9]+$/
-
-    return (gameName.length >= minLength && gameName.length <= maxLength && validNameRegex.test(gameName))
-}
+export const lobbyService = new LobbyService();
