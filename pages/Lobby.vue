@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import {GameCreationError, type LobbyCreationResponse} from "#shared/types";
+import {GameCreationError, type GameCreationResponse, GameJoinError, type GameJoinResponse} from "#shared/types";
 import {useSocket} from "~/utils/useSocketIO";
 import LobbyForm from "~/components/LobbyForm.vue";
 import LobbyList from "~/components/LobbyList.vue";
 
 const socket = useSocket();
 
-function lobbyCreationResponse(lobbyCreationResponse: LobbyCreationResponse) {
-  if (!lobbyCreationResponse.success) {
-    switch (lobbyCreationResponse.errorType) {
+function createGame(gameName: string) {
+  socket.emit("create-game", gameName, lobbyCreationResponse);
+}
+
+function lobbyCreationResponse(gameCreationResponse: GameCreationResponse) {
+  if (!gameCreationResponse.success) {
+    switch (gameCreationResponse.errorType) {
       case GameCreationError.ALREADY_TAKEN: {
         console.error("Dieser Lobbyname wird bereits verwendet!")
         break;
@@ -25,25 +29,38 @@ function lobbyCreationResponse(lobbyCreationResponse: LobbyCreationResponse) {
     return;
   }
 
-  console.log(lobbyCreationResponse);
+  console.log(gameCreationResponse);
 }
 
+function joinGame(gameName: string) {
+  socket.emit("join-game", gameName, gameJoinResponse);
+}
+
+function gameJoinResponse(gameJoinResponse: GameJoinResponse) {
+  switch (gameJoinResponse.errorType) {
+    case GameJoinError.FULL: {
+      console.error("Dieses Spiel ist bereits voll!");
+      break;
+    }
+    default: {
+      console.error("Unbekannter Fehler")
+      break;
+    }
+  }
+
+  console.log(gameJoinResponse);
+}
 
 onBeforeUnmount(() => {
   console.log(`Disconnect ${socket.id}`);
   socket?.disconnect();
 })
-
-function createGame(gameName: string) {
-  socket.emit("create-game", gameName, lobbyCreationResponse);
-}
-
 </script>
 
 <template>
   <div>
     <LobbyForm @submit="args => createGame(args)"/>
-    <LobbyList/>
+    <LobbyList @submit="args => joinGame(args)"/>
   </div>
 </template>
 

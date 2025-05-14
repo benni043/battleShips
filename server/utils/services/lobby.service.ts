@@ -1,4 +1,4 @@
-import {GameCreationError} from "~/shared/types";
+import {GameCreationError, GameJoinError} from "~/shared/types";
 import type {Socket} from "socket.io";
 import {lobbyRepository} from "~/server/utils/persistence/lobby.repository";
 
@@ -14,13 +14,21 @@ export class LobbyService {
         return lobbyRepository.createGame(gameName, socket);
     }
 
-    isGameNameAvailable(gameName: string) {
+    joinGame(gameName: string, socket: Socket) {
+        const game = lobbyRepository.getGameByName(gameName);
+
+        if (!game || game.socketPlayer2) return GameJoinError.FULL;
+
+        return lobbyRepository.joinGame(gameName, socket);
+    }
+
+    private isGameNameAvailable(gameName: string) {
         const lobbies = lobbyRepository.getAllGames();
 
         return !lobbies.has(gameName);
     }
 
-    isGameNameValid(gameName: string): boolean {
+    private isGameNameValid(gameName: string): boolean {
         const minLength = 3
         const maxLength = 20
         const validNameRegex = /^[a-zA-Z0-9]+$/

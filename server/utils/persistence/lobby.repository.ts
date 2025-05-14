@@ -1,5 +1,5 @@
-import type { GameLobby } from "~/shared/types";
-import type { Socket } from "socket.io";
+import type {GameLobby} from "~/shared/types";
+import type {Socket} from "socket.io";
 
 export class LobbyRepository {
     private games: Map<string, GameLobby>;
@@ -12,6 +12,10 @@ export class LobbyRepository {
         return this.games;
     }
 
+    getGameByName(gameName: string): GameLobby | undefined {
+        return this.games.get(gameName);
+    }
+
     getAllGameNames(): string[] {
         return Array.from(this.games.keys());
     }
@@ -21,21 +25,17 @@ export class LobbyRepository {
             socketPlayer1: socket,
             socketPlayer2: undefined
         } as GameLobby);
+
         return gameName;
     }
 
-    // // Optional: mehr Methoden, z.B. zum Löschen, Beitreten etc.
-    // deleteGame(gameName: string): boolean {
-    //     return this.games.delete(gameName);
-    // }
-    //
-    // joinGame(gameName: string, socket: Socket): boolean {
-    //     const game = this.games.get(gameName);
-    //     if (!game || game.socketPlayer2) return false;
-    //
-    //     game.socketPlayer2 = socket;
-    //     return true;
-    // }
+    joinGame(gameName: string, socket: Socket) {
+        const game = this.games.get(gameName)!;
+
+        game.socketPlayer2 = socket;
+
+        return gameName;
+    }
 }
 
 export const lobbyRepository = new LobbyRepository();

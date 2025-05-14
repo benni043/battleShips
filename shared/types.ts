@@ -5,7 +5,7 @@ export type GameLobby = {
     socketPlayer2: Socket | undefined;
 }
 
-export type LobbyCreationResponse = {
+export type GameCreationResponse = {
     success: boolean,
     errorType: GameCreationError | undefined,
 }
@@ -13,4 +13,13 @@ export type LobbyCreationResponse = {
 export enum GameCreationError {
     INVALID,
     ALREADY_TAKEN,
+}
+
+export enum GameJoinError {
+    FULL
+}
+
+export type GameJoinResponse = {
+    success: boolean,
+    errorType: GameJoinError | undefined,
 }
