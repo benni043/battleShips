@@ -38,7 +38,7 @@ export default function handleLobbyEvents(socket: Socket, io: Server) {
             cb({gameName: gameName} as GameCreationOrJoinResponse);
             io.to("lobby").emit("remove-game", game);
 
-            new GamePresentation(lobbyService.getGameByName(gameName)!, socket);
+            new GamePresentation(lobbyService.getGameByName(gameName)!);
         }
     })
 }
