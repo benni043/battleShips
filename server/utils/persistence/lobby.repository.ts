@@ -1,8 +1,9 @@
 import type {GameLobby} from "~/shared/types";
+import {GameState} from "~/shared/types";
 import type {Socket} from "socket.io";
 
 export class LobbyRepository {
-    private games: Map<string, GameLobby>;
+    private readonly games: Map<string, GameLobby>;
 
     constructor() {
         this.games = new Map<string, GameLobby>();
@@ -16,14 +17,17 @@ export class LobbyRepository {
         return this.games.get(gameName);
     }
 
-    getAllGameNames(): string[] {
-        return Array.from(this.games.keys());
+    getAvailableGames(): string[] {
+        return Array.from(this.games.entries())
+            .filter(([_, game]) => game.state === GameState.WAITING)
+            .map(([key, _]) => key);
     }
 
     createGame(gameName: string, socket: Socket): string {
         this.games.set(gameName, {
             socketPlayer1: socket,
-            socketPlayer2: undefined
+            socketPlayer2: undefined,
+            state: GameState.WAITING,
         } as GameLobby);
 
         return gameName;
@@ -33,6 +37,7 @@ export class LobbyRepository {
         const game = this.games.get(gameName)!;
 
         game.socketPlayer2 = socket;
+        game.state = GameState.STARTED;
 
         return gameName;
     }

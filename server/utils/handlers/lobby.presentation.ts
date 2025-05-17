@@ -1,26 +1,26 @@
 import type {Server, Socket} from 'socket.io';
 import {lobbyService} from "~/server/utils/services/lobby.service";
-import type {GameJoinResponse, GameCreationResponse} from "~/shared/types";
+import type {GameCreationOrJoinResponse} from "~/shared/types";
 import {GameCreationError, GameJoinError} from "~/shared/types";
 
 export default function handleLobbyEvents(socket: Socket, io: Server) {
     console.log(`User: ${socket.id} connected to lobby`);
 
     socket.join("lobby")
-    socket.to("lobby").emit("get-all-games", lobbyService.getAllGameNames());
+    io.to("lobby").emit("get-all-games", lobbyService.getAvailableGames());
 
     socket.on("create-game", (gameName, cb) => {
         const game = lobbyService.createGame(gameName, socket);
 
         if (game == GameCreationError.ALREADY_TAKEN) {
-            cb({success: false, errorType: GameCreationError.ALREADY_TAKEN} as GameCreationResponse)
+            cb(GameCreationError.ALREADY_TAKEN)
         } else if (game == GameCreationError.INVALID) {
-            cb({success: false, errorType: GameCreationError.INVALID} as GameCreationResponse)
+            cb(GameCreationError.INVALID)
         } else {
             socket.leave("lobby");
             socket.join(gameName);
 
-            cb({success: true, errorType: undefined} as GameCreationResponse);
+            cb({gameName: gameName} as GameCreationOrJoinResponse);
             io.to("lobby").emit("new-game", game);
         }
     });
@@ -29,12 +29,12 @@ export default function handleLobbyEvents(socket: Socket, io: Server) {
         const game = lobbyService.joinGame(gameName, socket);
 
         if (game == GameJoinError.FULL) {
-            cb({success: false, errorType: GameJoinError.FULL} as GameJoinResponse)
+            cb(GameJoinError.FULL)
         } else {
             socket.leave("lobby");
             socket.join(gameName);
 
-            cb({success: true, errorType: undefined} as GameCreationResponse);
+            cb({gameName: gameName} as GameCreationOrJoinResponse);
             io.to("lobby").emit("remove-game", game);
         }
     })

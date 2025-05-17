@@ -3,11 +3,11 @@ import type {Socket} from "socket.io";
 export type GameLobby = {
     socketPlayer1: Socket;
     socketPlayer2: Socket | undefined;
+    state: GameState;
 }
 
-export type GameCreationResponse = {
-    success: boolean,
-    errorType: GameCreationError | undefined,
+export type GameCreationOrJoinResponse = {
+    gameName: string,
 }
 
 export enum GameCreationError {
@@ -19,7 +19,8 @@ export enum GameJoinError {
     FULL
 }
 
-export type GameJoinResponse = {
-    success: boolean,
-    errorType: GameJoinError | undefined,
+export enum GameState {
+    WAITING,
+    STARTED,
+    FINISHED
 }

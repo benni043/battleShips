@@ -3,8 +3,8 @@ import type {Socket} from "socket.io";
 import {lobbyRepository} from "~/server/utils/persistence/lobby.repository";
 
 export class LobbyService {
-    getAllGameNames() {
-        return lobbyRepository.getAllGameNames();
+    getAvailableGames() {
+        return lobbyRepository.getAvailableGames();
     }
 
     createGame(gameName: string, socket: Socket) {
