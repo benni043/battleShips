@@ -1,10 +1,11 @@
 <script setup lang="ts">
 
-import Lobby from "~/pages/Lobby.vue";
+navigateTo("/game/place/1")
+
 </script>
 
 <template>
-  <Lobby/>
+
 </template>
 
 <style scoped>

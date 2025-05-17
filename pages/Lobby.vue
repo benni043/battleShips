@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {GameCreationError, type GameCreationOrJoinResponse, GameJoinError} from "#shared/types";
 import {useSocket} from "~/utils/useSocketIO";
-import LobbyForm from "~/components/LobbyForm.vue";
-import LobbyList from "~/components/LobbyList.vue";
+import LobbyForm from "~/components/lobby/LobbyForm.vue";
+import LobbyList from "~/components/lobby/LobbyList.vue";
 
 const socket = useSocket();
 

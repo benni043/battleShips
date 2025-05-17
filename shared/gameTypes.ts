@@ -1,18 +1,24 @@
-export type Cell = {
-    cell: WaterCell | ShipCell
+export interface Cell {
+    type: Type;
+    id: number | undefined;
+    color: string;
+    x: number;
+    y: number;
+    originX: number;
+    originY: number;
 }
 
-export type WaterCell = {
-    cord: Cord
+export interface Type {
+    fieldType: FieldType,
+    isHit: boolean
 }
 
-export type ShipCell = {
-    cord: Cord,
-    shipId: number,
-    isHit: boolean,
-}
-
-export type Cord = {
+export interface Cord {
     x: number,
-    y: number,
+    y: number
+}
+
+export enum FieldType {
+    SHIP,
+    WATER
 }
