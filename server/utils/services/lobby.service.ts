@@ -1,10 +1,14 @@
-import {GameCreationError, GameJoinError} from "~/shared/types";
+import {GameCreationError, GameJoinError, type GameLobby} from "~/shared/types";
 import type {Socket} from "socket.io";
 import {lobbyRepository} from "~/server/utils/persistence/lobby.repository";
 
 export class LobbyService {
     getAvailableGames() {
         return lobbyRepository.getAvailableGames();
+    }
+
+    getGameByName(gameName: string): GameLobby | undefined {
+        return lobbyRepository.getGameByName(gameName);
     }
 
     createGame(gameName: string, socket: Socket) {

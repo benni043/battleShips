@@ -24,3 +24,4 @@ export enum GameState {
     STARTED,
     FINISHED
 }
+
