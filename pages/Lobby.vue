@@ -22,7 +22,7 @@ function lobbyCreationResponse(gameCreationResponse: GameCreationOrJoinResponse 
     }
     default: {
       console.log(gameCreationResponse);
-      navigateTo(`/game/${gameCreationResponse.gameName}`)
+      navigateTo(`/game/place/${gameCreationResponse.gameName}`)
       break;
     }
   }
@@ -40,7 +40,7 @@ function gameJoinResponse(gameJoinResponse: GameCreationOrJoinResponse | GameJoi
     }
     default: {
       console.log(gameJoinResponse);
-      navigateTo(`/game/${gameJoinResponse.gameName}`)
+      navigateTo(`/game/place/${gameJoinResponse.gameName}`)
       break;
     }
   }

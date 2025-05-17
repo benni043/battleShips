@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import SimpleGrid from "~/components/game/SimpleGrid.vue";
 import {type Cell, type Cord, FieldType} from "#shared/gameTypes";
+import {useSocket} from "~/utils/useSocketIO";
+
+const socket = useSocket();
 
 const route = useRoute()
 console.log(route.params.id)
@@ -40,6 +43,8 @@ function initGrid() {
 function click(cord: Cord) {
   console.log(cord);
 }
+
+socket.emit("post-field", JSON.stringify(gridStore.grid));
 
 </script>
 

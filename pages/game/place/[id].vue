@@ -317,7 +317,7 @@ onMounted(() => {
 
 function start() {
   gridStore.grid = grid.value;
-  navigateTo("/game/1")
+  navigateTo(`/game/${route.params.id}`)
 }
 
 </script>
