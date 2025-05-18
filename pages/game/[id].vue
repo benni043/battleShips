@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import SimpleGrid from "~/components/game/SimpleGrid.vue";
-import {type Cell, type Cord, FieldType} from "#shared/gameTypes";
+import {type Cell, type Cord, FieldType, GameError, type HitResponse} from "#shared/gameTypes";
 import {useSocket} from "~/utils/useSocketIO";
+import {GameJoinError} from "#shared/types";
 
 const socket = useSocket();
 
@@ -41,9 +42,29 @@ function initGrid() {
 }
 
 function click(cord: Cord) {
-  console.log(cord);
+  socket.emit("click", cord, hitResponse);
 }
 
+function hitResponse(hitResponse: HitResponse | GameError) {
+  switch (hitResponse) {
+    case GameError.WRONG_PLAYER: {
+      console.error("Dein Gegner ist an der Reihe!");
+      break;
+    }
+    case GameError.INVALID_CORD: {
+      console.error("Ungültige Coordinaten");
+      break;
+    }
+    case GameError.INVALID_ID: {
+      console.error("ID ist falsch");
+      break;
+    }
+    default: {
+      console.log(hitResponse);
+      break;
+    }
+  }
+}
 
 
 </script>

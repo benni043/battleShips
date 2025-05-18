@@ -48,85 +48,85 @@ function initGrid() {
 }
 
 function initShips() {
-  grid.value[0][0].id = 0;
-  grid.value[0][0].color = "green";
-  grid.value[0][0].type = {
-    fieldType: FieldType.SHIP,
-    isHit: false
-  }
-
-  grid.value[0][1].id = 1;
-  grid.value[0][1].color = "green";
-  grid.value[0][1].type = {
-    fieldType: FieldType.SHIP,
-    isHit: false
-  }
-
-  grid.value[1][1].id = 1;
-  grid.value[1][1].color = "green";
-  grid.value[1][1].type = {
-    fieldType: FieldType.SHIP,
-    isHit: false
-  }
-
-  grid.value[1][2].id = 1;
-  grid.value[1][2].color = "green";
-  grid.value[1][2].type = {
-    fieldType: FieldType.SHIP,
-    isHit: false
-  }
-
-  grid.value[2][2].id = 1;
-  grid.value[2][2].color = "green";
-  grid.value[2][2].type = {
-    fieldType: FieldType.SHIP,
-    isHit: false
-  }
-
-  grid.value[6][6].id = 2;
-  grid.value[6][6].color = "green";
-  grid.value[6][6].type = {
-    fieldType: FieldType.SHIP,
-    isHit: false
-  }
-
-  grid.value[5][7].id = 2;
-  grid.value[5][7].color = "green";
-  grid.value[5][7].type = {
-    fieldType: FieldType.SHIP,
-    isHit: false
-  }
-
-  grid.value[6][7].id = 2;
-  grid.value[6][7].color = "green";
-  grid.value[6][7].type = {
-    fieldType: FieldType.SHIP,
-    isHit: false
-  }
-
-  grid.value[6][8].id = 2;
-  grid.value[6][8].color = "green";
-  grid.value[6][8].type = {
-    fieldType: FieldType.SHIP,
-    isHit: false
-  }
-
-  grid.value[7][7].id = 2;
-  grid.value[7][7].color = "green";
-  grid.value[7][7].type = {
-    fieldType: FieldType.SHIP,
-    isHit: false
-  }
+  // grid.value[0][0].id = 0;
+  // grid.value[0][0].color = "green";
+  // grid.value[0][0].type = {
+  //   fieldType: FieldType.SHIP,
+  //   isHit: false
+  // }
+  //
+  // grid.value[0][1].id = 1;
+  // grid.value[0][1].color = "green";
+  // grid.value[0][1].type = {
+  //   fieldType: FieldType.SHIP,
+  //   isHit: false
+  // }
+  //
+  // grid.value[1][1].id = 1;
+  // grid.value[1][1].color = "green";
+  // grid.value[1][1].type = {
+  //   fieldType: FieldType.SHIP,
+  //   isHit: false
+  // }
+  //
+  // grid.value[1][2].id = 1;
+  // grid.value[1][2].color = "green";
+  // grid.value[1][2].type = {
+  //   fieldType: FieldType.SHIP,
+  //   isHit: false
+  // }
+  //
+  // grid.value[2][2].id = 1;
+  // grid.value[2][2].color = "green";
+  // grid.value[2][2].type = {
+  //   fieldType: FieldType.SHIP,
+  //   isHit: false
+  // }
+  //
+  // grid.value[6][6].id = 2;
+  // grid.value[6][6].color = "green";
+  // grid.value[6][6].type = {
+  //   fieldType: FieldType.SHIP,
+  //   isHit: false
+  // }
+  //
+  // grid.value[5][7].id = 2;
+  // grid.value[5][7].color = "green";
+  // grid.value[5][7].type = {
+  //   fieldType: FieldType.SHIP,
+  //   isHit: false
+  // }
+  //
+  // grid.value[6][7].id = 2;
+  // grid.value[6][7].color = "green";
+  // grid.value[6][7].type = {
+  //   fieldType: FieldType.SHIP,
+  //   isHit: false
+  // }
+  //
+  // grid.value[6][8].id = 2;
+  // grid.value[6][8].color = "green";
+  // grid.value[6][8].type = {
+  //   fieldType: FieldType.SHIP,
+  //   isHit: false
+  // }
+  //
+  // grid.value[7][7].id = 2;
+  // grid.value[7][7].color = "green";
+  // grid.value[7][7].type = {
+  //   fieldType: FieldType.SHIP,
+  //   isHit: false
+  // }
 
   grid.value[0][9].id = 3;
-  grid.value[0][9].color = "green";
+  grid.value[0][9].color = "blue";
   grid.value[0][9].type = {
     fieldType: FieldType.SHIP,
     isHit: false
   }
 
   grid.value[1][9].id = 3;
-  grid.value[1][9].color = "green";
+  grid.value[1][9].color = "blue";
   grid.value[1][9].type = {
     fieldType: FieldType.SHIP,
     isHit: false
