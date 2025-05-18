@@ -28,6 +28,7 @@ export class LobbyRepository {
             socketPlayer1: socket,
             socketPlayer2: undefined,
             state: GameState.WAITING,
+            gameName: gameName,
         } as GameLobby);
 
         return gameName;

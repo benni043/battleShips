@@ -32,13 +32,13 @@ export default function handleLobbyEvents(socket: Socket, io: Server) {
         if (game == GameJoinError.FULL) {
             cb(GameJoinError.FULL)
         } else {
+            new GamePresentation(lobbyService.getGameByName(gameName)!);
+
             socket.leave("lobby");
             socket.join(gameName);
 
             cb({gameName: gameName} as GameCreationOrJoinResponse);
             io.to("lobby").emit("remove-game", game);
-
-            new GamePresentation(lobbyService.getGameByName(gameName)!);
         }
     })
 }

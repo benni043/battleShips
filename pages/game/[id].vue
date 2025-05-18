@@ -44,9 +44,7 @@ function click(cord: Cord) {
   console.log(cord);
 }
 
-socket.on("send-field", () => {
-  socket.emit("post-field", JSON.stringify(gridStore.grid));
-})
+
 
 </script>
 

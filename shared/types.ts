@@ -4,6 +4,7 @@ export type GameLobby = {
     socketPlayer1: Socket;
     socketPlayer2: Socket | undefined;
     state: GameState;
+    gameName: string;
 }
 
 export type GameCreationOrJoinResponse = {

@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import {type Cell, FieldType} from "#shared/gameTypes";
 import {useMyGridStore} from "~/stores/myGrid";
+import {useSocket} from "~/utils/useSocketIO";
 
 const route = useRoute()
 console.log(route.params.id)
 
+const socket = useSocket();
+
 const gridStore = useMyGridStore();
+
+const gridSent = ref(false);
 
 const canvasWidth = 400;
 const canvasHeight = 400;
@@ -190,133 +195,152 @@ onMounted(() => {
 
   drawGrid();
 
-  canvas.value!.addEventListener("mousedown", (event) => {
-    //todo does not work
+  canvas.value!.addEventListener("mousedown", mouseDown);
+  canvas.value!.addEventListener("mousemove", mouseMove);
+  canvas.value!.addEventListener("mouseup", mouseUp);
+})
 
-    currentCell = undefined;
-    mouseDownX = undefined;
-    mouseDownY = undefined;
+const mouseDown = (event) => {
+  //todo does not work
 
-    drawGrid();
+  currentCell = undefined;
+  mouseDownX = undefined;
+  mouseDownY = undefined;
 
-    const rect = canvas.value!.getBoundingClientRect();
-    const calcX = event.clientX - rect.left;
-    const calcY = event.clientY - rect.top;
+  drawGrid();
 
-    const x = Math.floor(calcX / cellSize);
-    const y = Math.floor(calcY / cellSize);
+  const rect = canvas.value!.getBoundingClientRect();
+  const calcX = event.clientX - rect.left;
+  const calcY = event.clientY - rect.top;
 
-    mouseDownX = x;
-    mouseDownY = y;
+  const x = Math.floor(calcX / cellSize);
+  const y = Math.floor(calcY / cellSize);
 
-    if (grid.value[x][y].id === undefined) return;
+  mouseDownX = x;
+  mouseDownY = y;
 
-    currentCell = grid.value[x][y];
-  })
+  if (grid.value[x][y].id === undefined) return;
 
-  canvas.value!.addEventListener("mousemove", (event) => {
-    if (currentCell === undefined) return;
+  currentCell = grid.value[x][y];
+}
 
-    const rect = canvas.value!.getBoundingClientRect();
-    const calcX = event.clientX - rect.left;
-    const calcY = event.clientY - rect.top;
 
-    const diffX = (calcX / cellSize - mouseDownX!) - 0.5;
-    const diffY = (calcY / cellSize - mouseDownY!) - 0.5;
+const mouseMove = (event) => {
+  if (currentCell === undefined) return;
 
-    for (let x1 = 0; x1 < gridSize; x1++) {
-      for (let y1 = 0; y1 < gridSize; y1++) {
-        if (grid.value[x1][y1].id !== currentCell.id) continue;
+  const rect = canvas.value!.getBoundingClientRect();
+  const calcX = event.clientX - rect.left;
+  const calcY = event.clientY - rect.top;
 
-        grid.value[x1][y1].x = grid.value[x1][y1].originX + diffX!;
-        grid.value[x1][y1].y = grid.value[x1][y1].originY + diffY!;
+  const diffX = (calcX / cellSize - mouseDownX!) - 0.5;
+  const diffY = (calcY / cellSize - mouseDownY!) - 0.5;
+
+  for (let x1 = 0; x1 < gridSize; x1++) {
+    for (let y1 = 0; y1 < gridSize; y1++) {
+      if (grid.value[x1][y1].id !== currentCell.id) continue;
+
+      grid.value[x1][y1].x = grid.value[x1][y1].originX + diffX!;
+      grid.value[x1][y1].y = grid.value[x1][y1].originY + diffY!;
+    }
+  }
+
+  drawGrid();
+}
+
+const mouseUp = () => {
+  if (currentCell === undefined) return;
+
+  const newPositions: { x: number, y: number }[] = [];
+  let isValidMove = true;
+
+  for (let x = 0; x < gridSize; x++) {
+    for (let y = 0; y < gridSize; y++) {
+      if (grid.value[x][y].id === currentCell.id) {
+        const newX = Math.floor(grid.value[x][y].x + 0.5);
+        const newY = Math.floor(grid.value[x][y].y + 0.5);
+
+        // Check if the new position is within bounds and not occupied by another ship
+        if (
+            newX < 0 || newX >= gridSize ||
+            newY < 0 || newY >= gridSize ||
+            (grid.value[newX][newY].id !== undefined && grid.value[newX][newY].id !== currentCell.id)
+        ) {
+          isValidMove = false;
+          break;
+        }
+
+        newPositions.push({x: newX, y: newY});
       }
     }
+    if (!isValidMove) break;
+  }
 
-    drawGrid();
-  })
-
-  canvas.value!.addEventListener("mouseup", () => {
-    if (currentCell === undefined) return;
-
-    const newPositions: { x: number, y: number }[] = [];
-    let isValidMove = true;
-
+  if (isValidMove) {
+    // Clear old positions
     for (let x = 0; x < gridSize; x++) {
       for (let y = 0; y < gridSize; y++) {
         if (grid.value[x][y].id === currentCell.id) {
-          const newX = Math.floor(grid.value[x][y].x + 0.5);
-          const newY = Math.floor(grid.value[x][y].y + 0.5);
-
-          // Check if the new position is within bounds and not occupied by another ship
-          if (
-              newX < 0 || newX >= gridSize ||
-              newY < 0 || newY >= gridSize ||
-              (grid.value[newX][newY].id !== undefined && grid.value[newX][newY].id !== currentCell.id)
-          ) {
-            isValidMove = false;
-            break;
-          }
-
-          newPositions.push({x: newX, y: newY});
-        }
-      }
-      if (!isValidMove) break;
-    }
-
-    if (isValidMove) {
-      // Clear old positions
-      for (let x = 0; x < gridSize; x++) {
-        for (let y = 0; y < gridSize; y++) {
-          if (grid.value[x][y].id === currentCell.id) {
-            grid.value[x][y] = {
-              type: {
-                fieldType: FieldType.WATER,
-                isHit: false
-              },
-              id: undefined,
-              color: "white",
-              x: x,
-              y: y,
-              originX: x,
-              originY: y,
-            };
-          }
-        }
-      }
-
-      // Assign new positions
-      for (const pos of newPositions) {
-        grid.value[pos.x][pos.y] = {
-          ...currentCell,
-          x: pos.x,
-          y: pos.y,
-          originX: pos.x,
-          originY: pos.y,
-        };
-      }
-    } else {
-      // If move is invalid, reset to original positions
-      for (let x = 0; x < gridSize; x++) {
-        for (let y = 0; y < gridSize; y++) {
-          if (grid.value[x][y].id === currentCell.id) {
-            grid.value[x][y].x = grid.value[x][y].originX;
-            grid.value[x][y].y = grid.value[x][y].originY;
-          }
+          grid.value[x][y] = {
+            type: {
+              fieldType: FieldType.WATER,
+              isHit: false
+            },
+            id: undefined,
+            color: "white",
+            x: x,
+            y: y,
+            originX: x,
+            originY: y,
+          };
         }
       }
     }
 
-    currentCell = undefined;
-    mouseDownX = undefined;
-    mouseDownY = undefined;
+    // Assign new positions
+    for (const pos of newPositions) {
+      grid.value[pos.x][pos.y] = {
+        ...currentCell,
+        x: pos.x,
+        y: pos.y,
+        originX: pos.x,
+        originY: pos.y,
+      };
+    }
+  } else {
+    // If move is invalid, reset to original positions
+    for (let x = 0; x < gridSize; x++) {
+      for (let y = 0; y < gridSize; y++) {
+        if (grid.value[x][y].id === currentCell.id) {
+          grid.value[x][y].x = grid.value[x][y].originX;
+          grid.value[x][y].y = grid.value[x][y].originY;
+        }
+      }
+    }
+  }
 
-    drawGrid();
-  });
-})
+  currentCell = undefined;
+  mouseDownX = undefined;
+  mouseDownY = undefined;
+
+  drawGrid();
+}
 
 function start() {
   gridStore.grid = grid.value;
+  gridSent.value = true;
+
+  canvas.value!.removeEventListener("mousemove", mouseMove)
+  canvas.value!.removeEventListener("mouseup", mouseUp)
+  canvas.value!.removeEventListener("mousedown", mouseDown)
+
+  socket.emit("ready");
+}
+
+socket.on("send-field", () => {
+  socket.emit("post-field", JSON.stringify(gridStore.grid), redirect);
+})
+
+function redirect() {
   navigateTo(`/game/${route.params.id}`)
 }
 
@@ -328,7 +352,7 @@ function start() {
       <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" style="border:1px solid #d3d3d3;"/>
     </div>
 
-    <button @click="start()">startGame</button>
+    <button :disabled="gridSent" @click="start()">startGame</button>
   </div>
 </template>
 
