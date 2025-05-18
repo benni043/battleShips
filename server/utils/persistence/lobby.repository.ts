@@ -1,5 +1,5 @@
-import type {GameLobby} from "~/shared/types";
-import {GameState} from "~/shared/types";
+import type {GameLobby} from "#shared/types";
+import {GameState} from "#shared/types";
 import type {Socket} from "socket.io";
 
 export class LobbyRepository {

@@ -1,6 +1,5 @@
-import {GameCreationError, GameJoinError, type GameLobby} from "~/shared/types";
+import {GameCreationError, GameJoinError, type GameLobby} from "~~/shared/types";
 import type {Socket} from "socket.io";
-import {lobbyRepository} from "~/server/utils/persistence/lobby.repository";
 
 export class LobbyService {
     getAvailableGames() {

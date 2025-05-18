@@ -1,6 +1,5 @@
 import {Server, type ServerOptions, type Socket} from 'socket.io'
 import type {H3Event} from 'h3'
-import registerConnectionHandlers from "~/server/utils/handlers/connection";
 
 const options: Partial<ServerOptions> = {
     path: '/api/socket.io',
