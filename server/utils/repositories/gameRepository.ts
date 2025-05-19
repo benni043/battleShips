@@ -1,8 +1,8 @@
 import type {Cell, Cord} from "#shared/gameTypes";
-import { GameError} from "#shared/gameTypes";
+import {GameError} from "#shared/gameTypes";
 import type {GameLobby} from "#shared/types";
 
-export class Game {
+export class GameRepository {
 
     private gameLobby: GameLobby | undefined;
 
@@ -10,6 +10,15 @@ export class Game {
     private player2Field: Cell[][] = []
 
     private isPlayer1Active = true;
+
+    getGameName() {
+        return this.gameLobby!.gameName!;
+    }
+
+    getOpponentSocket() {
+        if (this.isPlayer1Active) return this.gameLobby!.socketPlayer1;
+        else return this.gameLobby!.socketPlayer2!;
+    }
 
     setGame(game: Cell[][], id: string) {
         if (id === this.gameLobby?.socketPlayer1.id) {
@@ -68,5 +77,3 @@ export class Game {
         return GameError.WRONG_PLAYER;
     }
 }
-
-export const gameRepository = new Game();

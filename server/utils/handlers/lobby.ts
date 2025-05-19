@@ -2,7 +2,7 @@ import type {Server, Socket} from 'socket.io';
 import type {GameCreationOrJoinResponse} from "~~/shared/types";
 import {GameCreationError, GameJoinError} from "~~/shared/types";
 import {lobbyService} from "~~/server/utils/services/lobby";
-import {Game} from "~~/server/utils/handlers/game";
+import {GameHandler} from "~~/server/utils/handlers/gameHandler";
 
 export function handleLobbyEvents(socket: Socket, io: Server) {
     console.log(`User: ${socket.id} connected to lobby`);
@@ -32,7 +32,7 @@ export function handleLobbyEvents(socket: Socket, io: Server) {
         if (game == GameJoinError.FULL) {
             cb(GameJoinError.FULL)
         } else {
-            new Game(lobbyService.getGameByName(gameName)!);
+            new GameHandler(lobbyService.getGameByName(gameName)!);
 
             socket.leave("lobby");
             socket.join(gameName);

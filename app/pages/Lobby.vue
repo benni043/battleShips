@@ -21,7 +21,6 @@ function lobbyCreationResponse(gameCreationResponse: GameCreationOrJoinResponse 
       break;
     }
     default: {
-      console.log(gameCreationResponse);
       navigateTo(`/game/place/${gameCreationResponse.gameName}`)
       break;
     }

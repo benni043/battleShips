@@ -6,7 +6,6 @@ import {useSocket} from "~/utils/useSocketIO";
 const socket = useSocket();
 
 const route = useRoute()
-console.log(route.params.id)
 
 const gridStore = useMyGridStore();
 
@@ -44,6 +43,19 @@ function click(cord: Cord) {
   socket.emit("click", cord, hitResponse);
 }
 
+socket.on("hitResponse", (cord: Cord) => {
+  const x = cord.x;
+  const y = cord.y;
+
+  console.log("response: ")
+  console.log(cord)
+
+  if (myGrid.value[x] && myGrid.value[x][y]) {
+    myGrid.value[x][y].color = "red";
+    myGrid.value[x][y].id = 1;
+  }
+})
+
 function hitResponse(hitResponse: Cell | GameError) {
   switch (hitResponse) {
     case GameError.WRONG_PLAYER: {
@@ -62,13 +74,15 @@ function hitResponse(hitResponse: Cell | GameError) {
       const x = hitResponse.x;
       const y = hitResponse.y;
 
+      console.log("response: ")
+      console.log(hitResponse)
+
       if (opponentsGrid.value[x] && opponentsGrid.value[x][y]) opponentsGrid.value[x][y] = hitResponse;
 
       break;
     }
   }
 }
-
 
 </script>
 

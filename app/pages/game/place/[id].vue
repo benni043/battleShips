@@ -4,7 +4,6 @@ import {useMyGridStore} from "~/stores/myGrid";
 import {useSocket} from "~/utils/useSocketIO";
 
 const route = useRoute()
-console.log(route.params.id)
 
 const socket = useSocket();
 

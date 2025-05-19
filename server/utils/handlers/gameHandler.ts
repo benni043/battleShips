@@ -1,12 +1,14 @@
 import type {Socket} from "socket.io";
 import type {GameLobby} from "#shared/types";
-import type {Cell, Cord} from "#shared/gameTypes";
-import {gameService} from "~~/server/utils/services/game";
+import {Cell, Cord, GameError} from "#shared/gameTypes";
+import {GameService} from "~~/server/utils/services/gameService";
 
-export class Game {
+export class GameHandler {
+
+    gameService: GameService = new GameService();
 
     constructor(game: GameLobby) {
-        gameService.setGameLobby(game);
+        this.gameService.setGameLobby(game);
 
         this.handlePostField(game.socketPlayer1);
         this.handlePostField(game.socketPlayer2!);
@@ -23,7 +25,7 @@ export class Game {
         socket.on("post-field", (grid: string, cb) => {
             const parse: Cell[][] = JSON.parse(grid);
 
-            gameService.setGame(parse, socket.id);
+            this.gameService.setGame(parse, socket.id);
 
             cb();
         })
@@ -31,7 +33,12 @@ export class Game {
 
     handleClick(socket: Socket) {
         socket.on("click", (cord: Cord, cb) => {
-            cb(gameService.handleClick(cord, socket.id));
+            const cell = this.gameService.handleClick(cord, socket.id);
+
+            cb(cell);
+
+            if (cell !== GameError.INVALID_ID && cell !== GameError.INVALID_CORD && cell != GameError.WRONG_PLAYER)
+                this.gameService.getOpponentSocket().emit("hitResponse", cord);
         })
     }
 
