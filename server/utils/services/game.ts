@@ -1,7 +1,7 @@
 import type {Cell, Cord} from "#shared/gameTypes";
 import type {GameLobby} from "#shared/types";
 
-export class GameService {
+export class Game {
 
     setGame(game: Cell[][], id: string) {
         gameRepository.setGame(game, id);
@@ -17,4 +17,4 @@ export class GameService {
 
 }
 
-export const gameService = new GameService();
+export const gameService = new Game();

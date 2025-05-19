@@ -1,7 +1,7 @@
 import {GameCreationError, GameJoinError, type GameLobby} from "~~/shared/types";
 import type {Socket} from "socket.io";
 
-export class LobbyService {
+export class Lobby {
     getAvailableGames() {
         return lobbyRepository.getAvailableGames();
     }
@@ -40,4 +40,4 @@ export class LobbyService {
     }
 }
 
-export const lobbyService = new LobbyService();
+export const lobbyService = new Lobby();

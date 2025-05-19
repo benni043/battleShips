@@ -2,7 +2,7 @@ import type {Socket} from "socket.io";
 import type {GameLobby} from "#shared/types";
 import type {Cell, Cord} from "#shared/gameTypes";
 
-export class GamePresentation {
+export class Game {
 
     constructor(game: GameLobby) {
         gameService.setGameLobby(game);

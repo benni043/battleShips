@@ -1,7 +1,7 @@
 import {Cell, Cord, FieldType, GameError, HitResponse} from "#shared/gameTypes";
 import type {GameLobby} from "#shared/types";
 
-export class GameRepository {
+export class Game {
 
     private gameLobby: GameLobby | undefined;
 
@@ -75,4 +75,4 @@ export class GameRepository {
     }
 }
 
-export const gameRepository = new GameRepository();
+export const gameRepository = new Game();

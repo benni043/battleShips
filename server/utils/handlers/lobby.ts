@@ -30,7 +30,7 @@ export function handleLobbyEvents(socket: Socket, io: Server) {
         if (game == GameJoinError.FULL) {
             cb(GameJoinError.FULL)
         } else {
-            new GamePresentation(lobbyService.getGameByName(gameName)!);
+            new Game(lobbyService.getGameByName(gameName)!);
 
             socket.leave("lobby");
             socket.join(gameName);
