@@ -1,10 +1,8 @@
 import type {Server, Socket} from 'socket.io';
-import {lobbyService} from "~/server/utils/services/lobby.service";
-import type {GameCreationOrJoinResponse} from "~/shared/types";
-import {GameCreationError, GameJoinError} from "~/shared/types";
-import {GamePresentation} from "~/server/utils/handlers/game.presentation";
+import type {GameCreationOrJoinResponse} from "~~/shared/types";
+import {GameCreationError, GameJoinError} from "~~/shared/types";
 
-export default function handleLobbyEvents(socket: Socket, io: Server) {
+export function handleLobbyEvents(socket: Socket, io: Server) {
     console.log(`User: ${socket.id} connected to lobby`);
 
     socket.join("lobby")
