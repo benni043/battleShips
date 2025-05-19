@@ -1,6 +1,8 @@
 import type {Server, Socket} from 'socket.io';
 import type {GameCreationOrJoinResponse} from "~~/shared/types";
 import {GameCreationError, GameJoinError} from "~~/shared/types";
+import {lobbyService} from "~~/server/utils/services/lobby";
+import {Game} from "~~/server/utils/handlers/game";
 
 export function handleLobbyEvents(socket: Socket, io: Server) {
     console.log(`User: ${socket.id} connected to lobby`);
@@ -40,16 +42,3 @@ export function handleLobbyEvents(socket: Socket, io: Server) {
         }
     })
 }
-
-// export class Game {
-//
-//     grid = new Map<string, Lobby>()
-//
-//     constructor(socket: Socket) {
-//         socket.on("click", () => {
-//             "asdf"
-//
-//             this.grid.has("")
-//         })
-//     }
-// }

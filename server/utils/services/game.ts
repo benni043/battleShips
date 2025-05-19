@@ -1,5 +1,6 @@
 import type {Cell, Cord} from "#shared/gameTypes";
 import type {GameLobby} from "#shared/types";
+import {gameRepository} from "~~/server/utils/repositories/game";
 
 export class Game {
 

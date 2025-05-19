@@ -1,6 +1,7 @@
 import type {Socket} from "socket.io";
 import type {GameLobby} from "#shared/types";
 import type {Cell, Cord} from "#shared/gameTypes";
+import {gameService} from "~~/server/utils/services/game";
 
 export class Game {
 
@@ -30,8 +31,6 @@ export class Game {
 
     handleClick(socket: Socket) {
         socket.on("click", (cord: Cord, cb) => {
-            console.log(cord);
-
             cb(gameService.handleClick(cord, socket.id));
         })
     }

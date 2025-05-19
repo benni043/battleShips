@@ -29,21 +29,22 @@ export class Game {
         if (cord.y < 0
             || cord.y >= this.player1Field.length
             || cord.x < 0 || cord.x >= this.player1Field[cord.y].length) {
+
             return GameError.INVALID_CORD;
         }
 
-        let cell;
+        let fieldType;
 
         if (id === this.gameLobby?.socketPlayer1.id) {
-            cell = this.player1Field[cord.y][cord.x];
+            fieldType = this.player2Field[cord.x][cord.y].type.fieldType;
         } else if (id === this.gameLobby?.socketPlayer2?.id) {
-            cell = this.player2Field[cord.y][cord.x];
+            fieldType = this.player1Field[cord.x][cord.y].type.fieldType;
         } else {
             console.error(`Unknown game ID: ${id}`);
             return GameError.INVALID_ID;
         }
 
-        if (cell.type.fieldType === FieldType.SHIP) {
+        if (fieldType === FieldType.SHIP) {
             return FieldType.SHIP;
         } else {
             return FieldType.WATER;

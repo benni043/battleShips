@@ -19,14 +19,14 @@ export interface Cord {
 }
 
 export enum FieldType {
-    SHIP,
-    WATER
+    SHIP = "SHIP",
+    WATER = "WATER",
 }
 
 export enum GameError {
-    WRONG_PLAYER,
-    INVALID_CORD,
-    INVALID_ID,
+    WRONG_PLAYER = "WRONG_PLAYER",
+    INVALID_CORD = "INVALID_CORD",
+    INVALID_ID = "INVALID_ID",
 }
 
 export interface HitResponse {
