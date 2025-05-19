@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import SimpleGrid from "~/components/game/SimpleGrid.vue";
-import {type Cell, type Cord, FieldType, GameError, type HitResponse} from "#shared/gameTypes";
+import {type Cell, type Cord, FieldType, GameError} from "#shared/gameTypes";
 import {useSocket} from "~/utils/useSocketIO";
-import {GameJoinError} from "#shared/types";
 
 const socket = useSocket();
 
@@ -45,7 +44,7 @@ function click(cord: Cord) {
   socket.emit("click", cord, hitResponse);
 }
 
-function hitResponse(hitResponse: HitResponse | GameError) {
+function hitResponse(hitResponse: Cell | GameError) {
   switch (hitResponse) {
     case GameError.WRONG_PLAYER: {
       console.error("Dein Gegner ist an der Reihe!");
@@ -60,7 +59,11 @@ function hitResponse(hitResponse: HitResponse | GameError) {
       break;
     }
     default: {
-      console.log(hitResponse);
+      const x = hitResponse.x;
+      const y = hitResponse.y;
+
+      if (opponentsGrid.value[x] && opponentsGrid.value[x][y]) opponentsGrid.value[x][y] = hitResponse;
+
       break;
     }
   }

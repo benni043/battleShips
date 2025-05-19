@@ -29,7 +29,3 @@ export enum GameError {
     INVALID_ID = "INVALID_ID",
 }
 
-export interface HitResponse {
-    cord: Cord;
-    fieldType: FieldType;
-}

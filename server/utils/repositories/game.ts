@@ -1,4 +1,5 @@
-import {Cell, Cord, FieldType, GameError, HitResponse} from "#shared/gameTypes";
+import type {Cell, Cord} from "#shared/gameTypes";
+import { GameError} from "#shared/gameTypes";
 import type {GameLobby} from "#shared/types";
 
 export class Game {
@@ -33,43 +34,35 @@ export class Game {
             return GameError.INVALID_CORD;
         }
 
-        let fieldType;
-
         if (id === this.gameLobby?.socketPlayer1.id) {
-            fieldType = this.player2Field[cord.x][cord.y].type.fieldType;
+            return this.player2Field[cord.x][cord.y];
         } else if (id === this.gameLobby?.socketPlayer2?.id) {
-            fieldType = this.player1Field[cord.x][cord.y].type.fieldType;
+            return this.player1Field[cord.x][cord.y];
         } else {
             console.error(`Unknown game ID: ${id}`);
             return GameError.INVALID_ID;
-        }
-
-        if (fieldType === FieldType.SHIP) {
-            return FieldType.SHIP;
-        } else {
-            return FieldType.WATER;
         }
     }
 
     handleClick(cord: Cord, id: string) {
         if (id === this.gameLobby!.socketPlayer1.id && this.isPlayer1Active) {
-            const type = this.checkCell(cord, id);
+            const cell = this.checkCell(cord, id);
 
-            if (type === GameError.INVALID_CORD
-                || type === GameError.INVALID_ID) return type;
+            if (cell === GameError.INVALID_CORD
+                || cell === GameError.INVALID_ID) return cell;
 
             this.isPlayer1Active = false;
 
-            return {cord: cord, fieldType: type} as HitResponse;
+            return cell as Cell;
         } else if (id === this.gameLobby!.socketPlayer2?.id && !this.isPlayer1Active) {
-            const type = this.checkCell(cord, id);
+            const cell = this.checkCell(cord, id);
 
-            if (type === GameError.INVALID_CORD
-                || type === GameError.INVALID_ID) return type;
+            if (cell === GameError.INVALID_CORD
+                || cell === GameError.INVALID_ID) return cell;
 
             this.isPlayer1Active = true;
 
-            return {cord: cord, fieldType: type} as HitResponse;
+            return cell as Cell;
         }
 
         return GameError.WRONG_PLAYER;
