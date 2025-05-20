@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from "vue";
-import type { Cell, Cord } from "#shared/gameTypes";
+import {onMounted, ref, type Ref} from "vue";
+import type {Cell, Cord} from "#shared/gameTypes";
 
 const props = defineProps<{
   hasListener: boolean;
@@ -31,24 +31,44 @@ function drawGrid() {
 
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
-      ctx.value!.fillStyle = props.grid[i][j].color;
+      const shipData = props.grid[i]![j]!.shipData;
+
+      if (!shipData) continue;
+
+      ctx.value!.fillStyle = props.grid[i]![j]!.shipData!.color;
       drawShips(i, j);
     }
   }
 }
 
-function drawShips(x: number, y: number) {
+function drawShips(idxX: number, idxY: number) {
   const rows = props.grid.length;
-  const cols = props.grid[0].length;
+  const cols = props.grid[0]!.length;
 
-  const id = props.grid[x][y].id;
+  const shipData = props.grid[idxX]![idxY]!.shipData;
 
-  if (id === undefined) return;
+  if (!shipData) return;
 
-  const hasTopNeighbor = y > 0 && props.grid[x][y - 1].id === id;
-  const hasBottomNeighbor = y < rows - 1 && props.grid[x][y + 1].id === id;
-  const hasLeftNeighbor = x > 0 && props.grid[x - 1][y].id === id;
-  const hasRightNeighbor = x < cols - 1 && props.grid[x + 1][y].id === id;
+  const hasTopNeighbor =
+      idxY > 0 &&
+      props.grid[idxX]?.[idxY - 1]?.shipData &&
+      props.grid[idxX]![idxY - 1]!.shipData!.connectsTo === shipData.connectsTo;
+
+  const hasBottomNeighbor =
+      idxY < rows - 1 &&
+      props.grid[idxX]?.[idxY + 1]?.shipData &&
+      props.grid[idxX]![idxY + 1]!.shipData!.connectsTo === shipData.connectsTo;
+
+  const hasLeftNeighbor =
+      idxX > 0 &&
+      props.grid[idxX - 1]?.[idxY]?.shipData &&
+      props.grid[idxX - 1]![idxY]!.shipData!.connectsTo === shipData.connectsTo;
+
+  const hasRightNeighbor =
+      idxX < cols - 1 &&
+      props.grid[idxX + 1]?.[idxY]?.shipData &&
+      props.grid[idxX + 1]![idxY]!.shipData!.connectsTo === shipData.connectsTo;
+
 
   const leftX = hasLeftNeighbor ? 0 : 5;
   const rightX = hasRightNeighbor ? 0 : 5;
@@ -56,10 +76,10 @@ function drawShips(x: number, y: number) {
   const bottomY = hasBottomNeighbor ? 0 : 5;
 
   ctx.value!.fillRect(
-    x * cellSize + leftX,
-    y * cellSize + topY,
-    cellSize - leftX - rightX,
-    cellSize - topY - bottomY,
+      idxX * cellSize + leftX,
+      idxY * cellSize + topY,
+      cellSize - leftX - rightX,
+      cellSize - topY - bottomY,
   );
 }
 
@@ -71,7 +91,7 @@ function click(event: MouseEvent) {
   const i = Math.floor(x / cellSize);
   const j = Math.floor(y / cellSize);
 
-  emit("clicked", { x: i, y: j } as Cord);
+  emit("clicked", {x: i, y: j} as Cord);
 }
 
 onMounted(() => {
@@ -87,7 +107,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" />
+    <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight"/>
   </div>
 </template>
 
