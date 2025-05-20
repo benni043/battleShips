@@ -25,6 +25,8 @@ function drawGrid() {
 
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
+      ctx.value!.strokeStyle = "black";
+      ctx.value!.lineWidth = 1;
       ctx.value!.strokeRect(i * cellSize, j * cellSize, cellSize, cellSize);
     }
   }
@@ -33,12 +35,33 @@ function drawGrid() {
     for (let j = 0; j < gridSize; j++) {
       const shipData = props.grid[i]![j]!.shipData;
 
-      if (!shipData) continue;
+      if (!shipData) {
+        if (props.grid[i]![j]!.isHit) drawRedCross(i, j);
+        continue
+      }
 
       ctx.value!.fillStyle = props.grid[i]![j]!.shipData!.color;
       drawShips(i, j);
+
+      if (props.grid[i]![j]!.isHit) drawRedCross(i, j);
     }
   }
+}
+
+function drawRedCross(i: number, j: number) {
+  const padding = 5;
+  const x = i * cellSize;
+  const y = j * cellSize;
+
+  ctx.value!.strokeStyle = "red";
+  ctx.value!.lineWidth = 3;
+
+  ctx.value!.beginPath();
+  ctx.value!.moveTo(x + padding, y + padding);
+  ctx.value!.lineTo(x + cellSize - padding, y + cellSize - padding);
+  ctx.value!.moveTo(x + cellSize - padding, y + padding);
+  ctx.value!.lineTo(x + padding, y + cellSize - padding);
+  ctx.value!.stroke();
 }
 
 function drawShips(idxX: number, idxY: number) {

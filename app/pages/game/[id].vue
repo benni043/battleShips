@@ -4,17 +4,13 @@ import {type Cell, type Cord, GameError, type HitResponse} from "#shared/gameTyp
 import {useSocket} from "~/utils/useSocketIO";
 
 const socket = useSocket();
-
 const route = useRoute();
 
 const gridStore = useMyGridStore();
-
 const gridSize = 10;
 
 const myGrid: Ref<Cell[][]> = ref(gridStore.grid);
 const opponentsGrid: Ref<Cell[][]> = ref(initGrid());
-
-console.log(gridStore.grid);
 
 function initGrid() {
   const grid: Cell[][] = [];
@@ -42,12 +38,7 @@ function click(cord: Cord) {
 }
 
 socket.on("hitResponse", (cord: Cord) => {
-  console.log("response: ");
-  console.log(cord);
-
   myGrid.value[cord.x]![cord.y]!.isHit = true;
-
-  console.log(myGrid.value[cord.x]![cord.y])
 });
 
 function hitResponse(hitResponse: HitResponse | GameError) {
@@ -65,14 +56,7 @@ function hitResponse(hitResponse: HitResponse | GameError) {
       break;
     }
     default: {
-      console.log("response: ");
-      console.log(hitResponse);
-
-      opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit = true;
       opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.shipData = hitResponse.shipData;
-
-      console.log(opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y])
-
       break;
     }
   }
