@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, type Ref } from "vue";
-import type { Cell, Cord } from "#shared/gameTypes";
+import {onMounted, ref, watch, type Ref} from "vue";
+import type {Cell, Cord} from "#shared/gameTypes";
 
 const props = defineProps<{
   hasListener: boolean;
@@ -25,6 +25,13 @@ watch(props.grid, () => {
   drawGrid();
 });
 
+watch(
+    () => props.hasListener,
+    (newVal) => {
+      if (!newVal) canvas.value!.removeEventListener("mousedown", click);
+    }
+);
+
 function drawGrid() {
   if (!ctx.value) return;
 
@@ -48,9 +55,9 @@ function drawGrid() {
       if (i === 0) {
         ctx.value.fillStyle = "black";
         ctx.value.fillText(
-          (j + 1).toString(),
-          labelMargin / 2,
-          y + cellSize / 2,
+            (j + 1).toString(),
+            labelMargin / 2,
+            y + cellSize / 2,
         );
       }
 
@@ -94,20 +101,20 @@ function drawShips(idxX: number, idxY: number) {
   if (!shipData) return;
 
   const hasTopNeighbor =
-    idxY > 0 &&
-    props.grid[idxX]?.[idxY - 1]?.shipData?.connectsTo === shipData.connectsTo;
+      idxY > 0 &&
+      props.grid[idxX]?.[idxY - 1]?.shipData?.connectsTo === shipData.connectsTo;
 
   const hasBottomNeighbor =
-    idxY < rows - 1 &&
-    props.grid[idxX]?.[idxY + 1]?.shipData?.connectsTo === shipData.connectsTo;
+      idxY < rows - 1 &&
+      props.grid[idxX]?.[idxY + 1]?.shipData?.connectsTo === shipData.connectsTo;
 
   const hasLeftNeighbor =
-    idxX > 0 &&
-    props.grid[idxX - 1]?.[idxY]?.shipData?.connectsTo === shipData.connectsTo;
+      idxX > 0 &&
+      props.grid[idxX - 1]?.[idxY]?.shipData?.connectsTo === shipData.connectsTo;
 
   const hasRightNeighbor =
-    idxX < cols - 1 &&
-    props.grid[idxX + 1]?.[idxY]?.shipData?.connectsTo === shipData.connectsTo;
+      idxX < cols - 1 &&
+      props.grid[idxX + 1]?.[idxY]?.shipData?.connectsTo === shipData.connectsTo;
 
   const leftX = hasLeftNeighbor ? 0 : 5;
   const rightX = hasRightNeighbor ? 0 : 5;
@@ -115,10 +122,10 @@ function drawShips(idxX: number, idxY: number) {
   const bottomY = hasBottomNeighbor ? 0 : 5;
 
   ctx.value!.fillRect(
-    idxX * cellSize + leftX + labelMargin,
-    idxY * cellSize + topY + labelMargin,
-    cellSize - leftX - rightX,
-    cellSize - topY - bottomY,
+      idxX * cellSize + leftX + labelMargin,
+      idxY * cellSize + topY + labelMargin,
+      cellSize - leftX - rightX,
+      cellSize - topY - bottomY,
   );
 }
 
@@ -149,7 +156,7 @@ function click(event: MouseEvent) {
   const j = Math.floor(y / cellSize);
 
   if (i >= 0 && i < gridSize && j >= 0 && j < gridSize) {
-    emit("clicked", { x: i, y: j } as Cord);
+    emit("clicked", {x: i, y: j} as Cord);
   }
 }
 
@@ -165,7 +172,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" />
+    <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight"/>
   </div>
 </template>
 

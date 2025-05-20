@@ -3,6 +3,7 @@ import SimpleGrid from "~/components/game/SimpleGrid.vue";
 import {
   type Cell,
   type Cord,
+  type GameFinished,
   GameError,
   type HitResponse,
 } from "#shared/gameTypes";
@@ -16,6 +17,8 @@ const gridSize = 10;
 
 const myGrid: Ref<Cell[][]> = ref(gridStore.grid);
 const opponentsGrid: Ref<Cell[][]> = ref(initGrid());
+
+const isGameFinished = ref(false);
 
 function initGrid() {
   const grid: Cell[][] = [];
@@ -39,25 +42,21 @@ function initGrid() {
 }
 
 function click(cord: Cord) {
-  socket.emit("click", cord, hitResponse);
+  socket.emit("click", cord, hitResponseCallBack);
 }
 
-socket.on("hitResponse", (cord: Cord) => {
-  myGrid.value[cord.x]![cord.y]!.isHit = true;
-});
-
-function hitResponse(hitResponse: HitResponse | GameError) {
+function hitResponseCallBack(hitResponse: HitResponse | GameError) {
   switch (hitResponse) {
     case GameError.WRONG_PLAYER: {
-      console.error("Dein Gegner ist an der Reihe!");
+      alert("Dein Gegner ist an der Reihe!");
       break;
     }
     case GameError.INVALID_CORD: {
-      console.error("Ungültige Coordinaten");
+      alert("Ungültige Coordinaten");
       break;
     }
-    case GameError.INVALID_ID: {
-      console.error("ID ist falsch");
+    case GameError.ALREADY_HIT: {
+      alert("Auf dieses Feld hast du bereits geschossen");
       break;
     }
     default: {
@@ -69,11 +68,32 @@ function hitResponse(hitResponse: HitResponse | GameError) {
     }
   }
 }
+
+function leave() {
+  console.log("leave");
+  socket.emit("leave");
+  navigateTo(`/`);
+}
+
+socket.on("hit-response", (cord: Cord) => {
+  myGrid.value[cord.x]![cord.y]!.isHit = true;
+});
+
+socket.on("game-finished", (gameFinished: GameFinished) => {
+  isGameFinished.value = true;
+  console.log(gameFinished);
+});
 </script>
 
 <template>
   <div>
     <h1>game {{ route.params.id }}</h1>
+    <button
+      class="mt-1 cursor-pointer rounded border-1 bg-red-500 px-1 hover:bg-gray-300"
+      @click="leave()"
+    >
+      Leave
+    </button>
 
     <div id="fields">
       <div class="grid-container">
@@ -88,7 +108,7 @@ function hitResponse(hitResponse: HitResponse | GameError) {
 
           <SimpleGrid
             :grid="opponentsGrid"
-            :has-listener="true"
+            :has-listener="!isGameFinished"
             @clicked="(args) => click(args)"
           />
         </div>
