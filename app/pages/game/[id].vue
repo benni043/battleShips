@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import SimpleGrid from "~/components/game/SimpleGrid.vue";
-import {type Cell, type Cord, FieldType, GameError} from "#shared/gameTypes";
-import {useSocket} from "~/utils/useSocketIO";
+import { type Cell, type Cord, FieldType, GameError } from "#shared/gameTypes";
+import { useSocket } from "~/utils/useSocketIO";
 
 const socket = useSocket();
 
-const route = useRoute()
+const route = useRoute();
 
 const gridStore = useMyGridStore();
 
@@ -24,7 +24,7 @@ function initGrid() {
       grid[x][y] = {
         type: {
           fieldType: FieldType.WATER,
-          isHit: false
+          isHit: false,
         },
         id: undefined,
         color: "white",
@@ -32,7 +32,7 @@ function initGrid() {
         y: y,
         originX: x,
         originY: y,
-      }
+      };
     }
   }
 
@@ -47,14 +47,14 @@ socket.on("hitResponse", (cord: Cord) => {
   const x = cord.x;
   const y = cord.y;
 
-  console.log("response: ")
-  console.log(cord)
+  console.log("response: ");
+  console.log(cord);
 
   if (myGrid.value[x] && myGrid.value[x][y]) {
     myGrid.value[x][y].color = "red";
     myGrid.value[x][y].id = 1;
   }
-})
+});
 
 function hitResponse(hitResponse: Cell | GameError) {
   switch (hitResponse) {
@@ -74,16 +74,16 @@ function hitResponse(hitResponse: Cell | GameError) {
       const x = hitResponse.x;
       const y = hitResponse.y;
 
-      console.log("response: ")
-      console.log(hitResponse)
+      console.log("response: ");
+      console.log(hitResponse);
 
-      if (opponentsGrid.value[x] && opponentsGrid.value[x][y]) opponentsGrid.value[x][y] = hitResponse;
+      if (opponentsGrid.value[x] && opponentsGrid.value[x][y])
+        opponentsGrid.value[x][y] = hitResponse;
 
       break;
     }
   }
 }
-
 </script>
 
 <template>
@@ -95,19 +95,21 @@ function hitResponse(hitResponse: Cell | GameError) {
         <div class="player-grid">
           <h3>Player1</h3>
 
-          <SimpleGrid :grid="myGrid" :has-listener="false"/>
+          <SimpleGrid :grid="myGrid" :has-listener="false" />
         </div>
 
         <div class="player-grid">
           <h3>Player2</h3>
 
-          <SimpleGrid :grid="opponentsGrid" :has-listener="true" @clicked="args => click(args)"/>
+          <SimpleGrid
+            :grid="opponentsGrid"
+            :has-listener="true"
+            @clicked="(args) => click(args)"
+          />
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
