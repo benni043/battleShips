@@ -2,11 +2,11 @@
 import SimpleGrid from "~/components/game/SimpleGrid.vue";
 import {
   type Cell,
-  type Cord,
+  type Cord, type GameFinished,
   GameError,
   type HitResponse,
 } from "#shared/gameTypes";
-import { useSocket } from "~/utils/useSocketIO";
+import {useSocket} from "~/utils/useSocketIO";
 
 const socket = useSocket();
 const route = useRoute();
@@ -16,6 +16,8 @@ const gridSize = 10;
 
 const myGrid: Ref<Cell[][]> = ref(gridStore.grid);
 const opponentsGrid: Ref<Cell[][]> = ref(initGrid());
+
+let isGameFinished = ref(false);
 
 function initGrid() {
   const grid: Cell[][] = [];
@@ -39,14 +41,10 @@ function initGrid() {
 }
 
 function click(cord: Cord) {
-  socket.emit("click", cord, hitResponse);
+  socket.emit("click", cord, hitResponseCallBack);
 }
 
-socket.on("hitResponse", (cord: Cord) => {
-  myGrid.value[cord.x]![cord.y]!.isHit = true;
-});
-
-function hitResponse(hitResponse: HitResponse | GameError) {
+function hitResponseCallBack(hitResponse: HitResponse | GameError) {
   switch (hitResponse) {
     case GameError.WRONG_PLAYER: {
       console.error("Dein Gegner ist an der Reihe!");
@@ -62,13 +60,22 @@ function hitResponse(hitResponse: HitResponse | GameError) {
     }
     default: {
       opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit =
-        true;
+          true;
       opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.shipData =
-        hitResponse.shipData;
+          hitResponse.shipData;
       break;
     }
   }
 }
+
+socket.on("hit-response", (cord: Cord) => {
+  myGrid.value[cord.x]![cord.y]!.isHit = true;
+});
+
+socket.on("game-finished", (gameFinished: GameFinished) => {
+  isGameFinished.value = true;
+  console.log(gameFinished);
+})
 </script>
 
 <template>
@@ -80,16 +87,16 @@ function hitResponse(hitResponse: HitResponse | GameError) {
         <div class="player-grid">
           <h3>Player1</h3>
 
-          <SimpleGrid :grid="myGrid" :has-listener="false" />
+          <SimpleGrid :grid="myGrid" :has-listener="false"/>
         </div>
 
         <div class="player-grid">
           <h3>Player2</h3>
 
           <SimpleGrid
-            :grid="opponentsGrid"
-            :has-listener="true"
-            @clicked="(args) => click(args)"
+              :grid="opponentsGrid"
+              :has-listener="!isGameFinished"
+              @clicked="(args) => click(args)"
           />
         </div>
       </div>
