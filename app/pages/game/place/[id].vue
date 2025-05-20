@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type {Cell, ShipData} from "#shared/gameTypes";
-import {useMyGridStore} from "~/stores/myGrid";
-import {useSocket} from "~/utils/useSocketIO";
+import type { Cell, ShipData } from "#shared/gameTypes";
+import { useMyGridStore } from "~/stores/myGrid";
+import { useSocket } from "~/utils/useSocketIO";
 
 const route = useRoute();
 
@@ -45,19 +45,18 @@ function initGrid() {
 function initShips() {
   const ship1Data = {
     connectsTo: 1,
-    color: "blue"
+    color: "blue",
   } as ShipData;
 
-  grid.value[0]![0]!.shipData = ship1Data
+  grid.value[0]![0]!.shipData = ship1Data;
   grid.value[0]![1]!.shipData = ship1Data;
-
 
   const ship2Data = {
     connectsTo: 2,
-    color: "green"
+    color: "green",
   } as ShipData;
 
-  grid.value[5]![4]!.shipData = ship2Data
+  grid.value[5]![4]!.shipData = ship2Data;
   grid.value[5]![5]!.shipData = ship2Data;
   grid.value[5]![6]!.shipData = ship2Data;
   grid.value[4]![5]!.shipData = ship2Data;
@@ -92,7 +91,10 @@ function drawGrid() {
 
     for (let x = 0; x < gridSize; x++) {
       for (let y = 0; y < gridSize; y++) {
-        if (grid.value[x]?.[y]?.shipData?.connectsTo === currentCell.shipData?.connectsTo) {
+        if (
+          grid.value[x]?.[y]?.shipData?.connectsTo ===
+          currentCell.shipData?.connectsTo
+        ) {
           drawShip(x, y, grid.value[x]![y]!.x, grid.value[x]![y]!.y);
         }
       }
@@ -109,25 +111,24 @@ function drawShip(idxX: number, idxY: number, x: number, y: number) {
   if (!shipData) return;
 
   const hasTopNeighbor =
-      idxY > 0 &&
-      grid.value[idxX]?.[idxY - 1]?.shipData &&
-      grid.value[idxX]![idxY - 1]!.shipData!.connectsTo === shipData.connectsTo;
+    idxY > 0 &&
+    grid.value[idxX]?.[idxY - 1]?.shipData &&
+    grid.value[idxX]![idxY - 1]!.shipData!.connectsTo === shipData.connectsTo;
 
   const hasBottomNeighbor =
-      idxY < rows - 1 &&
-      grid.value[idxX]?.[idxY + 1]?.shipData &&
-      grid.value[idxX]![idxY + 1]!.shipData!.connectsTo === shipData.connectsTo;
+    idxY < rows - 1 &&
+    grid.value[idxX]?.[idxY + 1]?.shipData &&
+    grid.value[idxX]![idxY + 1]!.shipData!.connectsTo === shipData.connectsTo;
 
   const hasLeftNeighbor =
-      idxX > 0 &&
-      grid.value[idxX - 1]?.[idxY]?.shipData &&
-      grid.value[idxX - 1]![idxY]!.shipData!.connectsTo === shipData.connectsTo;
+    idxX > 0 &&
+    grid.value[idxX - 1]?.[idxY]?.shipData &&
+    grid.value[idxX - 1]![idxY]!.shipData!.connectsTo === shipData.connectsTo;
 
   const hasRightNeighbor =
-      idxX < cols - 1 &&
-      grid.value[idxX + 1]?.[idxY]?.shipData &&
-      grid.value[idxX + 1]![idxY]!.shipData!.connectsTo === shipData.connectsTo;
-
+    idxX < cols - 1 &&
+    grid.value[idxX + 1]?.[idxY]?.shipData &&
+    grid.value[idxX + 1]![idxY]!.shipData!.connectsTo === shipData.connectsTo;
 
   const leftX = hasLeftNeighbor ? 0 : 5;
   const rightX = hasRightNeighbor ? 0 : 5;
@@ -135,10 +136,10 @@ function drawShip(idxX: number, idxY: number, x: number, y: number) {
   const bottomY = hasBottomNeighbor ? 0 : 5;
 
   ctx.value!.fillRect(
-      x * cellSize + leftX,
-      y * cellSize + topY,
-      cellSize - leftX - rightX,
-      cellSize - topY - bottomY,
+    x * cellSize + leftX,
+    y * cellSize + topY,
+    cellSize - leftX - rightX,
+    cellSize - topY - bottomY,
   );
 }
 
@@ -155,7 +156,7 @@ onMounted(() => {
   canvas.value!.addEventListener("mouseup", mouseUp);
 });
 
-const mouseDown = (event) => {
+const mouseDown = (event: MouseEvent) => {
   //todo does not work
 
   currentCell = undefined;
@@ -179,7 +180,7 @@ const mouseDown = (event) => {
   currentCell = grid.value[x]![y];
 };
 
-const mouseMove = (event) => {
+const mouseMove = (event: MouseEvent) => {
   if (!currentCell) return;
 
   const rect = canvas.value!.getBoundingClientRect();
@@ -191,7 +192,11 @@ const mouseMove = (event) => {
 
   for (let x1 = 0; x1 < gridSize; x1++) {
     for (let y1 = 0; y1 < gridSize; y1++) {
-      if (grid.value[x1]?.[y1]?.shipData?.connectsTo !== currentCell.shipData?.connectsTo) continue;
+      if (
+        grid.value[x1]?.[y1]?.shipData?.connectsTo !==
+        currentCell.shipData?.connectsTo
+      )
+        continue;
 
       grid.value[x1]![y1]!.x = grid.value[x1]![y1]!.originX + diffX!;
       grid.value[x1]![y1]!.y = grid.value[x1]![y1]!.originY + diffY!;
@@ -209,25 +214,28 @@ const mouseUp = () => {
 
   for (let x = 0; x < gridSize; x++) {
     for (let y = 0; y < gridSize; y++) {
-      if (grid.value[x]?.[y]?.shipData?.connectsTo === currentCell.shipData?.connectsTo) {
-
+      if (
+        grid.value[x]?.[y]?.shipData?.connectsTo ===
+        currentCell.shipData?.connectsTo
+      ) {
         const newX = Math.floor(grid.value[x]![y]!.x + 0.5);
         const newY = Math.floor(grid.value[x]![y]!.y + 0.5);
 
         // Check if the new position is within bounds and not occupied by another ship
         if (
-            newX < 0 ||
-            newX >= gridSize ||
-            newY < 0 ||
-            newY >= gridSize ||
-            (grid.value[newX]![newY]!.shipData !== undefined &&
-                grid.value[newX]![newY]!.shipData!.connectsTo !== currentCell.shipData!.connectsTo)
+          newX < 0 ||
+          newX >= gridSize ||
+          newY < 0 ||
+          newY >= gridSize ||
+          (grid.value[newX]![newY]!.shipData !== undefined &&
+            grid.value[newX]![newY]!.shipData!.connectsTo !==
+              currentCell.shipData!.connectsTo)
         ) {
           isValidMove = false;
           break;
         }
 
-        newPositions.push({x: newX, y: newY});
+        newPositions.push({ x: newX, y: newY });
       }
     }
     if (!isValidMove) break;
@@ -237,8 +245,10 @@ const mouseUp = () => {
     // Clear old positions
     for (let x = 0; x < gridSize; x++) {
       for (let y = 0; y < gridSize; y++) {
-        if (grid.value[x]?.[y]?.shipData?.connectsTo === currentCell.shipData?.connectsTo) {
-
+        if (
+          grid.value[x]?.[y]?.shipData?.connectsTo ===
+          currentCell.shipData?.connectsTo
+        ) {
           grid.value[x]![y] = {
             shipData: undefined,
             isHit: false,
@@ -265,8 +275,10 @@ const mouseUp = () => {
     // If move is invalid, reset to original positions
     for (let x = 0; x < gridSize; x++) {
       for (let y = 0; y < gridSize; y++) {
-        if (grid.value[x]?.[y]?.shipData?.connectsTo === currentCell.shipData?.connectsTo) {
-
+        if (
+          grid.value[x]?.[y]?.shipData?.connectsTo ===
+          currentCell.shipData?.connectsTo
+        ) {
           grid.value[x]![y]!.x = grid.value[x]![y]!.originX;
           grid.value[x]![y]!.y = grid.value[x]![y]!.originY;
         }
@@ -305,10 +317,10 @@ function redirect() {
   <div>
     <div>
       <canvas
-          ref="canvas"
-          :width="canvasWidth"
-          :height="canvasHeight"
-          style="border: 1px solid #d3d3d3"
+        ref="canvas"
+        :width="canvasWidth"
+        :height="canvasHeight"
+        style="border: 1px solid #d3d3d3"
       />
     </div>
 

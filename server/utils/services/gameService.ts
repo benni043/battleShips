@@ -1,6 +1,6 @@
-import type {Cell, Cord} from "#shared/gameTypes";
-import type {GameLobby} from "#shared/types";
-import {GameRepository} from "~~/server/utils/repositories/gameRepository";
+import type { Cell, Cord } from "#shared/gameTypes";
+import type { GameLobby } from "#shared/types";
+import { GameRepository } from "~~/server/utils/repositories/gameRepository";
 
 export class GameService {
   gameRepository: GameRepository = new GameRepository();

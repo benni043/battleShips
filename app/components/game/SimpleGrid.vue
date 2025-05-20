@@ -47,7 +47,11 @@ function drawGrid() {
       // Linke Zahlenachse (1–10)
       if (i === 0) {
         ctx.value.fillStyle = "black";
-        ctx.value.fillText((j + 1).toString(), labelMargin / 2, y + cellSize / 2);
+        ctx.value.fillText(
+          (j + 1).toString(),
+          labelMargin / 2,
+          y + cellSize / 2,
+        );
       }
 
       // Obere Buchstabenachse (A–J)
@@ -90,20 +94,20 @@ function drawShips(idxX: number, idxY: number) {
   if (!shipData) return;
 
   const hasTopNeighbor =
-      idxY > 0 &&
-      props.grid[idxX]?.[idxY - 1]?.shipData?.connectsTo === shipData.connectsTo;
+    idxY > 0 &&
+    props.grid[idxX]?.[idxY - 1]?.shipData?.connectsTo === shipData.connectsTo;
 
   const hasBottomNeighbor =
-      idxY < rows - 1 &&
-      props.grid[idxX]?.[idxY + 1]?.shipData?.connectsTo === shipData.connectsTo;
+    idxY < rows - 1 &&
+    props.grid[idxX]?.[idxY + 1]?.shipData?.connectsTo === shipData.connectsTo;
 
   const hasLeftNeighbor =
-      idxX > 0 &&
-      props.grid[idxX - 1]?.[idxY]?.shipData?.connectsTo === shipData.connectsTo;
+    idxX > 0 &&
+    props.grid[idxX - 1]?.[idxY]?.shipData?.connectsTo === shipData.connectsTo;
 
   const hasRightNeighbor =
-      idxX < cols - 1 &&
-      props.grid[idxX + 1]?.[idxY]?.shipData?.connectsTo === shipData.connectsTo;
+    idxX < cols - 1 &&
+    props.grid[idxX + 1]?.[idxY]?.shipData?.connectsTo === shipData.connectsTo;
 
   const leftX = hasLeftNeighbor ? 0 : 5;
   const rightX = hasRightNeighbor ? 0 : 5;
@@ -111,10 +115,10 @@ function drawShips(idxX: number, idxY: number) {
   const bottomY = hasBottomNeighbor ? 0 : 5;
 
   ctx.value!.fillRect(
-      idxX * cellSize + leftX + labelMargin,
-      idxY * cellSize + topY + labelMargin,
-      cellSize - leftX - rightX,
-      cellSize - topY - bottomY
+    idxX * cellSize + leftX + labelMargin,
+    idxY * cellSize + topY + labelMargin,
+    cellSize - leftX - rightX,
+    cellSize - topY - bottomY,
   );
 }
 
