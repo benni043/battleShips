@@ -19,11 +19,11 @@ function lobbyCreationResponse(
 ) {
   switch (gameCreationResponse) {
     case GameCreationError.ALREADY_TAKEN: {
-      console.error("Dieser Lobbyname wird bereits verwendet!");
+      alert("Dieser Lobbyname wird bereits verwendet!");
       break;
     }
     case GameCreationError.INVALID: {
-      console.error("Dieser Lobbyname ist nicht erlaubt!");
+      alert("Dieser Lobbyname ist nicht erlaubt!");
       break;
     }
     default: {
@@ -42,11 +42,10 @@ function gameJoinResponse(
 ) {
   switch (gameJoinResponse) {
     case GameJoinError.FULL: {
-      console.error("Dieses Spiel ist bereits voll!");
+      alert("Dieses Spiel ist bereits voll!");
       break;
     }
     default: {
-      console.log(gameJoinResponse);
       navigateTo(`/game/place/${gameJoinResponse.gameName}`);
       break;
     }

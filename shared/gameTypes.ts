@@ -17,6 +17,11 @@ export interface Cord {
     y: number;
 }
 
+export interface Hit {
+    shipData: ShipData | undefined;
+    gameFinished: boolean;
+}
+
 export interface HitResponse {
     cord: Cord;
     shipData: ShipData | undefined;
@@ -25,7 +30,7 @@ export interface HitResponse {
 export enum GameError {
     WRONG_PLAYER = "WRONG_PLAYER",
     INVALID_CORD = "INVALID_CORD",
-    INVALID_ID = "INVALID_ID",
+    ALREADY_HIT = "ALREADY_HIT",
 }
 
 export interface GameFinished {
