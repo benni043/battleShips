@@ -29,7 +29,12 @@ function handleSubmit(gameName: string) {
 <template>
   <div>
     <div v-for="game in games" :key="game">
-      <button @click="handleSubmit(game)">{{ game }}</button>
+      <button
+        class="mt-1 cursor-pointer rounded border-1 px-1 hover:bg-gray-300"
+        @click="handleSubmit(game)"
+      >
+        {{ game }}
+      </button>
     </div>
   </div>
 </template>
