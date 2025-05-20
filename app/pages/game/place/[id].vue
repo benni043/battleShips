@@ -312,7 +312,13 @@ function redirect() {
       />
     </div>
 
-    <button :disabled="gridSent" @click="start()">startGame</button>
+    <button
+      class="mt-1 rounded border-1 px-1 not-disabled:cursor-pointer hover:bg-gray-300 disabled:bg-green-500"
+      :disabled="gridSent"
+      @click="start()"
+    >
+      startGame
+    </button>
   </div>
 </template>
 

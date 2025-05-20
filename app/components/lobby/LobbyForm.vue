@@ -24,20 +24,26 @@ function handleSubmit() {
 
 <template>
   <form @submit.prevent="handleSubmit">
-    <h2>Lobby erstellen</h2>
+    <h2 class="pb-2 text-2xl">Lobby erstellen</h2>
 
-    <div>
-      <label for="lobbyName">Lobby-Name</label>
+    <div class="flex flex-col">
+      <label class="text-neutral-600" for="lobbyName">Lobby-Name</label>
       <input
         id="lobbyName"
         v-model="lobbyName"
+        class="w-min border-1"
         type="text"
         placeholder="z.B. MeineLobby123"
       />
-      <p v-if="error">{{ error }}</p>
+      <p v-if="error" class="text-sm text-red-800">{{ error }}</p>
     </div>
 
-    <button type="submit">Erstellen</button>
+    <button
+      class="mt-1 cursor-pointer rounded border-1 px-1 hover:bg-gray-300"
+      type="submit"
+    >
+      Erstellen
+    </button>
   </form>
 </template>
 
