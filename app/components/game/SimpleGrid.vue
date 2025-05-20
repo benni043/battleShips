@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from "vue";
+import { onMounted, ref, watch, type Ref } from "vue";
 import type { Cell, Cord } from "#shared/gameTypes";
 
 const props = defineProps<{
@@ -7,48 +7,103 @@ const props = defineProps<{
   grid: Cell[][];
 }>();
 
+const emit = defineEmits(["clicked"]);
+
+// Grid und Canvas-Einstellungen
+const gridSize = 10;
+const labelMargin = 20;
+const baseSize = 400;
+const canvasWidth = baseSize + labelMargin;
+const canvasHeight = baseSize + labelMargin;
+const cellSize = baseSize / gridSize;
+
+const canvas: Ref<HTMLCanvasElement | null> = ref(null);
+const ctx: Ref<CanvasRenderingContext2D | null> = ref(null);
+
+// Zeichne Grid, wenn sich Grid ändert
 watch(props.grid, () => {
   drawGrid();
 });
 
-const emit = defineEmits(["clicked"]);
-
-const canvasWidth = 400;
-const canvasHeight = 400;
-const gridSize = 10;
-const cellSize = canvasHeight / gridSize;
-const canvas: Ref<HTMLCanvasElement | null> = ref(null);
-const ctx: Ref<CanvasRenderingContext2D | null> = ref(null);
-
 function drawGrid() {
-  ctx.value!.clearRect(0, 0, canvasWidth, canvasHeight);
+  if (!ctx.value) return;
 
+  ctx.value.clearRect(0, 0, canvasWidth, canvasHeight);
+
+  ctx.value.font = "14px sans-serif";
+  ctx.value.textAlign = "center";
+  ctx.value.textBaseline = "middle";
+
+  // Grid & Achsenbeschriftungen
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
-      ctx.value!.strokeRect(i * cellSize, j * cellSize, cellSize, cellSize);
+      const x = i * cellSize + labelMargin;
+      const y = j * cellSize + labelMargin;
+
+      ctx.value.strokeStyle = "black";
+      ctx.value.lineWidth = 1;
+      ctx.value.strokeRect(x, y, cellSize, cellSize);
+
+      // Linke Zahlenachse (1–10)
+      if (i === 0) {
+        ctx.value.fillStyle = "black";
+        ctx.value.fillText((j + 1).toString(), labelMargin / 2, y + cellSize / 2);
+      }
+
+      // Obere Buchstabenachse (A–J)
+      if (j === 0) {
+        ctx.value.fillStyle = "black";
+        const char = String.fromCharCode(65 + i); // 'A' = 65
+        ctx.value.fillText(char, x + cellSize / 2, labelMargin / 2);
+      }
     }
   }
 
+  // Schiffe & Treffer einzeichnen
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
-      ctx.value!.fillStyle = props.grid[i][j].color;
+      const cell = props.grid[i]?.[j];
+      if (!cell) continue;
+
+      const shipData = cell.shipData;
+
+      if (!shipData) {
+        if (cell.isHit) drawRedCross(i, j);
+        continue;
+      }
+
+      ctx.value.fillStyle = shipData.color;
       drawShips(i, j);
+
+      if (cell.isHit && !props.hasListener) {
+        drawRedCross(i, j);
+      }
     }
   }
 }
 
-function drawShips(x: number, y: number) {
+function drawShips(idxX: number, idxY: number) {
   const rows = props.grid.length;
-  const cols = props.grid[0].length;
+  const cols = props.grid[0]?.length ?? 0;
 
-  const id = props.grid[x][y].id;
+  const shipData = props.grid[idxX]?.[idxY]?.shipData;
+  if (!shipData) return;
 
-  if (id === undefined) return;
+  const hasTopNeighbor =
+      idxY > 0 &&
+      props.grid[idxX]?.[idxY - 1]?.shipData?.connectsTo === shipData.connectsTo;
 
-  const hasTopNeighbor = y > 0 && props.grid[x][y - 1].id === id;
-  const hasBottomNeighbor = y < rows - 1 && props.grid[x][y + 1].id === id;
-  const hasLeftNeighbor = x > 0 && props.grid[x - 1][y].id === id;
-  const hasRightNeighbor = x < cols - 1 && props.grid[x + 1][y].id === id;
+  const hasBottomNeighbor =
+      idxY < rows - 1 &&
+      props.grid[idxX]?.[idxY + 1]?.shipData?.connectsTo === shipData.connectsTo;
+
+  const hasLeftNeighbor =
+      idxX > 0 &&
+      props.grid[idxX - 1]?.[idxY]?.shipData?.connectsTo === shipData.connectsTo;
+
+  const hasRightNeighbor =
+      idxX < cols - 1 &&
+      props.grid[idxX + 1]?.[idxY]?.shipData?.connectsTo === shipData.connectsTo;
 
   const leftX = hasLeftNeighbor ? 0 : 5;
   const rightX = hasRightNeighbor ? 0 : 5;
@@ -56,32 +111,51 @@ function drawShips(x: number, y: number) {
   const bottomY = hasBottomNeighbor ? 0 : 5;
 
   ctx.value!.fillRect(
-    x * cellSize + leftX,
-    y * cellSize + topY,
-    cellSize - leftX - rightX,
-    cellSize - topY - bottomY,
+      idxX * cellSize + leftX + labelMargin,
+      idxY * cellSize + topY + labelMargin,
+      cellSize - leftX - rightX,
+      cellSize - topY - bottomY
   );
+}
+
+function drawRedCross(i: number, j: number) {
+  if (!ctx.value) return;
+
+  const padding = 5;
+  const x = i * cellSize + labelMargin;
+  const y = j * cellSize + labelMargin;
+
+  ctx.value.strokeStyle = "red";
+  ctx.value.lineWidth = 3;
+
+  ctx.value.beginPath();
+  ctx.value.moveTo(x + padding, y + padding);
+  ctx.value.lineTo(x + cellSize - padding, y + cellSize - padding);
+  ctx.value.moveTo(x + cellSize - padding, y + padding);
+  ctx.value.lineTo(x + padding, y + cellSize - padding);
+  ctx.value.stroke();
 }
 
 function click(event: MouseEvent) {
   const rect = canvas.value!.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+  const x = event.clientX - rect.left - labelMargin;
+  const y = event.clientY - rect.top - labelMargin;
 
   const i = Math.floor(x / cellSize);
   const j = Math.floor(y / cellSize);
 
-  emit("clicked", { x: i, y: j } as Cord);
+  if (i >= 0 && i < gridSize && j >= 0 && j < gridSize) {
+    emit("clicked", { x: i, y: j } as Cord);
+  }
 }
 
 onMounted(() => {
   ctx.value = canvas.value!.getContext("2d");
-
   drawGrid();
 
-  if (!props.hasListener) return;
-
-  canvas.value!.addEventListener("mousedown", click);
+  if (props.hasListener) {
+    canvas.value!.addEventListener("mousedown", click);
+  }
 });
 </script>
 
@@ -93,6 +167,6 @@ onMounted(() => {
 
 <style scoped>
 canvas {
-  border: 1px solid #d3d3d3;
+  display: block;
 }
 </style>

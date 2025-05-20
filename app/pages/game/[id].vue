@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import SimpleGrid from "~/components/game/SimpleGrid.vue";
-import { type Cell, type Cord, FieldType, GameError } from "#shared/gameTypes";
-import { useSocket } from "~/utils/useSocketIO";
+import {type Cell, type Cord, GameError, type HitResponse} from "#shared/gameTypes";
+import {useSocket} from "~/utils/useSocketIO";
 
 const socket = useSocket();
-
 const route = useRoute();
 
 const gridStore = useMyGridStore();
-
 const gridSize = 10;
 
 const myGrid: Ref<Cell[][]> = ref(gridStore.grid);
@@ -18,21 +16,17 @@ function initGrid() {
   const grid: Cell[][] = [];
 
   for (let x = 0; x < gridSize; x++) {
-    grid[x] = [];
+    grid.push([]);
 
     for (let y = 0; y < gridSize; y++) {
-      grid[x][y] = {
-        type: {
-          fieldType: FieldType.WATER,
-          isHit: false,
-        },
-        id: undefined,
-        color: "white",
+      grid[x]!.push({
+        shipData: undefined,
+        isHit: false,
         x: x,
         y: y,
         originX: x,
         originY: y,
-      };
+      } as Cell);
     }
   }
 
@@ -44,19 +38,10 @@ function click(cord: Cord) {
 }
 
 socket.on("hitResponse", (cord: Cord) => {
-  const x = cord.x;
-  const y = cord.y;
-
-  console.log("response: ");
-  console.log(cord);
-
-  if (myGrid.value[x] && myGrid.value[x][y]) {
-    myGrid.value[x][y].color = "red";
-    myGrid.value[x][y].id = 1;
-  }
+  myGrid.value[cord.x]![cord.y]!.isHit = true;
 });
 
-function hitResponse(hitResponse: Cell | GameError) {
+function hitResponse(hitResponse: HitResponse | GameError) {
   switch (hitResponse) {
     case GameError.WRONG_PLAYER: {
       console.error("Dein Gegner ist an der Reihe!");
@@ -71,15 +56,8 @@ function hitResponse(hitResponse: Cell | GameError) {
       break;
     }
     default: {
-      const x = hitResponse.x;
-      const y = hitResponse.y;
-
-      console.log("response: ");
-      console.log(hitResponse);
-
-      if (opponentsGrid.value[x] && opponentsGrid.value[x][y])
-        opponentsGrid.value[x][y] = hitResponse;
-
+      opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit = true;
+      opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.shipData = hitResponse.shipData;
       break;
     }
   }
@@ -95,16 +73,16 @@ function hitResponse(hitResponse: Cell | GameError) {
         <div class="player-grid">
           <h3>Player1</h3>
 
-          <SimpleGrid :grid="myGrid" :has-listener="false" />
+          <SimpleGrid :grid="myGrid" :has-listener="false"/>
         </div>
 
         <div class="player-grid">
           <h3>Player2</h3>
 
           <SimpleGrid
-            :grid="opponentsGrid"
-            :has-listener="true"
-            @clicked="(args) => click(args)"
+              :grid="opponentsGrid"
+              :has-listener="true"
+              @clicked="(args) => click(args)"
           />
         </div>
       </div>
