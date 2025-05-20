@@ -1,18 +1,18 @@
 export interface Cell {
-    // type: Type;
-    // id: number | undefined;
-    // color: string;
-    shipData: ShipData | undefined;
-    isHit: boolean;
-    x: number;
-    y: number;
-    originX: number;
-    originY: number;
+  // type: Type;
+  // id: number | undefined;
+  // color: string;
+  shipData: ShipData | undefined;
+  isHit: boolean;
+  x: number;
+  y: number;
+  originX: number;
+  originY: number;
 }
 
 export interface ShipData {
-    connectsTo: number;
-    color: string;
+  connectsTo: number;
+  color: string;
 }
 
 // export interface Type {
@@ -21,13 +21,13 @@ export interface ShipData {
 // }
 
 export interface Cord {
-    x: number;
-    y: number;
+  x: number;
+  y: number;
 }
 
 export interface HitResponse {
-    cord: Cord;
-    shipData: ShipData | undefined;
+  cord: Cord;
+  shipData: ShipData | undefined;
 }
 
 // export enum FieldType {
@@ -36,7 +36,7 @@ export interface HitResponse {
 // }
 
 export enum GameError {
-    WRONG_PLAYER = "WRONG_PLAYER",
-    INVALID_CORD = "INVALID_CORD",
-    INVALID_ID = "INVALID_ID",
+  WRONG_PLAYER = "WRONG_PLAYER",
+  INVALID_CORD = "INVALID_CORD",
+  INVALID_ID = "INVALID_ID",
 }

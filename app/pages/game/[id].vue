@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import SimpleGrid from "~/components/game/SimpleGrid.vue";
-import {type Cell, type Cord, GameError, type HitResponse} from "#shared/gameTypes";
-import {useSocket} from "~/utils/useSocketIO";
+import {
+  type Cell,
+  type Cord,
+  GameError,
+  type HitResponse,
+} from "#shared/gameTypes";
+import { useSocket } from "~/utils/useSocketIO";
 
 const socket = useSocket();
 const route = useRoute();
@@ -56,8 +61,10 @@ function hitResponse(hitResponse: HitResponse | GameError) {
       break;
     }
     default: {
-      opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit = true;
-      opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.shipData = hitResponse.shipData;
+      opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit =
+        true;
+      opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.shipData =
+        hitResponse.shipData;
       break;
     }
   }
@@ -73,16 +80,16 @@ function hitResponse(hitResponse: HitResponse | GameError) {
         <div class="player-grid">
           <h3>Player1</h3>
 
-          <SimpleGrid :grid="myGrid" :has-listener="false"/>
+          <SimpleGrid :grid="myGrid" :has-listener="false" />
         </div>
 
         <div class="player-grid">
           <h3>Player2</h3>
 
           <SimpleGrid
-              :grid="opponentsGrid"
-              :has-listener="true"
-              @clicked="(args) => click(args)"
+            :grid="opponentsGrid"
+            :has-listener="true"
+            @clicked="(args) => click(args)"
           />
         </div>
       </div>
