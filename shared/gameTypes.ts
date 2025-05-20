@@ -1,31 +1,30 @@
 export interface Cell {
-    type: Type;
-    id: number | undefined;
-    color: string;
-    x: number;
-    y: number;
-    originX: number;
-    originY: number;
+  type: Type;
+  id: number | undefined;
+  color: string;
+  x: number;
+  y: number;
+  originX: number;
+  originY: number;
 }
 
 export interface Type {
-    fieldType: FieldType,
-    isHit: boolean
+  fieldType: FieldType;
+  isHit: boolean;
 }
 
 export interface Cord {
-    x: number,
-    y: number
+  x: number;
+  y: number;
 }
 
 export enum FieldType {
-    SHIP = "SHIP",
-    WATER = "WATER",
+  SHIP = "SHIP",
+  WATER = "WATER",
 }
 
 export enum GameError {
-    WRONG_PLAYER = "WRONG_PLAYER",
-    INVALID_CORD = "INVALID_CORD",
-    INVALID_ID = "INVALID_ID",
+  WRONG_PLAYER = "WRONG_PLAYER",
+  INVALID_CORD = "INVALID_CORD",
+  INVALID_ID = "INVALID_ID",
 }
-

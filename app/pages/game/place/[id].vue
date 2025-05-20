@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import {type Cell, FieldType} from "#shared/gameTypes";
-import {useMyGridStore} from "~/stores/myGrid";
-import {useSocket} from "~/utils/useSocketIO";
+import { type Cell, FieldType } from "#shared/gameTypes";
+import { useMyGridStore } from "~/stores/myGrid";
+import { useSocket } from "~/utils/useSocketIO";
 
-const route = useRoute()
+const route = useRoute();
 
 const socket = useSocket();
 
@@ -33,7 +33,7 @@ function initGrid() {
       grid.value[x][y] = {
         type: {
           fieldType: FieldType.WATER,
-          isHit: false
+          isHit: false,
         },
         id: undefined,
         color: "white",
@@ -41,7 +41,7 @@ function initGrid() {
         y: y,
         originX: x,
         originY: y,
-      }
+      };
     }
   }
 }
@@ -121,15 +121,15 @@ function initShips() {
   grid.value[0][9].color = "blue";
   grid.value[0][9].type = {
     fieldType: FieldType.SHIP,
-    isHit: false
-  }
+    isHit: false,
+  };
 
   grid.value[1][9].id = 3;
   grid.value[1][9].color = "blue";
   grid.value[1][9].type = {
     fieldType: FieldType.SHIP,
-    isHit: false
-  }
+    isHit: false,
+  };
 }
 
 function drawGrid() {
@@ -174,30 +174,37 @@ function drawShip(idxX: number, idxY: number, x: number, y: number) {
   if (id === undefined) return;
 
   const hasTopNeighbor = idxY > 0 && grid.value[idxX][idxY - 1].id === id;
-  const hasBottomNeighbor = idxY < rows - 1 && grid.value[idxX][idxY + 1].id === id;
+  const hasBottomNeighbor =
+    idxY < rows - 1 && grid.value[idxX][idxY + 1].id === id;
   const hasLeftNeighbor = idxX > 0 && grid.value[idxX - 1][idxY].id === id;
-  const hasRightNeighbor = idxX < cols - 1 && grid.value[idxX + 1][idxY].id === id;
+  const hasRightNeighbor =
+    idxX < cols - 1 && grid.value[idxX + 1][idxY].id === id;
 
   const leftX = hasLeftNeighbor ? 0 : 5;
   const rightX = hasRightNeighbor ? 0 : 5;
   const topY = hasTopNeighbor ? 0 : 5;
   const bottomY = hasBottomNeighbor ? 0 : 5;
 
-  ctx.value!.fillRect(x * cellSize + leftX, y * cellSize + topY, cellSize - leftX - rightX, cellSize - topY - bottomY);
+  ctx.value!.fillRect(
+    x * cellSize + leftX,
+    y * cellSize + topY,
+    cellSize - leftX - rightX,
+    cellSize - topY - bottomY,
+  );
 }
 
 initGrid();
 initShips();
 
 onMounted(() => {
-  ctx.value = canvas.value!.getContext('2d');
+  ctx.value = canvas.value!.getContext("2d");
 
   drawGrid();
 
   canvas.value!.addEventListener("mousedown", mouseDown);
   canvas.value!.addEventListener("mousemove", mouseMove);
   canvas.value!.addEventListener("mouseup", mouseUp);
-})
+});
 
 const mouseDown = (event) => {
   //todo does not work
@@ -221,8 +228,7 @@ const mouseDown = (event) => {
   if (grid.value[x][y].id === undefined) return;
 
   currentCell = grid.value[x][y];
-}
-
+};
 
 const mouseMove = (event) => {
   if (currentCell === undefined) return;
@@ -231,8 +237,8 @@ const mouseMove = (event) => {
   const calcX = event.clientX - rect.left;
   const calcY = event.clientY - rect.top;
 
-  const diffX = (calcX / cellSize - mouseDownX!) - 0.5;
-  const diffY = (calcY / cellSize - mouseDownY!) - 0.5;
+  const diffX = calcX / cellSize - mouseDownX! - 0.5;
+  const diffY = calcY / cellSize - mouseDownY! - 0.5;
 
   for (let x1 = 0; x1 < gridSize; x1++) {
     for (let y1 = 0; y1 < gridSize; y1++) {
@@ -244,12 +250,12 @@ const mouseMove = (event) => {
   }
 
   drawGrid();
-}
+};
 
 const mouseUp = () => {
   if (currentCell === undefined) return;
 
-  const newPositions: { x: number, y: number }[] = [];
+  const newPositions: { x: number; y: number }[] = [];
   let isValidMove = true;
 
   for (let x = 0; x < gridSize; x++) {
@@ -260,15 +266,18 @@ const mouseUp = () => {
 
         // Check if the new position is within bounds and not occupied by another ship
         if (
-            newX < 0 || newX >= gridSize ||
-            newY < 0 || newY >= gridSize ||
-            (grid.value[newX][newY].id !== undefined && grid.value[newX][newY].id !== currentCell.id)
+          newX < 0 ||
+          newX >= gridSize ||
+          newY < 0 ||
+          newY >= gridSize ||
+          (grid.value[newX][newY].id !== undefined &&
+            grid.value[newX][newY].id !== currentCell.id)
         ) {
           isValidMove = false;
           break;
         }
 
-        newPositions.push({x: newX, y: newY});
+        newPositions.push({ x: newX, y: newY });
       }
     }
     if (!isValidMove) break;
@@ -282,7 +291,7 @@ const mouseUp = () => {
           grid.value[x][y] = {
             type: {
               fieldType: FieldType.WATER,
-              isHit: false
+              isHit: false,
             },
             id: undefined,
             color: "white",
@@ -322,39 +331,41 @@ const mouseUp = () => {
   mouseDownY = undefined;
 
   drawGrid();
-}
+};
 
 function start() {
   gridStore.grid = grid.value;
   gridSent.value = true;
 
-  canvas.value!.removeEventListener("mousemove", mouseMove)
-  canvas.value!.removeEventListener("mouseup", mouseUp)
-  canvas.value!.removeEventListener("mousedown", mouseDown)
+  canvas.value!.removeEventListener("mousemove", mouseMove);
+  canvas.value!.removeEventListener("mouseup", mouseUp);
+  canvas.value!.removeEventListener("mousedown", mouseDown);
 
   socket.emit("ready");
 }
 
 socket.on("send-field", () => {
   socket.emit("post-field", JSON.stringify(gridStore.grid), redirect);
-})
+});
 
 function redirect() {
-  navigateTo(`/game/${route.params.id}`)
+  navigateTo(`/game/${route.params.id}`);
 }
-
 </script>
 
 <template>
   <div>
     <div>
-      <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" style="border:1px solid #d3d3d3;"/>
+      <canvas
+        ref="canvas"
+        :width="canvasWidth"
+        :height="canvasHeight"
+        style="border: 1px solid #d3d3d3"
+      />
     </div>
 
     <button :disabled="gridSent" @click="start()">startGame</button>
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

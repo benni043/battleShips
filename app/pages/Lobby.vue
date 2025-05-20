@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import {GameCreationError, type GameCreationOrJoinResponse, GameJoinError} from "#shared/types";
-import {useSocket} from "~/utils/useSocketIO";
+import {
+  GameCreationError,
+  type GameCreationOrJoinResponse,
+  GameJoinError,
+} from "#shared/types";
+import { useSocket } from "~/utils/useSocketIO";
 import LobbyForm from "~/components/lobby/LobbyForm.vue";
 import LobbyList from "~/components/lobby/LobbyList.vue";
 
@@ -10,18 +14,20 @@ function createGame(gameName: string) {
   socket.emit("create-game", gameName, lobbyCreationResponse);
 }
 
-function lobbyCreationResponse(gameCreationResponse: GameCreationOrJoinResponse | GameCreationError) {
+function lobbyCreationResponse(
+  gameCreationResponse: GameCreationOrJoinResponse | GameCreationError,
+) {
   switch (gameCreationResponse) {
     case GameCreationError.ALREADY_TAKEN: {
-      console.error("Dieser Lobbyname wird bereits verwendet!")
+      console.error("Dieser Lobbyname wird bereits verwendet!");
       break;
     }
     case GameCreationError.INVALID: {
-      console.error("Dieser Lobbyname ist nicht erlaubt!")
+      console.error("Dieser Lobbyname ist nicht erlaubt!");
       break;
     }
     default: {
-      navigateTo(`/game/place/${gameCreationResponse.gameName}`)
+      navigateTo(`/game/place/${gameCreationResponse.gameName}`);
       break;
     }
   }
@@ -31,7 +37,9 @@ function joinGame(gameName: string) {
   socket.emit("join-game", gameName, gameJoinResponse);
 }
 
-function gameJoinResponse(gameJoinResponse: GameCreationOrJoinResponse | GameJoinError) {
+function gameJoinResponse(
+  gameJoinResponse: GameCreationOrJoinResponse | GameJoinError,
+) {
   switch (gameJoinResponse) {
     case GameJoinError.FULL: {
       console.error("Dieses Spiel ist bereits voll!");
@@ -39,7 +47,7 @@ function gameJoinResponse(gameJoinResponse: GameCreationOrJoinResponse | GameJoi
     }
     default: {
       console.log(gameJoinResponse);
-      navigateTo(`/game/place/${gameJoinResponse.gameName}`)
+      navigateTo(`/game/place/${gameJoinResponse.gameName}`);
       break;
     }
   }
@@ -53,11 +61,9 @@ function gameJoinResponse(gameJoinResponse: GameCreationOrJoinResponse | GameJoi
 
 <template>
   <div>
-    <LobbyForm @submit="args => createGame(args)"/>
-    <LobbyList @submit="args => joinGame(args)"/>
+    <LobbyForm @submit="(args) => createGame(args)" />
+    <LobbyList @submit="(args) => joinGame(args)" />
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

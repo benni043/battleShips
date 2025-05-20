@@ -7,7 +7,13 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "lint": "bun lint:eslint && bun lint:prettier",
+    "lint:eslint": "eslint .",
+    "lint:prettier": "prettier . --check",
+    "lint:typecheck": "nuxi typecheck",
+    "lintfull": "bun lint && bun lint:typecheck",
+    "lintfix": "eslint . --fix && prettier --write --list-different ."
   },
   "dependencies": {
     "@nuxt/eslint": "1.3.1",
@@ -22,6 +28,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "@pinia/nuxt": "^0.11.0"
+    "@pinia/nuxt": "^0.11.0",
+    "prettier": "^3.5.3"
   }
 }

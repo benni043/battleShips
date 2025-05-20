@@ -1,43 +1,52 @@
-import {GameCreationError, GameJoinError, type GameLobby} from "~~/shared/types";
-import type {Socket} from "socket.io";
+import {
+  GameCreationError,
+  GameJoinError,
+  type GameLobby,
+} from "~~/shared/types";
+import type { Socket } from "socket.io";
 
 export class Lobby {
-    getAvailableGames() {
-        return lobbyRepository.getAvailableGames();
-    }
+  getAvailableGames() {
+    return lobbyRepository.getAvailableGames();
+  }
 
-    getGameByName(gameName: string): GameLobby | undefined {
-        return lobbyRepository.getGameByName(gameName);
-    }
+  getGameByName(gameName: string): GameLobby | undefined {
+    return lobbyRepository.getGameByName(gameName);
+  }
 
-    createGame(gameName: string, socket: Socket) {
-        if (!this.isGameNameAvailable(gameName)) return GameCreationError.ALREADY_TAKEN;
-        if (!this.isGameNameValid(gameName)) return GameCreationError.INVALID;
+  createGame(gameName: string, socket: Socket) {
+    if (!this.isGameNameAvailable(gameName))
+      return GameCreationError.ALREADY_TAKEN;
+    if (!this.isGameNameValid(gameName)) return GameCreationError.INVALID;
 
-        return lobbyRepository.createGame(gameName, socket);
-    }
+    return lobbyRepository.createGame(gameName, socket);
+  }
 
-    joinGame(gameName: string, socket: Socket) {
-        const game = lobbyRepository.getGameByName(gameName);
+  joinGame(gameName: string, socket: Socket) {
+    const game = lobbyRepository.getGameByName(gameName);
 
-        if (!game || game.socketPlayer2) return GameJoinError.FULL;
+    if (!game || game.socketPlayer2) return GameJoinError.FULL;
 
-        return lobbyRepository.joinGame(gameName, socket);
-    }
+    return lobbyRepository.joinGame(gameName, socket);
+  }
 
-    private isGameNameAvailable(gameName: string) {
-        const lobbies = lobbyRepository.getAllGames();
+  private isGameNameAvailable(gameName: string) {
+    const lobbies = lobbyRepository.getAllGames();
 
-        return !lobbies.has(gameName);
-    }
+    return !lobbies.has(gameName);
+  }
 
-    private isGameNameValid(gameName: string): boolean {
-        const minLength = 3
-        const maxLength = 20
-        const validNameRegex = /^[a-zA-Z0-9]+$/
+  private isGameNameValid(gameName: string): boolean {
+    const minLength = 3;
+    const maxLength = 20;
+    const validNameRegex = /^[a-zA-Z0-9]+$/;
 
-        return (gameName.length >= minLength && gameName.length <= maxLength && validNameRegex.test(gameName))
-    }
+    return (
+      gameName.length >= minLength &&
+      gameName.length <= maxLength &&
+      validNameRegex.test(gameName)
+    );
+  }
 }
 
 export const lobbyService = new Lobby();

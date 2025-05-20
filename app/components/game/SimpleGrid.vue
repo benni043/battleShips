@@ -1,7 +1,6 @@
 <script setup lang="ts">
-
-import {onMounted, ref, type Ref} from "vue";
-import type {Cell, Cord} from "#shared/gameTypes";
+import { onMounted, ref, type Ref } from "vue";
+import type { Cell, Cord } from "#shared/gameTypes";
 
 const props = defineProps<{
   hasListener: boolean;
@@ -10,7 +9,7 @@ const props = defineProps<{
 
 watch(props.grid, () => {
   drawGrid();
-})
+});
 
 const emit = defineEmits(["clicked"]);
 
@@ -56,7 +55,12 @@ function drawShips(x: number, y: number) {
   const topY = hasTopNeighbor ? 0 : 5;
   const bottomY = hasBottomNeighbor ? 0 : 5;
 
-  ctx.value!.fillRect(x * cellSize + leftX, y * cellSize + topY, cellSize - leftX - rightX, cellSize - topY - bottomY);
+  ctx.value!.fillRect(
+    x * cellSize + leftX,
+    y * cellSize + topY,
+    cellSize - leftX - rightX,
+    cellSize - topY - bottomY,
+  );
 }
 
 function click(event: MouseEvent) {
@@ -67,24 +71,23 @@ function click(event: MouseEvent) {
   const i = Math.floor(x / cellSize);
   const j = Math.floor(y / cellSize);
 
-  emit("clicked", {x: i, y: j} as Cord)
+  emit("clicked", { x: i, y: j } as Cord);
 }
 
 onMounted(() => {
-  ctx.value = canvas.value!.getContext('2d');
+  ctx.value = canvas.value!.getContext("2d");
 
   drawGrid();
 
   if (!props.hasListener) return;
 
   canvas.value!.addEventListener("mousedown", click);
-})
-
+});
 </script>
 
 <template>
   <div>
-    <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight"/>
+    <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" />
   </div>
 </template>
 

@@ -1,28 +1,27 @@
-import type {Socket} from "socket.io";
+import type { Socket } from "socket.io";
 
 export type GameLobby = {
-    socketPlayer1: Socket;
-    socketPlayer2: Socket | undefined;
-    state: GameState;
-    gameName: string;
-}
+  socketPlayer1: Socket;
+  socketPlayer2: Socket | undefined;
+  state: GameState;
+  gameName: string;
+};
 
 export type GameCreationOrJoinResponse = {
-    gameName: string,
-}
+  gameName: string;
+};
 
 export enum GameCreationError {
-    INVALID,
-    ALREADY_TAKEN,
+  INVALID,
+  ALREADY_TAKEN,
 }
 
 export enum GameJoinError {
-    FULL
+  FULL,
 }
 
 export enum GameState {
-    WAITING,
-    STARTED,
-    FINISHED
+  WAITING,
+  STARTED,
+  FINISHED,
 }
-
