@@ -1,0 +1,10 @@
+services:
+  nuxt:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3007:3000"
+    environment:
+      NODE_ENV: production
+    restart: always
