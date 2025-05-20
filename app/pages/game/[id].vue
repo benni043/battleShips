@@ -56,6 +56,7 @@ function hitResponse(hitResponse: HitResponse | GameError) {
       break;
     }
     default: {
+      opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit = true;
       opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.shipData = hitResponse.shipData;
       break;
     }
