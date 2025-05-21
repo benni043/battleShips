@@ -72,6 +72,14 @@ function hitResponseCallBack(hitResponse: HitResponse | GameError) {
       alert("Spiel hat noch nicht gestartet");
       break;
     }
+    case GameError.INVALID_ID: {
+      alert("invalid id");
+      break;
+    }
+    case GameError.INVALID_GAME: {
+      alert("invalid game");
+      break;
+    }
     default: {
       opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit =
         true;
@@ -81,8 +89,6 @@ function hitResponseCallBack(hitResponse: HitResponse | GameError) {
     }
   }
 }
-
-socket.emit("start", route.params.id, route.params.gameId);
 
 function leave() {
   navigateTo(`/`);
@@ -94,7 +100,7 @@ socket.on("hit-response", (cord: Cord) => {
 
 socket.on("game-finished", (gameFinished: GameFinished) => {
   isGameFinished.value = true;
-  alert(gameFinished);
+  console.log(gameFinished);
 });
 
 onBeforeUnmount(() => {

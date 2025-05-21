@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Cell, ShipData } from "#shared/gameTypes";
+import { type Cell, GameError, type ShipData } from "#shared/gameTypes";
 import { useMyGridStore } from "~/stores/myGrid";
 import { io } from "socket.io-client";
 
@@ -312,8 +312,21 @@ function start() {
   );
 }
 
-function redirect() {
-  navigateTo(`/game/${route.params.gameId}/${route.params.id}`);
+function redirect(error: GameError) {
+  switch (error) {
+    case GameError.INVALID_GAME: {
+      alert("invalid game");
+      break;
+    }
+    case GameError.INVALID_ID: {
+      alert("invalid id");
+      break;
+    }
+    default: {
+      navigateTo(`/game/${route.params.gameId}/${route.params.id}`);
+      break;
+    }
+  }
 }
 
 onBeforeUnmount(() => {

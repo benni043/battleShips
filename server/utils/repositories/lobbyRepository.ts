@@ -1,7 +1,8 @@
 import type { GameLobby, Player } from "#shared/types";
 import { GameState } from "#shared/types";
 import type { Socket } from "socket.io";
-import type { Cell } from "#shared/gameTypes";
+import type { Cell} from "#shared/gameTypes";
+import { GameError } from "#shared/gameTypes";
 
 export class LobbyRepository {
   private readonly games: Map<string, GameLobby>;
@@ -55,14 +56,16 @@ export class LobbyRepository {
   }
 
   setGrid(id: string, gameName: string, field: Cell[][]) {
-    const game = this.games.get(gameName)!;
+    const game = this.games.get(gameName);
+
+    if (!game) return GameError.INVALID_GAME;
 
     if (id === game.player1.id) {
       game.player1.field = field;
     } else if (id === game.player2.id) {
       game.player2.field = field;
     } else {
-      console.log("wrong id on grid set");
+      return GameError.INVALID_ID;
     }
 
     if (game.player1.field && game.player2.field)
@@ -70,17 +73,17 @@ export class LobbyRepository {
   }
 
   setSocket(id: string, gameName: string, socket: Socket) {
-    const game = this.games.get(gameName)!;
+    const game = this.games.get(gameName);
+
+    if (!game) return GameError.INVALID_GAME;
 
     if (id === game.player1.id) {
       game.player1.socket = socket;
     } else if (id === game.player2.id) {
       game.player2.socket = socket;
     } else {
-      console.log("wrong id");
+      return GameError.INVALID_ID;
     }
-
-    console.log(game);
   }
 }
 

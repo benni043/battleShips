@@ -50,11 +50,11 @@ export class LobbyService {
   }
 
   setGrid(id: string, gameName: string, grid: Cell[][]) {
-    lobbyRepository.setGrid(id, gameName, grid);
+    return lobbyRepository.setGrid(id, gameName, grid);
   }
 
   setSocket(id: string, gameName: string, socket: Socket) {
-    lobbyRepository.setSocket(id, gameName, socket);
+    return lobbyRepository.setSocket(id, gameName, socket);
   }
 }
 
