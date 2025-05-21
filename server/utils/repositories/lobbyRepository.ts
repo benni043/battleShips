@@ -1,7 +1,7 @@
 import type { GameLobby, Player } from "#shared/types";
 import { GameState } from "#shared/types";
 import type { Socket } from "socket.io";
-import type { Cell} from "#shared/gameTypes";
+import type { Cell } from "#shared/gameTypes";
 import { GameError } from "#shared/gameTypes";
 
 export class LobbyRepository {
@@ -84,6 +84,14 @@ export class LobbyRepository {
     } else {
       return GameError.INVALID_ID;
     }
+  }
+
+  removeGame(gameName: string) {
+    const game = this.games.get(gameName);
+
+    if (!game) return GameError.INVALID_GAME;
+
+    this.games.delete(gameName);
   }
 }
 

@@ -10,11 +10,13 @@ export class GameService {
   }
 
   handleClick(id: string, gameName: string, cord: Cord) {
+    return gameRepository.handleClick(id, gameName, cord);
+  }
+
+  isStarted(gameName: string) {
     const game = lobbyService.getGameByName(gameName);
 
     if (game?.state === GameState.WAITING) return GameError.NOT_STARTED;
-
-    return gameRepository.handleClick(id, gameName, cord);
   }
 }
 

@@ -5,7 +5,6 @@ import type { Cord, GameFinished, HitResponse } from "#shared/gameTypes";
 import { GameError } from "#shared/gameTypes";
 
 export function handleGameEvents(socket: Socket, io: Server) {
-
   socket.on("click", (id: string, gameName: string, cord: Cord, cb) => {
     const socket1 = lobbyService.setSocket(id, gameName, socket);
 
@@ -16,13 +15,17 @@ export function handleGameEvents(socket: Socket, io: Server) {
 
     socket.join(gameName);
 
+    if (gameService.isStarted(gameName) === GameError.NOT_STARTED) {
+      cb(GameError.NOT_STARTED);
+      return;
+    }
+
     const shipData = gameService.handleClick(id, gameName, cord);
 
     if (
       shipData !== GameError.INVALID_CORD &&
       shipData !== GameError.WRONG_PLAYER &&
-      shipData !== GameError.ALREADY_HIT &&
-      shipData !== GameError.NOT_STARTED
+      shipData !== GameError.ALREADY_HIT
     ) {
       gameService.getOpponentSocket(gameName).emit("hit-response", cord);
 
@@ -37,5 +40,11 @@ export function handleGameEvents(socket: Socket, io: Server) {
     }
 
     cb(shipData);
+  });
+
+  socket.on("manual-disconnect", (gameName: string, cb) => {
+    const gameError = lobbyService.removeGame(gameName);
+
+    cb(gameError);
   });
 }

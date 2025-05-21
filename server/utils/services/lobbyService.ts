@@ -56,6 +56,10 @@ export class LobbyService {
   setSocket(id: string, gameName: string, socket: Socket) {
     return lobbyRepository.setSocket(id, gameName, socket);
   }
+
+  removeGame( gameName: string) {
+    return lobbyRepository.removeGame(gameName);
+  }
 }
 
 export const lobbyService = new LobbyService();

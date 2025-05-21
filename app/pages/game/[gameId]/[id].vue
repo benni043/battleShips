@@ -3,8 +3,8 @@ import SimpleGrid from "~/components/game/SimpleGrid.vue";
 import {
   type Cell,
   type Cord,
-  type GameFinished,
   GameError,
+  type GameFinished,
   type HitResponse,
 } from "#shared/gameTypes";
 import { io } from "socket.io-client";
@@ -104,8 +104,22 @@ socket.on("game-finished", (gameFinished: GameFinished) => {
 });
 
 onBeforeUnmount(() => {
-  socket?.disconnect();
+  socket.emit(
+    "manual-disconnect",
+    route.params.gameId,
+    disconnect,
+  );
 });
+
+function disconnect(error: GameError) {
+  if (error === GameError.INVALID_GAME) {
+    console.error("Spiel wurde bereits beendet!");
+    return;
+  }
+
+  console.log("disconnect");
+  socket?.disconnect();
+}
 </script>
 
 <template>
