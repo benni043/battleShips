@@ -24,10 +24,10 @@ function handleSubmit() {
 
 <template>
   <form @submit.prevent="handleSubmit">
-    <h2 class="pb-2 text-2xl">Lobby erstellen</h2>
+    <h2 class="pb-2 text-2xl">LobbyService erstellen</h2>
 
     <div class="flex flex-col">
-      <label class="text-neutral-600" for="lobbyName">Lobby-Name</label>
+      <label class="text-neutral-600" for="lobbyName">LobbyService-Name</label>
       <input
         id="lobbyName"
         v-model="lobbyName"

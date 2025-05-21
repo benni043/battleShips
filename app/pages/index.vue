@@ -4,16 +4,19 @@ import {
   type GameCreationOrJoinResponse,
   GameJoinError,
 } from "#shared/types";
-import { useSocket } from "~/utils/useSocketIO";
 import LobbyForm from "~/components/lobby/LobbyForm.vue";
 import LobbyList from "~/components/lobby/LobbyList.vue";
+import { io } from "socket.io-client";
 
-const socket = useSocket();
+const socket = io({
+  path: "/api/socket.io",
+});
 
 const games: Ref<string[]> = ref([]);
+const uuid: Ref<string> = ref("");
 
 function createGame(gameName: string) {
-  socket.emit("create-game", gameName, lobbyCreationResponse);
+  socket.emit("create-game", uuid.value, gameName, lobbyCreationResponse);
 }
 
 function lobbyCreationResponse(
@@ -29,14 +32,14 @@ function lobbyCreationResponse(
       break;
     }
     default: {
-      navigateTo(`/game/place/${gameCreationResponse.gameName}`);
+      navigateTo(`/game/${gameCreationResponse.gameName}/place/${uuid.value}`);
       break;
     }
   }
 }
 
 function joinGame(gameName: string) {
-  socket.emit("join-game", gameName, gameJoinResponse);
+  socket.emit("join-game", uuid.value, gameName, gameJoinResponse);
 }
 
 function gameJoinResponse(
@@ -48,7 +51,7 @@ function gameJoinResponse(
       break;
     }
     default: {
-      navigateTo(`/game/place/${gameJoinResponse.gameName}`);
+      navigateTo(`/game/${gameJoinResponse.gameName}/place/${uuid.value}`);
       break;
     }
   }
@@ -70,10 +73,26 @@ socket.on("remove-game", (gameName: string) => {
   if (index !== -1) games.value.splice(index, 1);
 });
 
+function generateUUID() {
+  const uuidGen = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+    /[xy]/g,
+    (char) => {
+      const rand = (Math.random() * 16) | 0;
+      const value = char === "x" ? rand : (rand & 0x3) | 0x8;
+      return value.toString(16);
+    },
+  );
+
+  console.log(uuid);
+  uuid.value = uuidGen;
+}
+
+generateUUID();
+
 onBeforeUnmount(() => {
-  console.log(`Disconnect ${socket.id}`);
   socket?.disconnect();
 });
+
 </script>
 
 <template>

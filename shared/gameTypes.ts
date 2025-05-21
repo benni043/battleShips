@@ -31,6 +31,7 @@ export enum GameError {
   WRONG_PLAYER = "WRONG_PLAYER",
   INVALID_CORD = "INVALID_CORD",
   ALREADY_HIT = "ALREADY_HIT",
+  NOT_STARTED = "NOT_STARTED",
 }
 
 export interface GameFinished {

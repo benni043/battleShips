@@ -3,9 +3,10 @@ import {
   GameJoinError,
   type GameLobby,
 } from "~~/shared/types";
+import type { Cell } from "#shared/gameTypes";
 import type { Socket } from "socket.io";
 
-export class Lobby {
+export class LobbyService {
   getAvailableGames() {
     return lobbyRepository.getAvailableGames();
   }
@@ -14,20 +15,20 @@ export class Lobby {
     return lobbyRepository.getGameByName(gameName);
   }
 
-  createGame(gameName: string, socket: Socket) {
+  createGame(id: string, gameName: string) {
     if (!this.isGameNameAvailable(gameName))
       return GameCreationError.ALREADY_TAKEN;
     if (!this.isGameNameValid(gameName)) return GameCreationError.INVALID;
 
-    return lobbyRepository.createGame(gameName, socket);
+    return lobbyRepository.createGame(id, gameName);
   }
 
-  joinGame(gameName: string, socket: Socket) {
+  joinGame(id: string, gameName: string) {
     const game = lobbyRepository.getGameByName(gameName);
 
-    if (!game || game.socketPlayer2) return GameJoinError.FULL;
+    if (!game || game.player2.id) return GameJoinError.FULL;
 
-    return lobbyRepository.joinGame(gameName, socket);
+    return lobbyRepository.joinGame(id, gameName);
   }
 
   private isGameNameAvailable(gameName: string) {
@@ -47,6 +48,14 @@ export class Lobby {
       validNameRegex.test(gameName)
     );
   }
+
+  setGrid(id: string, gameName: string, grid: Cell[][]) {
+    lobbyRepository.setGrid(id, gameName, grid);
+  }
+
+  setSocket(id: string, gameName: string, socket: Socket) {
+    lobbyRepository.setSocket(id, gameName, socket);
+  }
 }
 
-export const lobbyService = new Lobby();
+export const lobbyService = new LobbyService();

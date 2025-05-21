@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { Cell, ShipData } from "#shared/gameTypes";
 import { useMyGridStore } from "~/stores/myGrid";
-import { useSocket } from "~/utils/useSocketIO";
+import { io } from "socket.io-client";
 
 const route = useRoute();
 
-const socket = useSocket();
+const socket = io({
+  path: "/api/socket.io",
+});
 
 const gridStore = useMyGridStore();
 
@@ -301,16 +303,22 @@ function start() {
   canvas.value!.removeEventListener("mouseup", mouseUp);
   canvas.value!.removeEventListener("mousedown", mouseDown);
 
-  socket.emit("ready");
+  socket.emit(
+    "post-field",
+    route.params.id,
+    route.params.gameId,
+    JSON.stringify(gridStore.grid),
+    redirect,
+  );
 }
-
-socket.on("send-field", () => {
-  socket.emit("post-field", JSON.stringify(gridStore.grid), redirect);
-});
 
 function redirect() {
-  navigateTo(`/game/${route.params.id}`);
+  navigateTo(`/game/${route.params.gameId}/${route.params.id}`);
 }
+
+onBeforeUnmount(() => {
+  socket?.disconnect();
+});
 </script>
 
 <template>

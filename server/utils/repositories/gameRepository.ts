@@ -1,46 +1,17 @@
 import type { Cell, Cord, Hit } from "#shared/gameTypes";
 import { GameError } from "#shared/gameTypes";
-import type { GameLobby } from "#shared/types";
 
 export class GameRepository {
-  private gameLobby: GameLobby | undefined;
 
-  private player1Field: Cell[][] = [];
-  private player2Field: Cell[][] = [];
+  getOpponentSocket(gameName: string) {
+    const game = lobbyRepository.getGameByName(gameName)!;
 
-  private isPlayer1Active = true;
-
-  getGameName() {
-    return this.gameLobby!.gameName!;
-  }
-
-  getOpponentSocket() {
-    if (this.isPlayer1Active) return this.gameLobby!.socketPlayer1;
-    else return this.gameLobby!.socketPlayer2!;
-  }
-
-  setGame(game: Cell[][], id: string) {
-    if (id === this.gameLobby?.socketPlayer1.id) {
-      this.player1Field = game;
-    } else if (id === this.gameLobby?.socketPlayer2?.id) {
-      this.player2Field = game;
-    } else {
-      console.error(`Unknown game ID: ${id}`);
-      return;
-    }
-  }
-
-  setGameLobby(gameLobby: GameLobby) {
-    this.gameLobby = gameLobby;
+    if (game.isPlayer1Active) return game.player1!.socket!;
+    else return game.player2!.socket!;
   }
 
   private isCordValid(cord: Cord) {
-    return !(
-      cord.y < 0 ||
-      cord.y >= this.player1Field.length ||
-      cord.x < 0 ||
-      cord.x >= this.player1Field[cord.y]!.length
-    );
+    return !(cord.y < 0 || cord.y >= 10 || cord.x < 0 || cord.x >= 10);
   }
 
   private isAShipOnCord(cord: Cord, grid: Cell[][]) {
@@ -67,34 +38,35 @@ export class GameRepository {
     );
   }
 
-  handleClick(cord: Cord, id: string) {
-    if (id === this.gameLobby!.socketPlayer1.id && this.isPlayer1Active) {
-      if (this.isAlreadyHit(cord, this.player2Field))
-        return GameError.ALREADY_HIT;
+  handleClick(id: string, gameName: string, cord: Cord) {
+    const game = lobbyRepository.getGameByName(gameName)!;
 
-      const shipData = this.isAShipOnCord(cord, this.player2Field);
-      this.setCellHit(cord, this.player2Field);
+    if (id === game.player1!.id && game.isPlayer1Active) {
+      const field = game.player2.field!;
+
+      if (this.isAlreadyHit(cord, field)) return GameError.ALREADY_HIT;
+
+      const shipData = this.isAShipOnCord(cord, field);
+      this.setCellHit(cord, field);
 
       if (shipData === GameError.INVALID_CORD) return shipData;
 
-      this.isPlayer1Active = false;
-      const gameFinished = this.isGameFinished(this.player2Field);
+      game.isPlayer1Active = false;
+      const gameFinished = this.isGameFinished(field);
 
       return { gameFinished: gameFinished, shipData: shipData } as Hit;
-    } else if (
-      id === this.gameLobby!.socketPlayer2?.id &&
-      !this.isPlayer1Active
-    ) {
-      if (this.isAlreadyHit(cord, this.player1Field))
-        return GameError.ALREADY_HIT;
+    } else if (id === game.player2!.id && !game.isPlayer1Active) {
+      const field = game.player1.field!;
 
-      const shipData = this.isAShipOnCord(cord, this.player1Field);
-      this.setCellHit(cord, this.player1Field);
+      if (this.isAlreadyHit(cord, field)) return GameError.ALREADY_HIT;
+
+      const shipData = this.isAShipOnCord(cord, field);
+      this.setCellHit(cord, field);
 
       if (shipData === GameError.INVALID_CORD) return shipData;
 
-      this.isPlayer1Active = true;
-      const gameFinished = this.isGameFinished(this.player1Field);
+      game.isPlayer1Active = true;
+      const gameFinished = this.isGameFinished(field);
 
       return { gameFinished: gameFinished, shipData: shipData } as Hit;
     }
@@ -102,3 +74,5 @@ export class GameRepository {
     return GameError.WRONG_PLAYER;
   }
 }
+
+export const gameRepository = new GameRepository();

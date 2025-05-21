@@ -1,27 +1,21 @@
-import type { Cell, Cord } from "#shared/gameTypes";
-import type { GameLobby } from "#shared/types";
-import { GameRepository } from "~~/server/utils/repositories/gameRepository";
+import type { Cord } from "#shared/gameTypes";
+import { GameError } from "#shared/gameTypes";
+import { GameState } from "#shared/types";
+import { gameRepository } from "~~/server/utils/repositories/gameRepository";
 
 export class GameService {
-  gameRepository: GameRepository = new GameRepository();
 
-  getGameName() {
-    return this.gameRepository.getGameName();
+  getOpponentSocket(gameName: string) {
+    return gameRepository.getOpponentSocket(gameName);
   }
 
-  getOpponentSocket() {
-    return this.gameRepository.getOpponentSocket();
-  }
+  handleClick(id: string, gameName: string, cord: Cord) {
+    const game = lobbyService.getGameByName(gameName);
 
-  setGame(game: Cell[][], id: string) {
-    this.gameRepository.setGame(game, id);
-  }
+    if (game?.state === GameState.WAITING) return GameError.NOT_STARTED;
 
-  setGameLobby(gameLobby: GameLobby) {
-    this.gameRepository.setGameLobby(gameLobby);
-  }
-
-  handleClick(cord: Cord, id: string) {
-    return this.gameRepository.handleClick(cord, id);
+    return gameRepository.handleClick(id, gameName, cord);
   }
 }
+
+export const gameService = new GameService();

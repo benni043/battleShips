@@ -7,9 +7,12 @@ import {
   GameError,
   type HitResponse,
 } from "#shared/gameTypes";
-import { useSocket } from "~/utils/useSocketIO";
+import { io } from "socket.io-client";
 
-const socket = useSocket();
+const socket = io({
+  path: "/api/socket.io",
+});
+
 const route = useRoute();
 
 const gridStore = useMyGridStore();
@@ -42,7 +45,13 @@ function initGrid() {
 }
 
 function click(cord: Cord) {
-  socket.emit("click", cord, hitResponseCallBack);
+  socket.emit(
+    "click",
+    route.params.id,
+    route.params.gameId,
+    cord,
+    hitResponseCallBack,
+  );
 }
 
 function hitResponseCallBack(hitResponse: HitResponse | GameError) {
@@ -59,6 +68,10 @@ function hitResponseCallBack(hitResponse: HitResponse | GameError) {
       alert("Auf dieses Feld hast du bereits geschossen");
       break;
     }
+    case GameError.NOT_STARTED: {
+      alert("Spiel hat noch nicht gestartet");
+      break;
+    }
     default: {
       opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit =
         true;
@@ -69,9 +82,9 @@ function hitResponseCallBack(hitResponse: HitResponse | GameError) {
   }
 }
 
+socket.emit("start", route.params.id, route.params.gameId);
+
 function leave() {
-  console.log("leave");
-  socket.emit("leave");
   navigateTo(`/`);
 }
 
@@ -81,13 +94,17 @@ socket.on("hit-response", (cord: Cord) => {
 
 socket.on("game-finished", (gameFinished: GameFinished) => {
   isGameFinished.value = true;
-  console.log(gameFinished);
+  alert(gameFinished);
+});
+
+onBeforeUnmount(() => {
+  socket?.disconnect();
 });
 </script>
 
 <template>
   <div>
-    <h1>game {{ route.params.id }}</h1>
+    <h1>game {{ route.params.gameId }}</h1>
     <button
       class="mt-1 cursor-pointer rounded border-1 bg-red-500 px-1 hover:bg-gray-300"
       @click="leave()"
