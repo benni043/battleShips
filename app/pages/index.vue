@@ -10,6 +10,8 @@ import LobbyList from "~/components/lobby/LobbyList.vue";
 
 const socket = useSocket();
 
+const games: Ref<string[]> = ref([]);
+
 function createGame(gameName: string) {
   socket.emit("create-game", gameName, lobbyCreationResponse);
 }
@@ -52,16 +54,32 @@ function gameJoinResponse(
   }
 }
 
-// onBeforeUnmount(() => {
-//   console.log(`Disconnect ${socket.id}`);
-//   socket?.disconnect();
-// })
+socket.emit("join-lobby", getLobbies);
+
+function getLobbies(initGames: string[]) {
+  games.value = initGames;
+}
+
+socket.on("new-game", (gameName: string) => {
+  games.value.push(gameName);
+});
+
+socket.on("remove-game", (gameName: string) => {
+  const index = games.value.indexOf(gameName);
+
+  if (index !== -1) games.value.splice(index, 1);
+});
+
+onBeforeUnmount(() => {
+  console.log(`Disconnect ${socket.id}`);
+  socket?.disconnect();
+});
 </script>
 
 <template>
   <div class="p-2">
     <LobbyForm @submit="(args) => createGame(args)" />
-    <LobbyList @submit="(args) => joinGame(args)" />
+    <LobbyList :games="games" @submit="(args) => joinGame(args)" />
   </div>
 </template>
 

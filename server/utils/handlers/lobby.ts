@@ -5,10 +5,13 @@ import { lobbyService } from "~~/server/utils/services/lobby";
 import { GameHandler } from "~~/server/utils/handlers/gameHandler";
 
 export function handleLobbyEvents(socket: Socket, io: Server) {
-  console.log(`User: ${socket.id} connected to lobby`);
 
-  socket.join("lobby");
-  io.to("lobby").emit("get-all-games", lobbyService.getAvailableGames());
+  socket.on("join-lobby", (cb) => {
+    console.log(`User: ${socket.id} connected to lobby`);
+
+    socket.join("lobby");
+    cb(lobbyService.getAvailableGames());
+  })
 
   socket.on("create-game", (gameName, cb) => {
     const game = lobbyService.createGame(gameName, socket);
