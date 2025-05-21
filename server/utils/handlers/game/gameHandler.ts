@@ -31,20 +31,17 @@ export function handleGameEvents(socket: Socket, io: Server) {
 
       cb({ cord: cord, shipData: shipData.shipData } as HitResponse);
 
-      if (shipData.gameFinished)
+      if (shipData.gameFinished) {
         io.to(gameName).emit("game-finished", {
           winner: "player",
         } as GameFinished);
+
+        lobbyService.removeGame(gameName);
+      }
 
       return;
     }
 
     cb(shipData);
-  });
-
-  socket.on("manual-disconnect", (gameName: string, cb) => {
-    const gameError = lobbyService.removeGame(gameName);
-
-    cb(gameError);
   });
 }
