@@ -8,8 +8,8 @@ export class GameService {
     return gameRepository.postField(gameName, id, field);
   }
 
-  setSocket(id: string, gameName: string, socket: Socket) {
-    return gameRepository.setSocket(id, gameName, socket);
+  setSocket(id: string, gameName: string, username: string, socket: Socket) {
+    return gameRepository.setSocket(id, gameName, username, socket);
   }
 
   getOpponentSocket(gameName: string) {

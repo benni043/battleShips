@@ -8,12 +8,15 @@ import {
   type HitResponse,
 } from "#shared/gameTypes";
 import { io } from "socket.io-client";
+import { useUserNameStore } from "~/stores/username";
 
 const socket = io({
   path: "/api/socket.io",
 });
 
 const route = useRoute();
+
+const userNameStore = useUserNameStore();
 
 const gridStore = useMyGridStore();
 const gridSize = 10;
@@ -22,12 +25,9 @@ const myGrid: Ref<Cell[][]> = ref(gridStore.grid);
 const opponentsGrid: Ref<Cell[][]> = ref(initGrid());
 
 const isGameFinished = ref(false);
+
 const winner = ref("");
-
 const current = ref("");
-
-const opponent = ref("");
-const me = ref("");
 
 function initGrid() {
   const grid: Cell[][] = [];
@@ -117,15 +117,22 @@ socket.on("game-finished", (gameFinished: GameFinished) => {
 });
 
 socket.on("opponent", (opponentRes: string, currentRes: string) => {
-  opponent.value = opponentRes;
   current.value = currentRes;
+
+  userNameStore.opponent = opponentRes;
 });
 
 socket.on("current", (currentRes: string) => {
   current.value = currentRes;
 });
 
-socket.emit("post-socket", route.params.gameId, route.params.id, joined);
+socket.emit(
+  "post-socket",
+  route.params.gameId,
+  route.params.id,
+  userNameStore.me,
+  joined,
+);
 
 function joined(response: GameError | undefined) {
   handleError(response);
@@ -169,14 +176,14 @@ function disconnect() {
         <div
           class="player-grid flex flex-col items-center rounded-lg bg-white p-6 shadow-md"
         >
-          <h3 class="mb-4 text-2xl font-semibold text-gray-700">Player1</h3>
+          <h3 class="mb-4 text-2xl font-semibold text-gray-700">{{ userNameStore.me }}</h3>
           <SimpleGrid :grid="myGrid" :has-listener="false" />
         </div>
 
         <div
           class="player-grid flex flex-col items-center rounded-lg bg-white p-6 shadow-md"
         >
-          <h3 class="mb-4 text-2xl font-semibold text-gray-700">Player2</h3>
+          <h3 class="mb-4 text-2xl font-semibold text-gray-700">{{ userNameStore.opponent }}</h3>
           <SimpleGrid
             :grid="opponentsGrid"
             :has-listener="!isGameFinished"

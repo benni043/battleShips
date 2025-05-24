@@ -58,6 +58,7 @@ export enum GameState {
 
 export interface Player {
   id: string;
+  username: string | undefined;
   field: Cell[][];
   socket: Socket | undefined;
 }

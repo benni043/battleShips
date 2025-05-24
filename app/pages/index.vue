@@ -8,6 +8,8 @@ const socket = io({
   path: "/api/socket.io",
 });
 
+const userNameStore = useUserNameStore();
+
 const games: Ref<string[]> = ref([]);
 const uuid: Ref<string> = ref("");
 
@@ -44,8 +46,6 @@ function lobbyResponse(response: LobbyResponse | LobbyError) {
   }
 }
 
-socket.emit("join-lobby", getLobbies);
-
 function getLobbies(initGames: string[]) {
   games.value = initGames;
 }
@@ -75,24 +75,25 @@ function generateUUID() {
 
 generateUUID();
 
+socket.emit("join-lobby", getLobbies);
+
 onBeforeUnmount(() => {
   socket?.disconnect();
 });
 </script>
 
 <template>
-  <div class="p-4 max-w-md mx-auto font-sans min-h-screen">
+  <div class="mx-auto min-h-screen max-w-md p-4 font-sans">
     <LobbyForm
-      class="mb-6 bg-white rounded-lg shadow-md border border-gray-200 p-6 w-full"
+      class="mb-6 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
       @submit="(args) => createLobby(args)"
     />
     <LobbyList
       :games="games"
-      class="bg-white rounded-lg shadow-md border border-gray-200 p-6 w-full"
+      class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
       @submit="(args) => joinLobby(args)"
     />
   </div>
 </template>
-
 
 <style scoped></style>

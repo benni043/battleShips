@@ -46,12 +46,16 @@ export class GameRepository {
     return this.games.keys().toArray();
   }
 
-  setSocket(id: string, gameName: string, socket: Socket) {
+  setSocket(id: string, gameName: string, username: string, socket: Socket) {
     const game = this.games.get(gameName)!;
 
-    if (id === game.player1.id) game.player1.socket = socket;
-    else if (id === game.player2!.id) game.player2!.socket = socket;
-    else return GameError.INVALID_ID;
+    if (id === game.player1.id) {
+      game.player1.socket = socket;
+      game.player1.username = username;
+    } else if (id === game.player2!.id) {
+      game.player2!.socket = socket;
+      game.player2!.username = username;
+    } else return GameError.INVALID_ID;
 
     if (game.player1.socket && game.player2?.socket)
       game.state = GameState.STARTED;
@@ -77,8 +81,8 @@ export class GameRepository {
   getCurrentPlayer(gameName: string) {
     const game = this.getGameByName(gameName)!;
 
-    if (game.isPlayer1Active) return game.player1!.socket!.id;
-    else return game.player2!.socket!.id;
+    if (game.isPlayer1Active) return game.player1!.username;
+    else return game.player2!.username!;
   }
 
   removeGame(gameName: string) {
