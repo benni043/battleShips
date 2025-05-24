@@ -1,65 +1,66 @@
-import {
-  GameCreationError,
-  GameJoinError,
-  type GameLobby,
-} from "~~/shared/types";
-import type { Cell } from "#shared/gameTypes";
-import type { Socket } from "socket.io";
+import { LobbyError } from "#shared/lobbyTypes";
 
 export class LobbyService {
-  getAvailableGames() {
-    return lobbyRepository.getAvailableGames();
+  getAvailableLobbies() {
+    return lobbyRepository.getAvailableLobbies();
   }
 
-  getGameByName(gameName: string): GameLobby | undefined {
-    return lobbyRepository.getGameByName(gameName);
+  createLobby(lobbyName: string, id: string) {
+    if (!this.isLobbyNameAvailable(lobbyName)) return LobbyError.ALREADY_TAKEN;
+
+    if (!this.isLobbyNameValid(lobbyName)) return LobbyError.INVALID_GAME;
+
+    return lobbyRepository.createLobby(lobbyName, id);
   }
 
-  createGame(id: string, gameName: string) {
-    if (!this.isGameNameAvailable(gameName))
-      return GameCreationError.ALREADY_TAKEN;
-    if (!this.isGameNameValid(gameName)) return GameCreationError.INVALID;
+  joinLobby(lobbyName: string, id: string) {
+    const lobby = lobbyRepository.getLobbyByName(lobbyName);
 
-    return lobbyRepository.createGame(id, gameName);
+    if (!lobby) return LobbyError.INVALID_GAME;
+    if (lobby.player2Id !== undefined) return LobbyError.FULL;
+
+    return lobbyRepository.joinLobby(lobbyName, id);
   }
 
-  joinGame(id: string, gameName: string) {
-    const game = lobbyRepository.getGameByName(gameName);
+  private isLobbyNameAvailable(lobbyName: string) {
+    const lobbies = lobbyRepository.getAvailableLobbies();
 
-    if (!game || game.player2.id) return GameJoinError.FULL;
-
-    return lobbyRepository.joinGame(id, gameName);
+    return !lobbies.includes(lobbyName);
   }
 
-  private isGameNameAvailable(gameName: string) {
-    const lobbies = lobbyRepository.getAllGames();
-
-    return !lobbies.has(gameName);
-  }
-
-  private isGameNameValid(gameName: string): boolean {
+  private isLobbyNameValid(lobbyName: string): boolean {
     const minLength = 3;
     const maxLength = 20;
     const validNameRegex = /^[a-zA-Z0-9]+$/;
 
     return (
-      gameName.length >= minLength &&
-      gameName.length <= maxLength &&
-      validNameRegex.test(gameName)
+      lobbyName.length >= minLength &&
+      lobbyName.length <= maxLength &&
+      validNameRegex.test(lobbyName)
     );
   }
 
-  setGrid(id: string, gameName: string, grid: Cell[][]) {
-    return lobbyRepository.setGrid(id, gameName, grid);
+  checkData(lobbyName: string, id: string) {
+    const lobby = lobbyRepository.getLobbyByName(lobbyName);
+
+    if (!lobby) return LobbyError.INVALID_GAME;
+
+    if (lobby.player1Id !== id && lobby.player2Id !== id)
+      return LobbyError.INVALID_ID;
   }
 
-  setSocket(id: string, gameName: string, socket: Socket) {
-    return lobbyRepository.setSocket(id, gameName, socket);
-  }
-
-  removeGame( gameName: string) {
-    return lobbyRepository.removeGame(gameName);
-  }
+  //
+  // setGrid(id: string, gameName: string, grid: Cell[][]) {
+  //   return lobbyRepository.setGrid(id, gameName, grid);
+  // }
+  //
+  // setSocket(id: string, gameName: string, socket: Socket) {
+  //   return lobbyRepository.setSocket(id, gameName, socket);
+  // }
+  //
+  // removeGame( gameName: string) {
+  //   return lobbyRepository.removeGame(gameName);
+  // }
 }
 
 export const lobbyService = new LobbyService();

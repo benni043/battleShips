@@ -5,10 +5,6 @@ import { io } from "socket.io-client";
 
 const route = useRoute();
 
-const socket = io({
-  path: "/api/socket.io",
-});
-
 const gridStore = useMyGridStore();
 
 const gridSent = ref(false);
@@ -295,7 +291,7 @@ const mouseUp = () => {
   drawGrid();
 };
 
-function start() {
+async function start() {
   gridStore.grid = grid.value;
   gridSent.value = true;
 
@@ -303,35 +299,30 @@ function start() {
   canvas.value!.removeEventListener("mouseup", mouseUp);
   canvas.value!.removeEventListener("mousedown", mouseDown);
 
-  socket.emit(
-    "post-field",
-    route.params.id,
-    route.params.gameId,
-    JSON.stringify(gridStore.grid),
-    redirect,
-  );
-}
+  //post to backend
+  try {
+    const response = await $fetch("/api/place", {
+      method: "POST",
+      body: {
+        lobby: route.params.gameId,
+        id: route.params.id,
+        grid: JSON.stringify(grid.value),
+      },
+    });
 
-function redirect(error: GameError) {
-  switch (error) {
-    case GameError.INVALID_GAME: {
-      alert("invalid game");
-      break;
-    }
-    case GameError.INVALID_ID: {
-      alert("invalid id");
-      break;
-    }
-    default: {
-      navigateTo(`/game/${route.params.gameId}/${route.params.id}`);
-      break;
+    console.log("Game erfolgreich erstellt:", response);
+
+    navigateTo(`/game/${route.params.gameId}/${route.params.id}`);
+  } catch (error: any) {
+    if (error?.status === 401) {
+      console.error("Nicht autorisiert:", error.statusMessage);
+    } else if (error?.status === 400) {
+      console.error("Fehlerhafte Anfrage:", error.statusMessage);
+    } else {
+      console.error("Unbekannter Fehler:", error);
     }
   }
 }
-
-onBeforeUnmount(() => {
-  socket?.disconnect();
-});
 </script>
 
 <template>

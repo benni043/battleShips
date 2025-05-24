@@ -1,26 +1,13 @@
 import type { Socket } from "socket.io";
 import type { Cell } from "#shared/gameTypes";
 
-export type GameLobby = {
+export type Game = {
   player1: Player;
-  player2: Player;
+  player2: Player | undefined;
   gameName: string;
   state: GameState;
   isPlayer1Active: boolean;
 };
-
-export type GameCreationOrJoinResponse = {
-  gameName: string;
-};
-
-export enum GameCreationError {
-  INVALID,
-  ALREADY_TAKEN,
-}
-
-export enum GameJoinError {
-  FULL,
-}
 
 export enum GameState {
   WAITING,
@@ -29,7 +16,7 @@ export enum GameState {
 }
 
 export interface Player {
-  id: string | undefined;
-  field: Cell[][] | undefined;
+  id: string;
+  field: Cell[][];
   socket: Socket | undefined;
 }

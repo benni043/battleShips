@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import {
-  GameCreationError,
-  type GameCreationOrJoinResponse,
-  GameJoinError,
-} from "#shared/types";
 import LobbyForm from "~/components/lobby/LobbyForm.vue";
 import LobbyList from "~/components/lobby/LobbyList.vue";
 import { io } from "socket.io-client";
+import { LobbyError, type LobbyResponse } from "#shared/lobbyTypes";
 
 const socket = io({
   path: "/api/socket.io",
@@ -15,43 +11,36 @@ const socket = io({
 const games: Ref<string[]> = ref([]);
 const uuid: Ref<string> = ref("");
 
-function createGame(gameName: string) {
-  socket.emit("create-game", uuid.value, gameName, lobbyCreationResponse);
+function createLobby(lobbyName: string) {
+  socket.emit("create-game", lobbyName, uuid.value, lobbyResponse);
 }
 
-function lobbyCreationResponse(
-  gameCreationResponse: GameCreationOrJoinResponse | GameCreationError,
-) {
-  switch (gameCreationResponse) {
-    case GameCreationError.ALREADY_TAKEN: {
+function joinLobby(lobbyName: string) {
+  socket.emit("join-game", lobbyName, uuid.value, lobbyResponse);
+}
+
+function lobbyResponse(response: LobbyResponse | LobbyError) {
+  console.log(response);
+
+  switch (response) {
+    case LobbyError.ALREADY_TAKEN: {
       alert("Dieser Lobbyname wird bereits verwendet!");
       break;
     }
-    case GameCreationError.INVALID: {
+    case LobbyError.INVALID_GAME: {
       alert("Dieser Lobbyname ist nicht erlaubt!");
       break;
     }
-    default: {
-      navigateTo(`/game/${gameCreationResponse.gameName}/place/${uuid.value}`);
+    case LobbyError.FULL: {
+      alert("Diese Lobby ist voll!");
       break;
     }
-  }
-}
-
-function joinGame(gameName: string) {
-  socket.emit("join-game", uuid.value, gameName, gameJoinResponse);
-}
-
-function gameJoinResponse(
-  gameJoinResponse: GameCreationOrJoinResponse | GameJoinError,
-) {
-  switch (gameJoinResponse) {
-    case GameJoinError.FULL: {
-      alert("Dieses Spiel ist bereits voll!");
+    case LobbyError.INVALID_ID: {
+      alert("Ungültige ID!");
       break;
     }
     default: {
-      navigateTo(`/game/${gameJoinResponse.gameName}/place/${uuid.value}`);
+      navigateTo(`/game/${response.lobbyName}/place/${uuid.value}`);
       break;
     }
   }
@@ -63,12 +52,12 @@ function getLobbies(initGames: string[]) {
   games.value = initGames;
 }
 
-socket.on("new-game", (gameName: string) => {
-  games.value.push(gameName);
+socket.on("new-game", (lobbyName: string) => {
+  games.value.push(lobbyName);
 });
 
-socket.on("remove-game", (gameName: string) => {
-  const index = games.value.indexOf(gameName);
+socket.on("remove-game", (lobbyName: string) => {
+  const index = games.value.indexOf(lobbyName);
 
   if (index !== -1) games.value.splice(index, 1);
 });
@@ -83,7 +72,6 @@ function generateUUID() {
     },
   );
 
-  console.log(uuid);
   uuid.value = uuidGen;
 }
 
@@ -92,13 +80,12 @@ generateUUID();
 onBeforeUnmount(() => {
   socket?.disconnect();
 });
-
 </script>
 
 <template>
   <div class="p-2">
-    <LobbyForm @submit="(args) => createGame(args)" />
-    <LobbyList :games="games" @submit="(args) => joinGame(args)" />
+    <LobbyForm @submit="(args) => createLobby(args)" />
+    <LobbyList :games="games" @submit="(args) => joinLobby(args)" />
   </div>
 </template>
 
