@@ -1,5 +1,5 @@
-import type { Cell, Cord} from "#shared/gameTypes";
-import { GameError, GameState  } from "#shared/gameTypes";
+import type { Cell, Cord } from "#shared/gameTypes";
+import { GameError, GameState } from "#shared/gameTypes";
 import { gameRepository } from "~~/server/utils/repositories/gameRepository";
 import type { Socket } from "socket.io";
 
@@ -30,6 +30,22 @@ export class GameService {
     return gameRepository.removeGame(gameName);
   }
 
+  getGameByName(gameName: string) {
+    const game = gameRepository.getGameByName(gameName);
+
+    if (!game) return GameError.INVALID_GAME;
+
+    return game;
+  }
+
+  getCurrentPlayer(gameName: string) {
+    const game = gameRepository.getGameByName(gameName);
+
+    if (!game) return GameError.INVALID_GAME;
+
+    return gameRepository.getCurrentPlayer(gameName);
+  }
+
   tryRemove(gameName: string, socket: Socket) {
     const game = gameRepository.getGameByName(gameName);
 
@@ -41,6 +57,14 @@ export class GameService {
       return GameError.INVALID_ID;
 
     gameRepository.tryRemove(gameName, socket);
+  }
+
+  isGameStarted(gameName: string) {
+    const game = gameRepository.getGameByName(gameName)!;
+
+    if (!game) return GameError.INVALID_GAME;
+
+    return gameRepository.isGameStarted(gameName);
   }
 
   getAllGames(): string[] {

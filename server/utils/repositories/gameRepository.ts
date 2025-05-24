@@ -1,5 +1,12 @@
-import type { Cell, Cord, Hit, Game, Player } from "#shared/gameTypes";
-import { GameError, GameState } from "#shared/gameTypes";
+import {
+  Cell,
+  Cord,
+  Game,
+  GameError,
+  GameState,
+  Hit,
+  Player,
+} from "#shared/gameTypes";
 import type { Socket } from "socket.io";
 
 export class GameRepository {
@@ -51,7 +58,7 @@ export class GameRepository {
   }
 
   getGameByName(gameName: string) {
-    return this.games.get(gameName);
+    return this.games.get(gameName)!;
   }
 
   getOpponentSocket(gameName: string) {
@@ -59,6 +66,19 @@ export class GameRepository {
 
     if (game.isPlayer1Active) return game.player1!.socket!;
     else return game.player2!.socket!;
+  }
+
+  isGameStarted(gameName: string) {
+    const game = this.getGameByName(gameName)!;
+
+    return game.state !== GameState.WAITING;
+  }
+
+  getCurrentPlayer(gameName: string) {
+    const game = this.getGameByName(gameName)!;
+
+    if (game.isPlayer1Active) return game.player1!.socket!.id;
+    else return game.player2!.socket!.id;
   }
 
   removeGame(gameName: string) {
