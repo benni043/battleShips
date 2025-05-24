@@ -23,6 +23,7 @@ const opponentsGrid: Ref<Cell[][]> = ref(initGrid());
 
 const isGameFinished = ref(false);
 const winner = ref("");
+const current = ref("");
 
 function initGrid() {
   const grid: Cell[][] = [];
@@ -128,28 +129,34 @@ function disconnect() {
 </script>
 
 <template>
-  <div>
-    <h1>game {{ route.params.gameId }}</h1>
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center justify-center relative px-6 py-12">
+    <!-- Leave Button oben rechts -->
     <button
-      class="mt-1 cursor-pointer rounded border-1 bg-red-500 px-1 hover:bg-gray-300"
+      class="absolute top-6 right-6 rounded border border-red-600 bg-red-500 px-4 py-2 text-white hover:bg-red-600 transition"
       @click="leave()"
     >
-      Leave
+      Verlassen
     </button>
 
-    <h1 v-if="isGameFinished">Gewinner: {{ winner }}</h1>
+    <h1 class="text-3xl font-bold mb-8 text-gray-800">Lobby: {{ route.params.gameId }}</h1>
+    <h1 class="text-3xl font-bold mb-8 text-gray-800">{{current}} ist an der Reihe!</h1>
 
-    <div id="fields">
-      <div class="grid-container">
-        <div class="player-grid">
-          <h3>Player1</h3>
+    <h1
+      v-if="isGameFinished"
+      class="text-xl font-semibold text-green-700 mb-8"
+    >
+      Gewinner: {{ winner }}
+    </h1>
 
+    <div id="fields" class="w-full max-w-5xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div class="player-grid bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
+          <h3 class="text-2xl font-semibold text-gray-700 mb-4">Player1</h3>
           <SimpleGrid :grid="myGrid" :has-listener="false" />
         </div>
 
-        <div class="player-grid">
-          <h3>Player2</h3>
-
+        <div class="player-grid bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
+          <h3 class="text-2xl font-semibold text-gray-700 mb-4">Player2</h3>
           <SimpleGrid
             :grid="opponentsGrid"
             :has-listener="!isGameFinished"
@@ -160,5 +167,7 @@ function disconnect() {
     </div>
   </div>
 </template>
+
+
 
 <style scoped></style>

@@ -8,10 +8,12 @@ const gridStore = useMyGridStore();
 
 const gridSent = ref(false);
 
-const canvasWidth = 400;
-const canvasHeight = 400;
 const gridSize = 10;
-const cellSize = canvasHeight / gridSize;
+const labelMargin = 20;
+const baseSize = 400;
+const canvasWidth = baseSize + labelMargin;
+const canvasHeight = baseSize + labelMargin;
+const cellSize = baseSize / gridSize;
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null);
 const ctx: Ref<CanvasRenderingContext2D | null> = ref(null);
@@ -213,10 +215,36 @@ function initShips() {
 function drawGrid() {
   ctx.value!.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  // Draw the grid
-  for (let x = 0; x < gridSize; x++) {
-    for (let y = 0; y < gridSize; y++) {
-      ctx.value!.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize);
+  ctx.value!.font = "14px sans-serif";
+  ctx.value!.textAlign = "center";
+  ctx.value!.textBaseline = "middle";
+
+  // Grid & Achsenbeschriftungen
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+      const x = i * cellSize + labelMargin;
+      const y = j * cellSize + labelMargin;
+
+      ctx.value!.strokeStyle = "black";
+      ctx.value!.lineWidth = 1;
+      ctx.value!.strokeRect(x, y, cellSize, cellSize);
+
+      // Linke Zahlenachse (1–10)
+      if (i === 0) {
+        ctx.value!.fillStyle = "black";
+        ctx.value!.fillText(
+          (j + 1).toString(),
+          labelMargin / 2,
+          y + cellSize / 2,
+        );
+      }
+
+      // Obere Buchstabenachse (A–J)
+      if (j === 0) {
+        ctx.value!.fillStyle = "black";
+        const char = String.fromCharCode(65 + i); // 'A' = 65
+        ctx.value!.fillText(char, x + cellSize / 2, labelMargin / 2);
+      }
     }
   }
 
@@ -282,8 +310,8 @@ function drawShip(idxX: number, idxY: number, x: number, y: number) {
   const bottomY = hasBottomNeighbor ? 0 : 5;
 
   ctx.value!.fillRect(
-    x * cellSize + leftX,
-    y * cellSize + topY,
+    x * cellSize + leftX + labelMargin,
+    y * cellSize + topY + labelMargin,
     cellSize - leftX - rightX,
     cellSize - topY - bottomY,
   );
@@ -303,8 +331,6 @@ onMounted(() => {
 });
 
 const mouseDown = (event: MouseEvent) => {
-  //todo does not work
-
   currentCell = undefined;
   mouseDownX = undefined;
   mouseDownY = undefined;
@@ -312,26 +338,31 @@ const mouseDown = (event: MouseEvent) => {
   drawGrid();
 
   const rect = canvas.value!.getBoundingClientRect();
-  const calcX = event.clientX - rect.left;
-  const calcY = event.clientY - rect.top;
+
+  const calcX = event.clientX - rect.left - labelMargin;
+  const calcY = event.clientY - rect.top - labelMargin;
+
+  if (calcX < 0 || calcY < 0) return;
 
   const x = Math.floor(calcX / cellSize);
   const y = Math.floor(calcY / cellSize);
 
-  mouseDownX = x;
-  mouseDownY = y;
+  if (x >= gridSize || y >= gridSize) return;
 
   if (!grid.value[x]![y]!.shipData) return;
 
   currentCell = grid.value[x]![y];
+  mouseDownX = x;
+  mouseDownY = y;
 };
+
 
 const mouseMove = (event: MouseEvent) => {
   if (!currentCell) return;
 
   const rect = canvas.value!.getBoundingClientRect();
-  const calcX = event.clientX - rect.left;
-  const calcY = event.clientY - rect.top;
+  const calcX = event.clientX - rect.left - labelMargin;
+  const calcY = event.clientY - rect.top - labelMargin;
 
   const diffX = calcX / cellSize - mouseDownX! - 0.5;
   const diffY = calcY / cellSize - mouseDownY! - 0.5;
@@ -479,24 +510,31 @@ async function start() {
 </script>
 
 <template>
-  <div>
-    <div>
+  <div
+    class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-6"
+  >
+
+    <h1 class="text-3xl font-bold mb-8 text-gray-800">Platziere deine Schiffe!</h1>
+
+    <div
+      class="bg-white shadow-xl rounded-lg p-8 flex flex-col items-center"
+      style="width: 460px;"
+    >
       <canvas
         ref="canvas"
         :width="canvasWidth"
         :height="canvasHeight"
-        style="border: 1px solid #d3d3d3"
       />
+      <button
+        class="mt-6 w-full rounded-xl border border-gray-400 bg-blue-600 text-white py-3 hover:bg-blue-700 disabled:bg-green-500 disabled:cursor-not-allowed transition"
+        :disabled="gridSent"
+        @click="start()"
+      >
+        Start Game
+      </button>
     </div>
-
-    <button
-      class="mt-1 rounded border-1 px-1 not-disabled:cursor-pointer hover:bg-gray-300 disabled:bg-green-500"
-      :disabled="gridSent"
-      @click="start()"
-    >
-      startGame
-    </button>
   </div>
 </template>
+
 
 <style scoped></style>
