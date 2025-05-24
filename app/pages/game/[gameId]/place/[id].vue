@@ -40,24 +40,174 @@ function initGrid() {
 }
 
 function initShips() {
-  const ship1Data = {
+  //2er
+  const ship2Data = {
     connectsTo: 1,
     color: "blue",
   } as ShipData;
 
-  grid.value[0]![0]!.shipData = ship1Data;
-  grid.value[0]![1]!.shipData = ship1Data;
+  grid.value[0]![0]!.shipData = ship2Data;
+  grid.value[0]![1]!.shipData = ship2Data;
 
-  const ship2Data = {
+  const ship2Data2 = {
     connectsTo: 2,
+    color: "blue",
+  } as ShipData;
+
+  grid.value[0]![2]!.shipData = ship2Data2;
+  grid.value[0]![3]!.shipData = ship2Data2;
+
+  const ship2Data3 = {
+    connectsTo: 3,
+    color: "blue",
+  } as ShipData;
+
+  grid.value[0]![4]!.shipData = ship2Data3;
+  grid.value[0]![5]!.shipData = ship2Data3;
+
+  //3er
+  const ship3Data = {
+    connectsTo: 4,
+    color: "red",
+  } as ShipData;
+
+  grid.value[1]![1]!.shipData = ship3Data;
+  grid.value[2]![1]!.shipData = ship3Data;
+  grid.value[3]![1]!.shipData = ship3Data;
+
+  const ship3Data2 = {
+    connectsTo: 5,
+    color: "red",
+  } as ShipData;
+
+  grid.value[1]![0]!.shipData = ship3Data2;
+  grid.value[2]![0]!.shipData = ship3Data2;
+  grid.value[3]![0]!.shipData = ship3Data2;
+
+  const ship3Data3 = {
+    connectsTo: 6,
+    color: "red",
+  } as ShipData;
+
+  grid.value[1]![3]!.shipData = ship3Data3;
+  grid.value[1]![4]!.shipData = ship3Data3;
+  grid.value[1]![5]!.shipData = ship3Data3;
+
+  //4er
+  const ship4Data = {
+    connectsTo: 7,
+    color: "orange",
+  } as ShipData;
+
+  grid.value[0]![9]!.shipData = ship4Data;
+  grid.value[0]![8]!.shipData = ship4Data;
+  grid.value[1]![9]!.shipData = ship4Data;
+  grid.value[1]![8]!.shipData = ship4Data;
+
+  //5er
+  const ship5Data = {
+    connectsTo: 8,
     color: "green",
   } as ShipData;
 
-  grid.value[5]![4]!.shipData = ship2Data;
-  grid.value[5]![5]!.shipData = ship2Data;
-  grid.value[5]![6]!.shipData = ship2Data;
-  grid.value[4]![5]!.shipData = ship2Data;
-  grid.value[6]![5]!.shipData = ship2Data;
+  grid.value[5]![4]!.shipData = ship5Data;
+  grid.value[5]![5]!.shipData = ship5Data;
+  grid.value[5]![6]!.shipData = ship5Data;
+  grid.value[4]![5]!.shipData = ship5Data;
+  grid.value[6]![5]!.shipData = ship5Data;
+
+  //1er
+  const ship1Data = {
+    connectsTo: 9,
+    color: "magenta",
+  } as ShipData;
+
+  grid.value[9]![0]!.shipData = ship1Data;
+
+  const ship1Data2 = {
+    connectsTo: 10,
+    color: "magenta",
+  } as ShipData;
+
+  grid.value[8]![0]!.shipData = ship1Data2;
+
+  const ship1Data3 = {
+    connectsTo: 11,
+    color: "magenta",
+  } as ShipData;
+
+  grid.value[8]![1]!.shipData = ship1Data3;
+
+  const ship1Data4 = {
+    connectsTo: 12,
+    color: "magenta",
+  } as ShipData;
+
+  grid.value[9]![1]!.shipData = ship1Data4;
+
+  //8er
+  const ship8Data = {
+    connectsTo: 13,
+    color: "blue",
+  } as ShipData;
+
+  grid.value[9]![9]!.shipData = ship8Data;
+
+  const ship8Data2 = {
+    connectsTo: 13,
+    color: "magenta",
+  } as ShipData;
+
+  grid.value[8]![9]!.shipData = ship8Data2;
+
+  const ship8Data3 = {
+    connectsTo: 13,
+    color: "red",
+  } as ShipData;
+
+  grid.value[7]![9]!.shipData = ship8Data3;
+
+  const ship8Data4 = {
+    connectsTo: 13,
+    color: "orange",
+  } as ShipData;
+
+  grid.value[8]![8]!.shipData = ship8Data4;
+
+  const ship8Data5 = {
+    connectsTo: 13,
+    color: "green",
+  } as ShipData;
+
+  grid.value[8]![7]!.shipData = ship8Data5;
+
+  const ship8Data6 = {
+    connectsTo: 13,
+    color: "cyan",
+  } as ShipData;
+
+  grid.value[9]![7]!.shipData = ship8Data6;
+
+  const ship8Data7 = {
+    connectsTo: 13,
+    color: "cyan",
+  } as ShipData;
+
+  grid.value[9]![7]!.shipData = ship8Data7;
+
+  const ship8Data8 = {
+    connectsTo: 13,
+    color: "purple",
+  } as ShipData;
+
+  grid.value[7]![7]!.shipData = ship8Data8;
+
+  const ship8Data9 = {
+    connectsTo: 13,
+    color: "brown",
+  } as ShipData;
+
+  grid.value[6]![9]!.shipData = ship8Data9;
 }
 
 function drawGrid() {
@@ -84,14 +234,13 @@ function drawGrid() {
 
   // Draw the currently moved ship last
   if (currentCell) {
-    ctx.value!.fillStyle = currentCell.shipData!.color;
-
     for (let x = 0; x < gridSize; x++) {
       for (let y = 0; y < gridSize; y++) {
         if (
           grid.value[x]?.[y]?.shipData?.connectsTo ===
           currentCell.shipData?.connectsTo
         ) {
+          ctx.value!.fillStyle = grid.value[x]![y]!.shipData!.color; // Farbe pro Zelle setzen
           drawShip(x, y, grid.value[x]![y]!.x, grid.value[x]![y]!.y);
         }
       }
@@ -209,12 +358,16 @@ const mouseUp = () => {
   const newPositions: { x: number; y: number }[] = [];
   let isValidMove = true;
 
+  // Alle Schiffsteile mit ihren individuellen Daten speichern
+  const shipCells: Cell[] = [];
   for (let x = 0; x < gridSize; x++) {
     for (let y = 0; y < gridSize; y++) {
       if (
         grid.value[x]?.[y]?.shipData?.connectsTo ===
         currentCell.shipData?.connectsTo
       ) {
+        shipCells.push(grid.value[x]![y]!);
+
         const newX = Math.floor(grid.value[x]![y]!.x + 0.5);
         const newY = Math.floor(grid.value[x]![y]!.y + 0.5);
 
@@ -239,7 +392,7 @@ const mouseUp = () => {
   }
 
   if (isValidMove) {
-    // Clear old positions
+    // Alte Positionen löschen
     for (let x = 0; x < gridSize; x++) {
       for (let y = 0; y < gridSize; y++) {
         if (
@@ -258,10 +411,13 @@ const mouseUp = () => {
       }
     }
 
-    // Assign new positions
-    for (const pos of newPositions) {
+    // Neue Positionen zuweisen mit individuellen shipData von shipCells
+    for (let i = 0; i < newPositions.length; i++) {
+      const pos = newPositions[i]!;
+      const cell = shipCells[i]!;
+
       grid.value[pos.x]![pos.y] = {
-        ...currentCell,
+        ...cell,
         x: pos.x,
         y: pos.y,
         originX: pos.x,
@@ -269,7 +425,7 @@ const mouseUp = () => {
       };
     }
   } else {
-    // If move is invalid, reset to original positions
+    // Wenn ungültig, Positionen zurücksetzen
     for (let x = 0; x < gridSize; x++) {
       for (let y = 0; y < gridSize; y++) {
         if (
