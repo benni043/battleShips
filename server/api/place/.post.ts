@@ -55,7 +55,7 @@ export default defineEventHandler(async (event: H3Event) => {
       }
     }
 
-    const game = gameService.createGame(lobby, id, parsedGrid);
+    const game = gameService.postField(lobby, id, parsedGrid);
 
     return {
       statusCode: 200,

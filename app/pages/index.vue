@@ -57,6 +57,7 @@ socket.on("new-game", (lobbyName: string) => {
 });
 
 socket.on("remove-game", (lobbyName: string) => {
+  console.log("sdfgiu");
   const index = games.value.indexOf(lobbyName);
 
   if (index !== -1) games.value.splice(index, 1);

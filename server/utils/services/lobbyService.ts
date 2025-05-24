@@ -48,19 +48,6 @@ export class LobbyService {
     if (lobby.player1Id !== id && lobby.player2Id !== id)
       return LobbyError.INVALID_ID;
   }
-
-  //
-  // setGrid(id: string, gameName: string, grid: Cell[][]) {
-  //   return lobbyRepository.setGrid(id, gameName, grid);
-  // }
-  //
-  // setSocket(id: string, gameName: string, socket: Socket) {
-  //   return lobbyRepository.setSocket(id, gameName, socket);
-  // }
-  //
-  // removeGame( gameName: string) {
-  //   return lobbyRepository.removeGame(gameName);
-  // }
 }
 
 export const lobbyService = new LobbyService();

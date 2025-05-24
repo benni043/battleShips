@@ -5,20 +5,19 @@ import type { Cord, GameFinished, HitResponse } from "#shared/gameTypes";
 import { GameError } from "#shared/gameTypes";
 
 export function handleGameEvents(socket: Socket, io: Server) {
-  socket.on("click", (id: string, gameName: string, cord: Cord, cb) => {
-    const socket1 = lobbyService.setSocket(id, gameName, socket);
+  socket.on("post-socket", (gameName: string, id: string, cb) => {
+    const response = gameService.setSocket(id, gameName, socket);
 
-    if (socket1 !== undefined) {
-      cb(socket1);
+    cb(response);
+  });
+
+  socket.on("click", (id: string, gameName: string, cord: Cord, cb) => {
+    if (!gameService.isStarted(gameName)) {
+      cb(GameError.NOT_STARTED);
       return;
     }
 
     socket.join(gameName);
-
-    if (gameService.isStarted(gameName) === GameError.NOT_STARTED) {
-      cb(GameError.NOT_STARTED);
-      return;
-    }
 
     const shipData = gameService.handleClick(id, gameName, cord);
 
@@ -36,12 +35,16 @@ export function handleGameEvents(socket: Socket, io: Server) {
           winner: "player",
         } as GameFinished);
 
-        lobbyService.removeGame(gameName);
+        gameService.removeGame(gameName);
       }
 
       return;
     }
 
     cb(shipData);
+  });
+
+  socket.on("manual-disconnect", (gameName: string) => {
+    gameService.tryRemove(gameName, socket);
   });
 }

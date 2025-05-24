@@ -103,20 +103,17 @@ socket.on("game-finished", (gameFinished: GameFinished) => {
   console.log(gameFinished);
 });
 
+socket.emit("post-socket", route.params.gameId, route.params.id, joined);
+
+function joined(response: GameError | undefined) {
+  alert(response);
+}
+
 onBeforeUnmount(() => {
-  socket.emit(
-    "manual-disconnect",
-    route.params.gameId,
-    disconnect,
-  );
+  socket.emit("manual-disconnect", route.params.gameId, disconnect);
 });
 
-function disconnect(error: GameError) {
-  if (error === GameError.INVALID_GAME) {
-    console.error("Spiel wurde bereits beendet!");
-    return;
-  }
-
+function disconnect() {
   console.log("disconnect");
   socket?.disconnect();
 }

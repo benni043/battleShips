@@ -1,5 +1,5 @@
 import type { Server, Socket } from "socket.io";
-import { handleGameEvents } from "~~/server/utils/handlers/game/gameHandler";
+import { handleGameEvents } from "~~/server/utils/handlers/gameHandler";
 
 export function registerConnectionHandlers(socket: Socket, io: Server) {
   handleLobbyEvents(socket, io);
