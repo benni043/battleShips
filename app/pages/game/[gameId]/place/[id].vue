@@ -51,117 +51,117 @@ function initShips() {
   grid.value[0]![0]!.shipData = ship2Data;
   grid.value[0]![1]!.shipData = ship2Data;
 
-  // const ship2Data2 = {
-  //   connectsTo: 2,
-  //   color: "blue",
-  // } as ShipData;
-  //
-  // grid.value[0]![2]!.shipData = ship2Data2;
-  // grid.value[0]![3]!.shipData = ship2Data2;
-  //
-  // const ship2Data3 = {
-  //   connectsTo: 3,
-  //   color: "blue",
-  // } as ShipData;
-  //
-  // grid.value[0]![4]!.shipData = ship2Data3;
-  // grid.value[0]![5]!.shipData = ship2Data3;
-  //
-  // //3er
-  // const ship3Data = {
-  //   connectsTo: 4,
-  //   color: "blue",
-  // } as ShipData;
-  //
-  // grid.value[1]![1]!.shipData = ship3Data;
-  // grid.value[2]![1]!.shipData = ship3Data;
-  // grid.value[3]![1]!.shipData = ship3Data;
-  //
-  // const ship3Data2 = {
-  //   connectsTo: 5,
-  //   color: "blue",
-  // } as ShipData;
-  //
-  // grid.value[1]![0]!.shipData = ship3Data2;
-  // grid.value[2]![0]!.shipData = ship3Data2;
-  // grid.value[3]![0]!.shipData = ship3Data2;
-  //
-  // const ship3Data3 = {
-  //   connectsTo: 6,
-  //   color: "blue",
-  // } as ShipData;
-  //
-  // grid.value[1]![3]!.shipData = ship3Data3;
-  // grid.value[1]![4]!.shipData = ship3Data3;
-  // grid.value[1]![5]!.shipData = ship3Data3;
-  //
-  // //4er
-  // const ship4Data = {
-  //   connectsTo: 7,
-  //   color: "green",
-  // } as ShipData;
-  //
-  // grid.value[0]![9]!.shipData = ship4Data;
-  // grid.value[0]![8]!.shipData = ship4Data;
-  // grid.value[1]![9]!.shipData = ship4Data;
-  // grid.value[1]![8]!.shipData = ship4Data;
-  //
-  // //5er
-  // const ship5Data = {
-  //   connectsTo: 8,
-  //   color: "green",
-  // } as ShipData;
-  //
-  // grid.value[5]![4]!.shipData = ship5Data;
-  // grid.value[5]![5]!.shipData = ship5Data;
-  // grid.value[5]![6]!.shipData = ship5Data;
-  // grid.value[4]![5]!.shipData = ship5Data;
-  // grid.value[6]![5]!.shipData = ship5Data;
-  //
-  // //1er
-  // const ship1Data = {
-  //   connectsTo: 9,
-  //   color: "orange",
-  // } as ShipData;
-  //
-  // grid.value[9]![0]!.shipData = ship1Data;
-  //
-  // const ship1Data2 = {
-  //   connectsTo: 10,
-  //   color: "orange",
-  // } as ShipData;
-  //
-  // grid.value[8]![0]!.shipData = ship1Data2;
-  //
-  // const ship1Data3 = {
-  //   connectsTo: 11,
-  //   color: "orange",
-  // } as ShipData;
-  //
-  // grid.value[8]![1]!.shipData = ship1Data3;
-  //
-  // const ship1Data4 = {
-  //   connectsTo: 12,
-  //   color: "orange",
-  // } as ShipData;
-  //
-  // grid.value[9]![1]!.shipData = ship1Data4;
-  //
-  // //8er
-  // const ship8Data = {
-  //   connectsTo: 13,
-  //   color: "green",
-  // } as ShipData;
-  //
-  // grid.value[9]![9]!.shipData = ship8Data;
-  // grid.value[8]![9]!.shipData = ship8Data;
-  // grid.value[7]![9]!.shipData = ship8Data;
-  // grid.value[8]![8]!.shipData = ship8Data;
-  // grid.value[8]![7]!.shipData = ship8Data;
-  // grid.value[9]![7]!.shipData = ship8Data;
-  // grid.value[9]![7]!.shipData = ship8Data;
-  // grid.value[7]![7]!.shipData = ship8Data;
-  // grid.value[6]![9]!.shipData = ship8Data;
+  const ship2Data2 = {
+    connectsTo: 2,
+    color: "blue",
+  } as ShipData;
+
+  grid.value[0]![2]!.shipData = ship2Data2;
+  grid.value[0]![3]!.shipData = ship2Data2;
+
+  const ship2Data3 = {
+    connectsTo: 3,
+    color: "blue",
+  } as ShipData;
+
+  grid.value[0]![4]!.shipData = ship2Data3;
+  grid.value[0]![5]!.shipData = ship2Data3;
+
+  //3er
+  const ship3Data = {
+    connectsTo: 4,
+    color: "blue",
+  } as ShipData;
+
+  grid.value[1]![1]!.shipData = ship3Data;
+  grid.value[2]![1]!.shipData = ship3Data;
+  grid.value[3]![1]!.shipData = ship3Data;
+
+  const ship3Data2 = {
+    connectsTo: 5,
+    color: "blue",
+  } as ShipData;
+
+  grid.value[1]![0]!.shipData = ship3Data2;
+  grid.value[2]![0]!.shipData = ship3Data2;
+  grid.value[3]![0]!.shipData = ship3Data2;
+
+  const ship3Data3 = {
+    connectsTo: 6,
+    color: "blue",
+  } as ShipData;
+
+  grid.value[1]![3]!.shipData = ship3Data3;
+  grid.value[1]![4]!.shipData = ship3Data3;
+  grid.value[1]![5]!.shipData = ship3Data3;
+
+  //4er
+  const ship4Data = {
+    connectsTo: 7,
+    color: "green",
+  } as ShipData;
+
+  grid.value[0]![9]!.shipData = ship4Data;
+  grid.value[0]![8]!.shipData = ship4Data;
+  grid.value[1]![9]!.shipData = ship4Data;
+  grid.value[1]![8]!.shipData = ship4Data;
+
+  //5er
+  const ship5Data = {
+    connectsTo: 8,
+    color: "green",
+  } as ShipData;
+
+  grid.value[5]![4]!.shipData = ship5Data;
+  grid.value[5]![5]!.shipData = ship5Data;
+  grid.value[5]![6]!.shipData = ship5Data;
+  grid.value[4]![5]!.shipData = ship5Data;
+  grid.value[6]![5]!.shipData = ship5Data;
+
+  //1er
+  const ship1Data = {
+    connectsTo: 9,
+    color: "orange",
+  } as ShipData;
+
+  grid.value[9]![0]!.shipData = ship1Data;
+
+  const ship1Data2 = {
+    connectsTo: 10,
+    color: "orange",
+  } as ShipData;
+
+  grid.value[8]![0]!.shipData = ship1Data2;
+
+  const ship1Data3 = {
+    connectsTo: 11,
+    color: "orange",
+  } as ShipData;
+
+  grid.value[8]![1]!.shipData = ship1Data3;
+
+  const ship1Data4 = {
+    connectsTo: 12,
+    color: "orange",
+  } as ShipData;
+
+  grid.value[9]![1]!.shipData = ship1Data4;
+
+  //8er
+  const ship8Data = {
+    connectsTo: 13,
+    color: "green",
+  } as ShipData;
+
+  grid.value[9]![9]!.shipData = ship8Data;
+  grid.value[8]![9]!.shipData = ship8Data;
+  grid.value[7]![9]!.shipData = ship8Data;
+  grid.value[8]![8]!.shipData = ship8Data;
+  grid.value[8]![7]!.shipData = ship8Data;
+  grid.value[9]![7]!.shipData = ship8Data;
+  grid.value[9]![7]!.shipData = ship8Data;
+  grid.value[7]![7]!.shipData = ship8Data;
+  grid.value[6]![9]!.shipData = ship8Data;
 }
 
 function drawGrid() {

@@ -1,11 +1,12 @@
-import {
+import type {
   Cell,
   Cord,
   Game,
-  GameError,
-  GameState,
   Hit,
-  Player,
+  Player} from "#shared/gameTypes";
+import {
+  GameError,
+  GameState
 } from "#shared/gameTypes";
 import type { Socket } from "socket.io";
 
