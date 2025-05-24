@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import type { Cell, ShipData } from "#shared/gameTypes";
 import { useMyGridStore } from "~/stores/myGrid";
-import { useSocket } from "~/utils/useSocketIO";
 
 const route = useRoute();
-
-const socket = useSocket();
 
 const gridStore = useMyGridStore();
 
@@ -293,7 +290,7 @@ const mouseUp = () => {
   drawGrid();
 };
 
-function start() {
+async function start() {
   gridStore.grid = grid.value;
   gridSent.value = true;
 
@@ -301,15 +298,27 @@ function start() {
   canvas.value!.removeEventListener("mouseup", mouseUp);
   canvas.value!.removeEventListener("mousedown", mouseDown);
 
-  socket.emit("ready");
-}
+  //post to backend
+  try {
+    await $fetch("/api/place", {
+      method: "POST",
+      body: {
+        lobby: route.params.gameId,
+        id: route.params.id,
+        grid: JSON.stringify(grid.value),
+      },
+    });
 
-socket.on("send-field", () => {
-  socket.emit("post-field", JSON.stringify(gridStore.grid), redirect);
-});
-
-function redirect() {
-  navigateTo(`/game/${route.params.id}`);
+    navigateTo(`/game/${route.params.gameId}/${route.params.id}`);
+  } catch (error: any) {
+    if (error?.status === 401) {
+      console.error("Nicht autorisiert:", error.statusMessage);
+    } else if (error?.status === 400) {
+      console.error("Fehlerhafte Anfrage:", error.statusMessage);
+    } else {
+      console.error("Unbekannter Fehler:", error);
+    }
+  }
 }
 </script>
 

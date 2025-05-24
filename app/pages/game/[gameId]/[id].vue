@@ -3,13 +3,16 @@ import SimpleGrid from "~/components/game/SimpleGrid.vue";
 import {
   type Cell,
   type Cord,
-  type GameFinished,
   GameError,
+  type GameFinished,
   type HitResponse,
 } from "#shared/gameTypes";
-import { useSocket } from "~/utils/useSocketIO";
+import { io } from "socket.io-client";
 
-const socket = useSocket();
+const socket = io({
+  path: "/api/socket.io",
+});
+
 const route = useRoute();
 
 const gridStore = useMyGridStore();
@@ -19,6 +22,7 @@ const myGrid: Ref<Cell[][]> = ref(gridStore.grid);
 const opponentsGrid: Ref<Cell[][]> = ref(initGrid());
 
 const isGameFinished = ref(false);
+const winner = ref("");
 
 function initGrid() {
   const grid: Cell[][] = [];
@@ -42,36 +46,59 @@ function initGrid() {
 }
 
 function click(cord: Cord) {
-  socket.emit("click", cord, hitResponseCallBack);
+  socket.emit(
+    "click",
+    route.params.id,
+    route.params.gameId,
+    cord,
+    hitResponseCallBack,
+  );
 }
 
-function hitResponseCallBack(hitResponse: HitResponse | GameError) {
-  switch (hitResponse) {
+function handleError(err: any) {
+  switch (err) {
     case GameError.WRONG_PLAYER: {
       alert("Dein Gegner ist an der Reihe!");
-      break;
+      return true;
     }
     case GameError.INVALID_CORD: {
       alert("Ungültige Coordinaten");
-      break;
+      return true;
     }
     case GameError.ALREADY_HIT: {
       alert("Auf dieses Feld hast du bereits geschossen");
-      break;
+      return true;
     }
-    default: {
-      opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit =
-        true;
-      opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.shipData =
-        hitResponse.shipData;
-      break;
+    case GameError.NOT_STARTED: {
+      alert("Spiel hat noch nicht gestartet");
+      return true;
     }
+    case GameError.INVALID_ID: {
+      alert("invalid id");
+      return true;
+    }
+    case GameError.INVALID_GAME: {
+      alert("invalid game");
+      return true;
+    }
+    default:
+      return false;
+  }
+}
+
+function hitResponseCallBack(hitResponse: HitResponse | GameError) {
+  const hasError = handleError(hitResponse);
+
+  if (!hasError) {
+    hitResponse = hitResponse as HitResponse;
+
+    opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit = true;
+    opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.shipData =
+      hitResponse.shipData;
   }
 }
 
 function leave() {
-  console.log("leave");
-  socket.emit("leave");
   navigateTo(`/`);
 }
 
@@ -81,19 +108,36 @@ socket.on("hit-response", (cord: Cord) => {
 
 socket.on("game-finished", (gameFinished: GameFinished) => {
   isGameFinished.value = true;
-  console.log(gameFinished);
+  winner.value = gameFinished.winner;
 });
+
+socket.emit("post-socket", route.params.gameId, route.params.id, joined);
+
+function joined(response: GameError | undefined) {
+  handleError(response);
+}
+
+onBeforeUnmount(() => {
+  socket.emit("manual-disconnect", route.params.gameId, disconnect);
+});
+
+function disconnect() {
+  console.log("disconnect");
+  socket?.disconnect();
+}
 </script>
 
 <template>
   <div>
-    <h1>game {{ route.params.id }}</h1>
+    <h1>game {{ route.params.gameId }}</h1>
     <button
       class="mt-1 cursor-pointer rounded border-1 bg-red-500 px-1 hover:bg-gray-300"
       @click="leave()"
     >
       Leave
     </button>
+
+    <h1 v-if="isGameFinished">Gewinner: {{ winner }}</h1>
 
     <div id="fields">
       <div class="grid-container">

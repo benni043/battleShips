@@ -1,3 +1,5 @@
+import type { Socket } from "socket.io";
+
 export interface Cell {
   shipData: ShipData | undefined;
   isHit: boolean;
@@ -30,9 +32,32 @@ export interface HitResponse {
 export enum GameError {
   WRONG_PLAYER = "WRONG_PLAYER",
   INVALID_CORD = "INVALID_CORD",
+  INVALID_ID = "INVALID_ID",
+  INVALID_GAME = "INVALID_GAME",
   ALREADY_HIT = "ALREADY_HIT",
+  NOT_STARTED = "NOT_STARTED",
 }
 
 export interface GameFinished {
   winner: string;
+}
+
+export type Game = {
+  player1: Player;
+  player2: Player | undefined;
+  gameName: string;
+  state: GameState;
+  isPlayer1Active: boolean;
+};
+
+export enum GameState {
+  WAITING,
+  STARTED,
+  FINISHED,
+}
+
+export interface Player {
+  id: string;
+  field: Cell[][];
+  socket: Socket | undefined;
 }

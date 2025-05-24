@@ -1,27 +1,51 @@
-import type { Cell, Cord } from "#shared/gameTypes";
-import type { GameLobby } from "#shared/types";
-import { GameRepository } from "~~/server/utils/repositories/gameRepository";
+import type { Cell, Cord} from "#shared/gameTypes";
+import { GameError, GameState  } from "#shared/gameTypes";
+import { gameRepository } from "~~/server/utils/repositories/gameRepository";
+import type { Socket } from "socket.io";
 
 export class GameService {
-  gameRepository: GameRepository = new GameRepository();
-
-  getGameName() {
-    return this.gameRepository.getGameName();
+  postField(gameName: string, id: string, field: Cell[][]) {
+    return gameRepository.postField(gameName, id, field);
   }
 
-  getOpponentSocket() {
-    return this.gameRepository.getOpponentSocket();
+  setSocket(id: string, gameName: string, socket: Socket) {
+    return gameRepository.setSocket(id, gameName, socket);
   }
 
-  setGame(game: Cell[][], id: string) {
-    this.gameRepository.setGame(game, id);
+  getOpponentSocket(gameName: string) {
+    return gameRepository.getOpponentSocket(gameName);
   }
 
-  setGameLobby(gameLobby: GameLobby) {
-    this.gameRepository.setGameLobby(gameLobby);
+  handleClick(id: string, gameName: string, cord: Cord) {
+    return gameRepository.handleClick(id, gameName, cord);
   }
 
-  handleClick(cord: Cord, id: string) {
-    return this.gameRepository.handleClick(cord, id);
+  isStarted(gameName: string) {
+    const game = gameRepository.getGameByName(gameName);
+
+    return !(!game || game!.state === GameState.WAITING);
+  }
+
+  removeGame(gameName: string) {
+    return gameRepository.removeGame(gameName);
+  }
+
+  tryRemove(gameName: string, socket: Socket) {
+    const game = gameRepository.getGameByName(gameName);
+
+    if (!game) return GameError.INVALID_GAME;
+    if (
+      socket.id !== game.player1.socket?.id &&
+      socket.id !== game.player2!.socket?.id
+    )
+      return GameError.INVALID_ID;
+
+    gameRepository.tryRemove(gameName, socket);
+  }
+
+  getAllGames(): string[] {
+    return gameRepository.getAllGames();
   }
 }
+
+export const gameService = new GameService();

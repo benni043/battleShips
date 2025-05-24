@@ -1,67 +1,50 @@
-import type { Socket } from "socket.io";
-import type { GameLobby } from "#shared/types";
-import type { Cell, Cord, GameFinished, HitResponse } from "#shared/gameTypes";
+import type { Server, Socket } from "socket.io";
+
+import { gameService } from "~~/server/utils/services/gameService";
+import type { Cord, GameFinished, HitResponse } from "#shared/gameTypes";
 import { GameError } from "#shared/gameTypes";
-import { GameService } from "~~/server/utils/services/gameService";
 
-export class GameHandler {
-  gameService: GameService = new GameService();
+export function handleGameEvents(socket: Socket, io: Server) {
+  socket.on("post-socket", (gameName: string, id: string, cb) => {
+    const response = gameService.setSocket(id, gameName, socket);
 
-  constructor(game: GameLobby) {
-    this.gameService.setGameLobby(game);
+    cb(response);
+  });
 
-    this.handlePostField(game.socketPlayer1);
-    this.handlePostField(game.socketPlayer2!);
+  socket.on("click", (id: string, gameName: string, cord: Cord, cb) => {
+    if (!gameService.isStarted(gameName)) {
+      cb(GameError.NOT_STARTED);
+      return;
+    }
 
-    game.socketPlayer2?.on("ready", () => {
-      io.to(game.gameName).emit("send-field");
-    });
+    socket.join(gameName);
 
-    this.handleClick(game.socketPlayer1);
-    this.handleClick(game.socketPlayer2!);
+    const shipData = gameService.handleClick(id, gameName, cord);
 
-    this.handleLeave(game.socketPlayer1);
-    this.handleLeave(game.socketPlayer2!);
-  }
+    if (
+      shipData !== GameError.INVALID_CORD &&
+      shipData !== GameError.WRONG_PLAYER &&
+      shipData !== GameError.ALREADY_HIT
+    ) {
+      gameService.getOpponentSocket(gameName).emit("hit-response", cord);
 
-  handlePostField(socket: Socket) {
-    socket.on("post-field", (grid: string, cb) => {
-      const parse: Cell[][] = JSON.parse(grid);
+      cb({ cord: cord, shipData: shipData.shipData } as HitResponse);
 
-      this.gameService.setGame(parse, socket.id);
+      if (shipData.gameFinished) {
+        io.to(gameName).emit("game-finished", {
+          winner: "player",
+        } as GameFinished);
 
-      cb();
-    });
-  }
-
-  handleClick(socket: Socket) {
-    socket.on("click", (cord: Cord, cb) => {
-      const shipData = this.gameService.handleClick(cord, socket.id);
-
-      if (
-        shipData !== GameError.INVALID_CORD &&
-        shipData !== GameError.WRONG_PLAYER &&
-        shipData !== GameError.ALREADY_HIT
-      ) {
-        this.gameService.getOpponentSocket().emit("hit-response", cord);
-        cb({ cord: cord, shipData: shipData.shipData } as HitResponse);
-
-        if (shipData.gameFinished)
-          io.to(this.gameService.getGameName()).emit("game-finished", {
-            winner: "player",
-          } as GameFinished);
-
-        return;
+        gameService.removeGame(gameName);
       }
 
-      cb(shipData);
-    });
-  }
+      return;
+    }
 
-  handleLeave(socket: Socket) {
-    socket.on("leave", () => {
-      socket.leave(this.gameService.getGameName());
-      socket.join("lobby");
-    });
-  }
+    cb(shipData);
+  });
+
+  socket.on("manual-disconnect", (gameName: string) => {
+    gameService.tryRemove(gameName, socket);
+  });
 }
