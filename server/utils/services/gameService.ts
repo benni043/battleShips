@@ -46,6 +46,14 @@ export class GameService {
     return gameRepository.getCurrentPlayer(gameName);
   }
 
+  getWinner(gameName: string) {
+    const game = gameRepository.getGameByName(gameName);
+
+    if (!game) return GameError.INVALID_GAME;
+
+    return gameRepository.getWinner(gameName);
+  }
+
   tryRemove(gameName: string, socket: Socket) {
     const game = gameRepository.getGameByName(gameName);
 

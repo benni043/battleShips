@@ -85,6 +85,13 @@ export class GameRepository {
     else return game.player2!.username!;
   }
 
+  getWinner(gameName: string) {
+    const game = this.getGameByName(gameName)!;
+
+    if (game.isPlayer1Active) return game.player2!.username;
+    else return game.player1!.username!;
+  }
+
   removeGame(gameName: string) {
     this.games.delete(gameName);
   }

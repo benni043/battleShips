@@ -9,6 +9,8 @@ export function handleGameEvents(socket: Socket, io: Server) {
     (gameName: string, id: string, username: string, cb) => {
       const response = gameService.setSocket(id, gameName, username, socket);
 
+      socket.join(gameName);
+
       if (gameService.isGameStarted(gameName)) {
         const game = gameService.getGameByName(gameName);
 
@@ -36,8 +38,6 @@ export function handleGameEvents(socket: Socket, io: Server) {
       return;
     }
 
-    socket.join(gameName);
-
     const shipData = gameService.handleClick(id, gameName, cord);
 
     if (
@@ -45,15 +45,16 @@ export function handleGameEvents(socket: Socket, io: Server) {
       shipData !== GameError.WRONG_PLAYER &&
       shipData !== GameError.ALREADY_HIT
     ) {
+      const current = gameService.getCurrentPlayer(gameName);
+      io.to(gameName).emit("current", current);
+
       gameService.getOpponentSocket(gameName).emit("hit-response", cord);
 
       cb({ cord: cord, shipData: shipData.shipData } as HitResponse);
 
-      io.to(gameName).emit("current", gameService.getCurrentPlayer(gameName));
-
       if (shipData.gameFinished) {
         io.to(gameName).emit("game-finished", {
-          winner: "player",
+          winner: gameService.getWinner(gameName),
         } as GameFinished);
 
         gameService.removeGame(gameName);
