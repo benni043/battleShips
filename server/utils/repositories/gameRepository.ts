@@ -92,11 +92,12 @@ export class GameRepository {
   tryRemove(gameName: string, socket: Socket) {
     const game = this.getGameByName(gameName)!;
 
-    if (socket.id === game.player1.socket!.id) game.player1.socket = undefined;
+    if (socket.id === game.player1.socket?.id) game.player1.socket = undefined;
     else game.player2!.socket = undefined;
 
-    if (!game.player1.socket && !game.player2!.socket)
+    if (!game.player1.socket && !game.player2?.socket) {
       this.removeGame(gameName);
+    }
   }
 
   private isCordValid(cord: Cord) {

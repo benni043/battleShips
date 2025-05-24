@@ -3,6 +3,7 @@ import LobbyForm from "~/components/lobby/LobbyForm.vue";
 import LobbyList from "~/components/lobby/LobbyList.vue";
 import { io } from "socket.io-client";
 import { LobbyError, type LobbyResponse } from "#shared/lobbyTypes";
+import Username from "~/components/lobby/Username.vue";
 
 const socket = io({
   path: "/api/socket.io",
@@ -11,14 +12,13 @@ const socket = io({
 const userNameStore = useUserNameStore();
 
 const games: Ref<string[]> = ref([]);
-const uuid: Ref<string> = ref("");
 
 function createLobby(lobbyName: string) {
-  socket.emit("create-game", lobbyName, uuid.value, lobbyResponse);
+  socket.emit("create-game", lobbyName, userNameStore.uuid, lobbyResponse);
 }
 
 function joinLobby(lobbyName: string) {
-  socket.emit("join-game", lobbyName, uuid.value, lobbyResponse);
+  socket.emit("join-game", lobbyName, userNameStore.uuid, lobbyResponse);
 }
 
 function lobbyResponse(response: LobbyResponse | LobbyError) {
@@ -40,7 +40,7 @@ function lobbyResponse(response: LobbyResponse | LobbyError) {
       break;
     }
     default: {
-      navigateTo(`/game/${response.lobbyName}/place/${uuid.value}`);
+      navigateTo(`/game/${response.lobbyName}/place/${userNameStore.uuid}`);
       break;
     }
   }
@@ -61,7 +61,7 @@ socket.on("remove-game", (lobbyName: string) => {
 });
 
 function generateUUID() {
-  const uuidGen = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+  userNameStore.uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
     /[xy]/g,
     (char) => {
       const rand = (Math.random() * 16) | 0;
@@ -69,13 +69,19 @@ function generateUUID() {
       return value.toString(16);
     },
   );
-
-  uuid.value = uuidGen;
 }
 
-generateUUID();
+function setUserName(usernameRes: string) {
+  userNameStore.me = usernameRes;
 
-socket.emit("join-lobby", getLobbies);
+  generateUUID();
+
+  socket.emit("join-lobby", getLobbies);
+}
+
+if (userNameStore.me.length !== 0) {
+  socket.emit("join-lobby", getLobbies);
+}
 
 onBeforeUnmount(() => {
   socket?.disconnect();
@@ -84,15 +90,24 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="mx-auto min-h-screen max-w-md p-4 font-sans">
-    <LobbyForm
-      class="mb-6 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
-      @submit="(args) => createLobby(args)"
-    />
-    <LobbyList
-      :games="games"
-      class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
-      @submit="(args) => joinLobby(args)"
-    />
+    <div v-if="userNameStore.me.length === 0">
+      <Username
+        class="mb-6 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
+        @submit="(args) => setUserName(args)"
+      />
+    </div>
+
+    <div v-if="userNameStore.me.length !== 0">
+      <LobbyForm
+        class="mb-6 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
+        @submit="(args) => createLobby(args)"
+      />
+      <LobbyList
+        :games="games"
+        class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
+        @submit="(args) => joinLobby(args)"
+      />
+    </div>
   </div>
 </template>
 

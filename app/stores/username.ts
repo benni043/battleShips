@@ -1,6 +1,7 @@
 export const useUserNameStore = defineStore("userName", {
   state: () => ({
-    me: "benni",
+    me: "",
+    uuid: "",
     opponent: "",
   }),
 });
