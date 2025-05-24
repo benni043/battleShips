@@ -30,6 +30,10 @@ export class LobbyRepository {
   getLobbyByName(lobbyName: string) {
     return this.lobbies.get(lobbyName);
   }
+
+  removeLobby(lobbyName: string) {
+    this.lobbies.delete(lobbyName);
+  }
 }
 
 export const lobbyRepository = new LobbyRepository();

@@ -62,6 +62,8 @@ export default defineEventHandler(async (event: H3Event) => {
       body: game,
     };
   } catch (err) {
+    console.error(err);
+
     return sendError(
       event,
       createError({

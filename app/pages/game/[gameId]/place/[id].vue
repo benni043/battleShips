@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { type Cell, GameError, type ShipData } from "#shared/gameTypes";
+import type { Cell, ShipData } from "#shared/gameTypes";
 import { useMyGridStore } from "~/stores/myGrid";
-import { io } from "socket.io-client";
 
 const route = useRoute();
 
@@ -301,7 +300,7 @@ async function start() {
 
   //post to backend
   try {
-    const response = await $fetch("/api/place", {
+    await $fetch("/api/place", {
       method: "POST",
       body: {
         lobby: route.params.gameId,
@@ -309,8 +308,6 @@ async function start() {
         grid: JSON.stringify(grid.value),
       },
     });
-
-    console.log("Game erfolgreich erstellt:", response);
 
     navigateTo(`/game/${route.params.gameId}/${route.params.id}`);
   } catch (error: any) {

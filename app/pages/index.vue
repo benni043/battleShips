@@ -20,8 +20,6 @@ function joinLobby(lobbyName: string) {
 }
 
 function lobbyResponse(response: LobbyResponse | LobbyError) {
-  console.log(response);
-
   switch (response) {
     case LobbyError.ALREADY_TAKEN: {
       alert("Dieser Lobbyname wird bereits verwendet!");
@@ -57,7 +55,6 @@ socket.on("new-game", (lobbyName: string) => {
 });
 
 socket.on("remove-game", (lobbyName: string) => {
-  console.log("sdfgiu");
   const index = games.value.indexOf(lobbyName);
 
   if (index !== -1) games.value.splice(index, 1);

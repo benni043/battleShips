@@ -1,7 +1,7 @@
-import { Cell, Cord, GameError } from "#shared/gameTypes";
+import type { Cell, Cord} from "#shared/gameTypes";
+import { GameError, GameState  } from "#shared/gameTypes";
 import { gameRepository } from "~~/server/utils/repositories/gameRepository";
 import type { Socket } from "socket.io";
-import { GameState } from "#shared/gameTypes";
 
 export class GameService {
   postField(gameName: string, id: string, field: Cell[][]) {
@@ -34,10 +34,17 @@ export class GameService {
     const game = gameRepository.getGameByName(gameName);
 
     if (!game) return GameError.INVALID_GAME;
-    if (socket.id !== game.player1.socket!.id && socket.id !== game.player2!.socket!.id)
+    if (
+      socket.id !== game.player1.socket?.id &&
+      socket.id !== game.player2!.socket?.id
+    )
       return GameError.INVALID_ID;
 
     gameRepository.tryRemove(gameName, socket);
+  }
+
+  getAllGames(): string[] {
+    return gameRepository.getAllGames();
   }
 }
 

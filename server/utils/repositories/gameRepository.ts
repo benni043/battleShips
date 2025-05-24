@@ -28,9 +28,15 @@ export class GameRepository {
         field: field,
         socket: undefined,
       } as Player;
+
+      lobbyService.removeLobby(gameName);
     }
 
     return gameName;
+  }
+
+  getAllGames(): string[] {
+    return this.games.keys().toArray();
   }
 
   setSocket(id: string, gameName: string, socket: Socket) {

@@ -22,6 +22,7 @@ const myGrid: Ref<Cell[][]> = ref(gridStore.grid);
 const opponentsGrid: Ref<Cell[][]> = ref(initGrid());
 
 const isGameFinished = ref(false);
+const winner = ref("");
 
 function initGrid() {
   const grid: Cell[][] = [];
@@ -54,39 +55,46 @@ function click(cord: Cord) {
   );
 }
 
-function hitResponseCallBack(hitResponse: HitResponse | GameError) {
-  switch (hitResponse) {
+function handleError(err: any) {
+  switch (err) {
     case GameError.WRONG_PLAYER: {
       alert("Dein Gegner ist an der Reihe!");
-      break;
+      return true;
     }
     case GameError.INVALID_CORD: {
       alert("Ungültige Coordinaten");
-      break;
+      return true;
     }
     case GameError.ALREADY_HIT: {
       alert("Auf dieses Feld hast du bereits geschossen");
-      break;
+      return true;
     }
     case GameError.NOT_STARTED: {
       alert("Spiel hat noch nicht gestartet");
-      break;
+      return true;
     }
     case GameError.INVALID_ID: {
       alert("invalid id");
-      break;
+      return true;
     }
     case GameError.INVALID_GAME: {
       alert("invalid game");
-      break;
+      return true;
     }
-    default: {
-      opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit =
-        true;
-      opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.shipData =
-        hitResponse.shipData;
-      break;
-    }
+    default:
+      return false;
+  }
+}
+
+function hitResponseCallBack(hitResponse: HitResponse | GameError) {
+  const hasError = handleError(hitResponse);
+
+  if (!hasError) {
+    hitResponse = hitResponse as HitResponse;
+
+    opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit = true;
+    opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.shipData =
+      hitResponse.shipData;
   }
 }
 
@@ -100,13 +108,13 @@ socket.on("hit-response", (cord: Cord) => {
 
 socket.on("game-finished", (gameFinished: GameFinished) => {
   isGameFinished.value = true;
-  console.log(gameFinished);
+  winner.value = gameFinished.winner;
 });
 
 socket.emit("post-socket", route.params.gameId, route.params.id, joined);
 
 function joined(response: GameError | undefined) {
-  alert(response);
+  handleError(response);
 }
 
 onBeforeUnmount(() => {
@@ -128,6 +136,8 @@ function disconnect() {
     >
       Leave
     </button>
+
+    <h1 v-if="isGameFinished">Gewinner: {{ winner }}</h1>
 
     <div id="fields">
       <div class="grid-container">

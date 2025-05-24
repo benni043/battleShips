@@ -1,4 +1,6 @@
 import { LobbyError } from "#shared/lobbyTypes";
+import { lobbyRepository } from "~~/server/utils/repositories/lobbyRepository";
+import { gameService } from "~~/server/utils/services/gameService";
 
 export class LobbyService {
   getAvailableLobbies() {
@@ -24,8 +26,9 @@ export class LobbyService {
 
   private isLobbyNameAvailable(lobbyName: string) {
     const lobbies = lobbyRepository.getAvailableLobbies();
+    const games = gameService.getAllGames();
 
-    return !lobbies.includes(lobbyName);
+    return !lobbies.includes(lobbyName) && !games.includes(lobbyName);
   }
 
   private isLobbyNameValid(lobbyName: string): boolean {
@@ -47,6 +50,10 @@ export class LobbyService {
 
     if (lobby.player1Id !== id && lobby.player2Id !== id)
       return LobbyError.INVALID_ID;
+  }
+
+  removeLobby(lobbyName: string) {
+    lobbyRepository.removeLobby(lobbyName);
   }
 }
 
