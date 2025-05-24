@@ -81,10 +81,18 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="p-2">
-    <LobbyForm @submit="(args) => createLobby(args)" />
-    <LobbyList :games="games" @submit="(args) => joinLobby(args)" />
+  <div class="p-4 max-w-md mx-auto font-sans min-h-screen">
+    <LobbyForm
+      class="mb-6 bg-white rounded-lg shadow-md border border-gray-200 p-6 w-full"
+      @submit="(args) => createLobby(args)"
+    />
+    <LobbyList
+      :games="games"
+      class="bg-white rounded-lg shadow-md border border-gray-200 p-6 w-full"
+      @submit="(args) => joinLobby(args)"
+    />
   </div>
 </template>
+
 
 <style scoped></style>

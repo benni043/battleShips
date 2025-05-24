@@ -12,16 +12,17 @@ function handleSubmit(gameName: string) {
 </script>
 
 <template>
-  <div>
-    <div v-for="game in games" :key="game">
+  <div class="max-w-md mx-auto p-4 bg-white rounded-lg shadow">
+    <div v-for="game in games" :key="game" class="mb-2">
       <button
-        class="mt-1 cursor-pointer rounded border-1 px-1 hover:bg-gray-300"
         @click="handleSubmit(game)"
+        class="w-full text-left px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition"
       >
         {{ game }}
       </button>
     </div>
   </div>
 </template>
+
 
 <style scoped></style>
