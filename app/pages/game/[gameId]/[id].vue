@@ -154,7 +154,7 @@ function disconnect() {
   >
     <!-- Leave Button oben rechts -->
     <button
-      class="absolute top-6 right-6 rounded border border-red-600 bg-red-500 px-4 py-2 text-white transition hover:bg-red-600"
+      class="absolute top-6 right-6 rounded border border-red-600 bg-red-500 px-4 py-2 text-white transition hover:bg-red-600 hover:cursor-pointer"
       @click="leave()"
     >
       Verlassen

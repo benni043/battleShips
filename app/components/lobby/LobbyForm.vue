@@ -40,7 +40,7 @@ function handleSubmit() {
 
     <button
       type="submit"
-      class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+      class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition hover:cursor-pointer"
     >
       Erstellen
     </button>

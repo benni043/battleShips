@@ -356,7 +356,6 @@ const mouseDown = (event: MouseEvent) => {
   mouseDownY = y;
 };
 
-
 const mouseMove = (event: MouseEvent) => {
   if (!currentCell) return;
 
@@ -511,22 +510,19 @@ async function start() {
 
 <template>
   <div
-    class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-6"
+    class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-6"
   >
-
-    <h1 class="text-3xl font-bold mb-8 text-gray-800">Platziere deine Schiffe!</h1>
+    <h1 class="mb-8 text-3xl font-bold text-gray-800">
+      Platziere deine Schiffe!
+    </h1>
 
     <div
-      class="bg-white shadow-xl rounded-lg p-8 flex flex-col items-center"
-      style="width: 460px;"
+      class="flex flex-col items-center rounded-lg bg-white p-8 shadow-xl"
+      style="width: 460px"
     >
-      <canvas
-        ref="canvas"
-        :width="canvasWidth"
-        :height="canvasHeight"
-      />
+      <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" />
       <button
-        class="mt-6 w-full rounded-xl border border-gray-400 bg-blue-600 text-white py-3 hover:bg-blue-700 disabled:bg-green-500 disabled:cursor-not-allowed transition"
+        class="mt-6 w-full rounded-xl border border-gray-400 bg-blue-600 py-3 text-white transition hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-green-500"
         :disabled="gridSent"
         @click="start()"
       >
@@ -535,6 +531,5 @@ async function start() {
     </div>
   </div>
 </template>
-
 
 <style scoped></style>
