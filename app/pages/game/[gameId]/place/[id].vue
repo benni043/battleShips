@@ -22,8 +22,7 @@ const ctx: Ref<CanvasRenderingContext2D | null> = ref(null);
 const grid: Ref<Cell[][]> = ref([]);
 
 let currentCell: Cell | undefined;
-let mouseDownX: number | undefined;
-let mouseDownY: number | undefined;
+let mouseDownPos: { x: number; y: number } | undefined;
 
 function initGrid() {
   for (let x = 0; x < gridSize; x++) {
@@ -283,41 +282,46 @@ onMounted(() => {
   canvas.value!.addEventListener("mouseup", mouseUp);
 });
 
-const mouseDown = (event: MouseEvent) => {
-  currentCell = undefined;
-  mouseDownX = undefined;
-  mouseDownY = undefined;
-
-  drawGrid();
-
+function mouseGridPostion(event: MouseEvent): { x: number; y: number } {
   const rect = canvas.value!.getBoundingClientRect();
 
   const calcX = event.clientX - rect.left - labelMargin;
   const calcY = event.clientY - rect.top - labelMargin;
 
-  if (calcX < 0 || calcY < 0) return;
+  return {
+    x: calcX / cellSize,
+    y: calcY / cellSize,
+  };
+}
 
-  const x = Math.floor(calcX / cellSize);
-  const y = Math.floor(calcY / cellSize);
+const mouseDown = (event: MouseEvent) => {
+  currentCell = undefined;
+  mouseDownPos = undefined;
+
+  drawGrid();
+
+  const mousePos = mouseGridPostion(event);
+
+  if (mousePos.x < 0 || mousePos.y < 0) return;
+
+  const x = Math.floor(mousePos.x);
+  const y = Math.floor(mousePos.y);
 
   if (x >= gridSize || y >= gridSize) return;
 
   if (!grid.value[x]![y]!.shipData) return;
 
   currentCell = grid.value[x]![y];
-  mouseDownX = x;
-  mouseDownY = y;
+  mouseDownPos = mousePos;
 };
 
 const mouseMove = (event: MouseEvent) => {
   if (!currentCell) return;
 
-  const rect = canvas.value!.getBoundingClientRect();
-  const calcX = event.clientX - rect.left - labelMargin;
-  const calcY = event.clientY - rect.top - labelMargin;
+  const mousePos = mouseGridPostion(event);
 
-  const diffX = calcX / cellSize - mouseDownX! - 0.5;
-  const diffY = calcY / cellSize - mouseDownY! - 0.5;
+  const diffX = mousePos.x - mouseDownPos!.x;
+  const diffY = mousePos.y - mouseDownPos!.y;
 
   for (let x1 = 0; x1 < gridSize; x1++) {
     for (let y1 = 0; y1 < gridSize; y1++) {
@@ -335,7 +339,11 @@ const mouseMove = (event: MouseEvent) => {
   drawGrid();
 };
 
-const mouseUp = () => {
+function handleClick() {
+  //todo - handle click
+}
+
+function handleDrop() {
   if (!currentCell) return;
 
   const newPositions: { x: number; y: number }[] = [];
@@ -421,10 +429,21 @@ const mouseUp = () => {
       }
     }
   }
+}
+
+const mouseUp = (event: MouseEvent) => {
+  if (!currentCell) return;
+
+  const mousePos = mouseGridPostion(event);
+
+  if (mousePos.x == mouseDownPos!.x && mousePos.y == mouseDownPos!.y) {
+    handleClick();
+  } else {
+    handleDrop();
+  }
 
   currentCell = undefined;
-  mouseDownX = undefined;
-  mouseDownY = undefined;
+  mouseDownPos = undefined;
 
   drawGrid();
 };
