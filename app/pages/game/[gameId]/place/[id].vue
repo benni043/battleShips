@@ -169,7 +169,6 @@ function drawGrid() {
   ctx.value!.textAlign = "center";
   ctx.value!.textBaseline = "middle";
 
-  // Grid & Achsenbeschriftungen
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       const x = i * cellSize + labelMargin;
@@ -179,7 +178,7 @@ function drawGrid() {
       ctx.value!.lineWidth = 1;
       ctx.value!.strokeRect(x, y, cellSize, cellSize);
 
-      // Linke Zahlenachse (1–10)
+      // number axis
       if (i === 0) {
         ctx.value!.fillStyle = "black";
         ctx.value!.fillText(
@@ -189,7 +188,7 @@ function drawGrid() {
         );
       }
 
-      // Obere Buchstabenachse (A–J)
+      // letter axis
       if (j === 0) {
         ctx.value!.fillStyle = "black";
         const char = String.fromCharCode(65 + i); // 'A' = 65
@@ -223,7 +222,7 @@ function drawGrid() {
           grid.value[x]?.[y]?.shipData?.connectsTo ===
           currentCell.shipData?.connectsTo
         ) {
-          ctx.value!.fillStyle = grid.value[x]![y]!.shipData!.color; // Farbe pro Zelle setzen
+          ctx.value!.fillStyle = grid.value[x]![y]!.shipData!.color;
           drawShip(
             x,
             y,
@@ -290,7 +289,7 @@ onMounted(() => {
   canvas.value!.addEventListener("mouseup", mouseUp);
 });
 
-function mouseGridPostion(event: MouseEvent): { x: number; y: number } {
+function mouseGridPosition(event: MouseEvent): { x: number; y: number } {
   const rect = canvas.value!.getBoundingClientRect();
 
   const calcX = event.clientX - rect.left - labelMargin;
@@ -308,7 +307,7 @@ const mouseDown = (event: MouseEvent) => {
 
   drawGrid();
 
-  const mousePos = mouseGridPostion(event);
+  const mousePos = mouseGridPosition(event);
 
   if (mousePos.x < 0 || mousePos.y < 0) return;
 
@@ -326,7 +325,7 @@ const mouseDown = (event: MouseEvent) => {
 const mouseMove = (event: MouseEvent) => {
   if (!currentCell) return;
 
-  const mousePos = mouseGridPostion(event);
+  const mousePos = mouseGridPosition(event);
 
   const diffX = mousePos.x - mouseDownPos!.x;
   const diffY = mousePos.y - mouseDownPos!.y;
@@ -412,7 +411,7 @@ function placeShipToVisualCord() {
   }
 
   if (isValidMove) {
-    //removing and adding needs to be in 2 steps else a ship might overwrite it self
+    //removing and adding needs to be in 2 steps else a ship might overwrite itself
 
     //remove old cell
     for (const cell of shipCells) {
@@ -436,7 +435,7 @@ function placeShipToVisualCord() {
       };
     }
   } else {
-    // reset cell to gridCordinate
+    // reset cell to gridCoordinate
     for (const cell of shipCells) {
       cell.visualCord.x = cell.gridCord.x;
       cell.visualCord.y = cell.gridCord.y;
@@ -447,7 +446,7 @@ function placeShipToVisualCord() {
 const mouseUp = (event: MouseEvent) => {
   if (!currentCell) return;
 
-  const mousePos = mouseGridPostion(event);
+  const mousePos = mouseGridPosition(event);
 
   if (
     Math.abs(mousePos.x - mouseDownPos!.x) < 0.1 &&
@@ -472,7 +471,6 @@ async function start() {
   canvas.value!.removeEventListener("mouseup", mouseUp);
   canvas.value!.removeEventListener("mousedown", mouseDown);
 
-  //post to backend
   try {
     await $fetch("/api/place", {
       method: "POST",
@@ -487,14 +485,14 @@ async function start() {
   } catch (error) {
     if (error instanceof FetchError) {
       if (error?.status === 401) {
-        console.error("Nicht autorisiert:", error.statusMessage);
+        console.error("unauthorized: ", error.statusMessage);
       } else if (error?.status === 400) {
-        console.error("Fehlerhafte Anfrage:", error.statusMessage);
+        console.error("illegal request: ", error.statusMessage);
       } else {
-        console.error("Unbekannter Fehler:", error);
+        console.error("unknown error: ", error);
       }
     } else {
-      console.error("Unbekannter Fehler:", error);
+      console.error("unknown error: ", error);
     }
   }
 }

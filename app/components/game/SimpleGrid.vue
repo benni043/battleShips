@@ -9,7 +9,6 @@ const props = defineProps<{
 
 const emit = defineEmits(["clicked"]);
 
-// Grid und Canvas-Einstellungen
 const gridSize = 10;
 const labelMargin = 20;
 const baseSize = 400;
@@ -20,7 +19,6 @@ const cellSize = baseSize / gridSize;
 const canvas: Ref<HTMLCanvasElement | null> = ref(null);
 const ctx: Ref<CanvasRenderingContext2D | null> = ref(null);
 
-// Zeichne Grid, wenn sich Grid ändert
 watch(props.grid, () => {
   drawGrid();
 });
@@ -41,7 +39,6 @@ function drawGrid() {
   ctx.value.textAlign = "center";
   ctx.value.textBaseline = "middle";
 
-  // Grid & Achsenbeschriftungen
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       const x = i * cellSize + labelMargin;
@@ -51,7 +48,7 @@ function drawGrid() {
       ctx.value.lineWidth = 1;
       ctx.value.strokeRect(x, y, cellSize, cellSize);
 
-      // Linke Zahlenachse (1–10)
+      // number axis
       if (i === 0) {
         ctx.value.fillStyle = "black";
         ctx.value.fillText(
@@ -61,7 +58,7 @@ function drawGrid() {
         );
       }
 
-      // Obere Buchstabenachse (A–J)
+      // letter axis
       if (j === 0) {
         ctx.value.fillStyle = "black";
         const char = String.fromCharCode(65 + i); // 'A' = 65
@@ -70,7 +67,7 @@ function drawGrid() {
     }
   }
 
-  // Schiffe & Treffer einzeichnen
+  // draw ships and hits
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       const cell = props.grid[i]?.[j];
