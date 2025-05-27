@@ -449,7 +449,10 @@ const mouseUp = (event: MouseEvent) => {
 
   const mousePos = mouseGridPostion(event);
 
-  if (mousePos.x == mouseDownPos!.x && mousePos.y == mouseDownPos!.y) {
+  if (
+    Math.abs(mousePos.x - mouseDownPos!.x) < 0.1 &&
+    Math.abs(mousePos.y - mouseDownPos!.y) < 0.1
+  ) {
     handleClick();
   } else {
     placeShipToVisualCord();
