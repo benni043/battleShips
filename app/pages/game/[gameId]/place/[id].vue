@@ -32,10 +32,8 @@ function initGrid() {
       grid.value[x]!.push({
         shipData: undefined,
         isHit: false,
-        x: x,
-        y: y,
-        originX: x,
-        originY: y,
+        visualCord: { x: x, y: y },
+        gridCord: { x: x, y: y },
       } as Cell);
     }
   }
@@ -207,7 +205,12 @@ function drawGrid() {
         if (!grid.value[x]![y]!.shipData!) continue;
 
         ctx.value!.fillStyle = grid.value[x]![y]!.shipData!.color;
-        drawShip(x, y, grid.value[x]![y]!.x, grid.value[x]![y]!.y);
+        drawShip(
+          x,
+          y,
+          grid.value[x]![y]!.visualCord.x,
+          grid.value[x]![y]!.visualCord.y,
+        );
       }
     }
   }
@@ -221,7 +224,12 @@ function drawGrid() {
           currentCell.shipData?.connectsTo
         ) {
           ctx.value!.fillStyle = grid.value[x]![y]!.shipData!.color; // Farbe pro Zelle setzen
-          drawShip(x, y, grid.value[x]![y]!.x, grid.value[x]![y]!.y);
+          drawShip(
+            x,
+            y,
+            grid.value[x]![y]!.visualCord.x,
+            grid.value[x]![y]!.visualCord.y,
+          );
         }
       }
     }
@@ -331,8 +339,10 @@ const mouseMove = (event: MouseEvent) => {
       )
         continue;
 
-      grid.value[x1]![y1]!.x = grid.value[x1]![y1]!.originX + diffX!;
-      grid.value[x1]![y1]!.y = grid.value[x1]![y1]!.originY + diffY!;
+      grid.value[x1]![y1]!.visualCord.x =
+        grid.value[x1]![y1]!.gridCord.x + diffX!;
+      grid.value[x1]![y1]!.visualCord.y =
+        grid.value[x1]![y1]!.gridCord.y + diffY!;
     }
   }
 
@@ -359,8 +369,10 @@ function handleDrop() {
       ) {
         shipCells.push(grid.value[x]![y]!);
 
-        const newX = Math.floor(grid.value[x]![y]!.x + 0.5);
-        const newY = Math.floor(grid.value[x]![y]!.y + 0.5);
+        console.log(grid.value[x]![y]!);
+
+        const newX = Math.floor(grid.value[x]![y]!.visualCord.x + 0.5);
+        const newY = Math.floor(grid.value[x]![y]!.visualCord.y + 0.5);
 
         // Check if the new position is within bounds and not occupied by another ship
         if (
@@ -393,10 +405,8 @@ function handleDrop() {
           grid.value[x]![y] = {
             shipData: undefined,
             isHit: false,
-            x: x,
-            y: y,
-            originX: x,
-            originY: y,
+            visualCord: { x: x, y: y },
+            gridCord: { x: x, y: y },
           } as Cell;
         }
       }
@@ -409,10 +419,8 @@ function handleDrop() {
 
       grid.value[pos.x]![pos.y] = {
         ...cell,
-        x: pos.x,
-        y: pos.y,
-        originX: pos.x,
-        originY: pos.y,
+        visualCord: { x: pos.x, y: pos.y },
+        gridCord: { x: pos.x, y: pos.y },
       };
     }
   } else {
@@ -423,8 +431,8 @@ function handleDrop() {
           grid.value[x]?.[y]?.shipData?.connectsTo ===
           currentCell.shipData?.connectsTo
         ) {
-          grid.value[x]![y]!.x = grid.value[x]![y]!.originX;
-          grid.value[x]![y]!.y = grid.value[x]![y]!.originY;
+          grid.value[x]![y]!.visualCord.x = grid.value[x]![y]!.gridCord.x;
+          grid.value[x]![y]!.visualCord.y = grid.value[x]![y]!.gridCord.y;
         }
       }
     }
