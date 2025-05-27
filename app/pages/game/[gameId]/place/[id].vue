@@ -350,7 +350,20 @@ const mouseMove = (event: MouseEvent) => {
 };
 
 function handleClick() {
-  //todo - handle click
+  if (!currentCell) return;
+
+  const shipCells = getShipCells(currentCell);
+
+  const pivotX = currentCell.gridCord.x;
+  const pivotY = currentCell.gridCord.y;
+
+  for (const cell of shipCells) {
+    // rotate 90° -> x=-y y=x
+    cell.visualCord.x = -(cell.gridCord.y - pivotY) + pivotX;
+    cell.visualCord.y = cell.gridCord.x - pivotX + pivotY;
+  }
+
+  placeShipToVisualCord();
 }
 
 function getShipCells(cell: Cell): Cell[] {
@@ -369,7 +382,7 @@ function getShipCells(cell: Cell): Cell[] {
   return shipCells;
 }
 
-function handleDrop() {
+function placeShipToVisualCord() {
   if (!currentCell) return;
 
   const shipCells = getShipCells(currentCell);
@@ -439,7 +452,7 @@ const mouseUp = (event: MouseEvent) => {
   if (mousePos.x == mouseDownPos!.x && mousePos.y == mouseDownPos!.y) {
     handleClick();
   } else {
-    handleDrop();
+    placeShipToVisualCord();
   }
 
   currentCell = undefined;
