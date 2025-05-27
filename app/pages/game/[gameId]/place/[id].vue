@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Cell, ShipData } from "#shared/gameTypes";
 import { useMyGridStore } from "~/stores/myGrid";
-import { FetchError } from "ohmyfetch";
+import { FetchError } from "ofetch";
 
 const route = useRoute();
 

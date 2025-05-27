@@ -39,10 +39,8 @@ function initGrid() {
       grid[x]!.push({
         shipData: undefined,
         isHit: false,
-        x: x,
-        y: y,
-        originX: x,
-        originY: y,
+        visualCord: { x: x, y: y },
+        gridCord: { x: x, y: y },
       } as Cell);
     }
   }
