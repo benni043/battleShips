@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Cell, ShipData } from "#shared/gameTypes";
 import { useMyGridStore } from "~/stores/myGrid";
+import { FetchError } from "ohmyfetch";
 
 const route = useRoute();
 
@@ -448,11 +449,15 @@ async function start() {
     });
 
     navigateTo(`/game/${route.params.gameId}/${route.params.id}`);
-  } catch (error: any) {
-    if (error?.status === 401) {
-      console.error("Nicht autorisiert:", error.statusMessage);
-    } else if (error?.status === 400) {
-      console.error("Fehlerhafte Anfrage:", error.statusMessage);
+  } catch (error) {
+    if (error instanceof FetchError) {
+      if (error?.status === 401) {
+        console.error("Nicht autorisiert:", error.statusMessage);
+      } else if (error?.status === 400) {
+        console.error("Fehlerhafte Anfrage:", error.statusMessage);
+      } else {
+        console.error("Unbekannter Fehler:", error);
+      }
     } else {
       console.error("Unbekannter Fehler:", error);
     }

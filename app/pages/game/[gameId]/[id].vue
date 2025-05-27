@@ -60,43 +60,41 @@ function click(cord: Cord) {
   );
 }
 
-function handleError(err: any) {
+function handleError<T>(err: GameError | T): T | undefined {
   switch (err) {
     case GameError.WRONG_PLAYER: {
       alert("Dein Gegner ist an der Reihe!");
-      return true;
+      return undefined;
     }
     case GameError.INVALID_CORD: {
       alert("Ungültige Coordinaten");
-      return true;
+      return undefined;
     }
     case GameError.ALREADY_HIT: {
       alert("Auf dieses Feld hast du bereits geschossen");
-      return true;
+      return undefined;
     }
     case GameError.NOT_STARTED: {
       alert("Spiel hat noch nicht gestartet");
-      return true;
+      return undefined;
     }
     case GameError.INVALID_ID: {
       alert("invalid id");
-      return true;
+      return undefined;
     }
     case GameError.INVALID_GAME: {
       alert("invalid game");
-      return true;
+      return undefined;
     }
     default:
-      return false;
+      return err;
   }
 }
 
-function hitResponseCallBack(hitResponse: HitResponse | GameError) {
-  const hasError = handleError(hitResponse);
+function hitResponseCallBack(data: HitResponse | GameError) {
+  const hitResponse = handleError(data);
 
-  if (!hasError) {
-    hitResponse = hitResponse as HitResponse;
-
+  if (hitResponse) {
     opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit = true;
     opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.shipData =
       hitResponse.shipData;
@@ -154,7 +152,7 @@ function disconnect() {
   >
     <!-- Leave Button oben rechts -->
     <button
-      class="absolute top-6 right-6 rounded border border-red-600 bg-red-500 px-4 py-2 text-white transition hover:bg-red-600 hover:cursor-pointer"
+      class="absolute top-6 right-6 rounded border border-red-600 bg-red-500 px-4 py-2 text-white transition hover:cursor-pointer hover:bg-red-600"
       @click="leave()"
     >
       Verlassen
@@ -176,14 +174,18 @@ function disconnect() {
         <div
           class="player-grid flex flex-col items-center rounded-lg bg-white p-6 shadow-md"
         >
-          <h3 class="mb-4 text-2xl font-semibold text-gray-700">{{ userNameStore.me }}</h3>
+          <h3 class="mb-4 text-2xl font-semibold text-gray-700">
+            {{ userNameStore.me }}
+          </h3>
           <SimpleGrid :grid="myGrid" :has-listener="false" />
         </div>
 
         <div
           class="player-grid flex flex-col items-center rounded-lg bg-white p-6 shadow-md"
         >
-          <h3 class="mb-4 text-2xl font-semibold text-gray-700">{{ userNameStore.opponent }}</h3>
+          <h3 class="mb-4 text-2xl font-semibold text-gray-700">
+            {{ userNameStore.opponent }}
+          </h3>
           <SimpleGrid
             :grid="opponentsGrid"
             :has-listener="!isGameFinished"
