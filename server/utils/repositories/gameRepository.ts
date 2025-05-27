@@ -1,13 +1,5 @@
-import type {
-  Cell,
-  Cord,
-  Game,
-  Hit,
-  Player} from "#shared/gameTypes";
-import {
-  GameError,
-  GameState
-} from "#shared/gameTypes";
+import type { Cell, Cord, Game, Hit, Player } from "#shared/gameTypes";
+import { GameError, GameState } from "#shared/gameTypes";
 import type { Socket } from "socket.io";
 
 export class GameRepository {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Cell, ShipData } from "#shared/gameTypes";
 import { useMyGridStore } from "~/stores/myGrid";
+import { FetchError } from "ofetch";
 
 const route = useRoute();
 
@@ -21,8 +22,7 @@ const ctx: Ref<CanvasRenderingContext2D | null> = ref(null);
 const grid: Ref<Cell[][]> = ref([]);
 
 let currentCell: Cell | undefined;
-let mouseDownX: number | undefined;
-let mouseDownY: number | undefined;
+let mouseDownPos: { x: number; y: number } | undefined;
 
 function initGrid() {
   for (let x = 0; x < gridSize; x++) {
@@ -32,10 +32,8 @@ function initGrid() {
       grid.value[x]!.push({
         shipData: undefined,
         isHit: false,
-        x: x,
-        y: y,
-        originX: x,
-        originY: y,
+        visualCord: { x: x, y: y },
+        gridCord: { x: x, y: y },
       } as Cell);
     }
   }
@@ -171,7 +169,6 @@ function drawGrid() {
   ctx.value!.textAlign = "center";
   ctx.value!.textBaseline = "middle";
 
-  // Grid & Achsenbeschriftungen
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       const x = i * cellSize + labelMargin;
@@ -181,7 +178,7 @@ function drawGrid() {
       ctx.value!.lineWidth = 1;
       ctx.value!.strokeRect(x, y, cellSize, cellSize);
 
-      // Linke Zahlenachse (1–10)
+      // number axis
       if (i === 0) {
         ctx.value!.fillStyle = "black";
         ctx.value!.fillText(
@@ -191,7 +188,7 @@ function drawGrid() {
         );
       }
 
-      // Obere Buchstabenachse (A–J)
+      // letter axis
       if (j === 0) {
         ctx.value!.fillStyle = "black";
         const char = String.fromCharCode(65 + i); // 'A' = 65
@@ -207,7 +204,12 @@ function drawGrid() {
         if (!grid.value[x]![y]!.shipData!) continue;
 
         ctx.value!.fillStyle = grid.value[x]![y]!.shipData!.color;
-        drawShip(x, y, grid.value[x]![y]!.x, grid.value[x]![y]!.y);
+        drawShip(
+          x,
+          y,
+          grid.value[x]![y]!.visualCord.x,
+          grid.value[x]![y]!.visualCord.y,
+        );
       }
     }
   }
@@ -220,8 +222,13 @@ function drawGrid() {
           grid.value[x]?.[y]?.shipData?.connectsTo ===
           currentCell.shipData?.connectsTo
         ) {
-          ctx.value!.fillStyle = grid.value[x]![y]!.shipData!.color; // Farbe pro Zelle setzen
-          drawShip(x, y, grid.value[x]![y]!.x, grid.value[x]![y]!.y);
+          ctx.value!.fillStyle = grid.value[x]![y]!.shipData!.color;
+          drawShip(
+            x,
+            y,
+            grid.value[x]![y]!.visualCord.x,
+            grid.value[x]![y]!.visualCord.y,
+          );
         }
       }
     }
@@ -282,41 +289,46 @@ onMounted(() => {
   canvas.value!.addEventListener("mouseup", mouseUp);
 });
 
-const mouseDown = (event: MouseEvent) => {
-  currentCell = undefined;
-  mouseDownX = undefined;
-  mouseDownY = undefined;
-
-  drawGrid();
-
+function mouseGridPosition(event: MouseEvent): { x: number; y: number } {
   const rect = canvas.value!.getBoundingClientRect();
 
   const calcX = event.clientX - rect.left - labelMargin;
   const calcY = event.clientY - rect.top - labelMargin;
 
-  if (calcX < 0 || calcY < 0) return;
+  return {
+    x: calcX / cellSize,
+    y: calcY / cellSize,
+  };
+}
 
-  const x = Math.floor(calcX / cellSize);
-  const y = Math.floor(calcY / cellSize);
+const mouseDown = (event: MouseEvent) => {
+  currentCell = undefined;
+  mouseDownPos = undefined;
+
+  drawGrid();
+
+  const mousePos = mouseGridPosition(event);
+
+  if (mousePos.x < 0 || mousePos.y < 0) return;
+
+  const x = Math.floor(mousePos.x);
+  const y = Math.floor(mousePos.y);
 
   if (x >= gridSize || y >= gridSize) return;
 
   if (!grid.value[x]![y]!.shipData) return;
 
   currentCell = grid.value[x]![y];
-  mouseDownX = x;
-  mouseDownY = y;
+  mouseDownPos = mousePos;
 };
 
 const mouseMove = (event: MouseEvent) => {
   if (!currentCell) return;
 
-  const rect = canvas.value!.getBoundingClientRect();
-  const calcX = event.clientX - rect.left - labelMargin;
-  const calcY = event.clientY - rect.top - labelMargin;
+  const mousePos = mouseGridPosition(event);
 
-  const diffX = calcX / cellSize - mouseDownX! - 0.5;
-  const diffY = calcY / cellSize - mouseDownY! - 0.5;
+  const diffX = mousePos.x - mouseDownPos!.x;
+  const diffY = mousePos.y - mouseDownPos!.y;
 
   for (let x1 = 0; x1 < gridSize; x1++) {
     for (let y1 = 0; y1 < gridSize; y1++) {
@@ -326,104 +338,127 @@ const mouseMove = (event: MouseEvent) => {
       )
         continue;
 
-      grid.value[x1]![y1]!.x = grid.value[x1]![y1]!.originX + diffX!;
-      grid.value[x1]![y1]!.y = grid.value[x1]![y1]!.originY + diffY!;
+      grid.value[x1]![y1]!.visualCord.x =
+        grid.value[x1]![y1]!.gridCord.x + diffX!;
+      grid.value[x1]![y1]!.visualCord.y =
+        grid.value[x1]![y1]!.gridCord.y + diffY!;
     }
   }
 
   drawGrid();
 };
 
-const mouseUp = () => {
+function handleClick() {
   if (!currentCell) return;
 
-  const newPositions: { x: number; y: number }[] = [];
-  let isValidMove = true;
+  const shipCells = getShipCells(currentCell);
 
-  // Alle Schiffsteile mit ihren individuellen Daten speichern
+  const pivotX = currentCell.gridCord.x;
+  const pivotY = currentCell.gridCord.y;
+
+  for (const cell of shipCells) {
+    // rotate 90° -> x=-y y=x
+    cell.visualCord.x = -(cell.gridCord.y - pivotY) + pivotX;
+    cell.visualCord.y = cell.gridCord.x - pivotX + pivotY;
+  }
+
+  placeShipToVisualCord();
+}
+
+function getShipCells(cell: Cell): Cell[] {
   const shipCells: Cell[] = [];
+
   for (let x = 0; x < gridSize; x++) {
     for (let y = 0; y < gridSize; y++) {
       if (
-        grid.value[x]?.[y]?.shipData?.connectsTo ===
-        currentCell.shipData?.connectsTo
+        grid.value[x]?.[y]?.shipData?.connectsTo === cell.shipData?.connectsTo
       ) {
         shipCells.push(grid.value[x]![y]!);
-
-        const newX = Math.floor(grid.value[x]![y]!.x + 0.5);
-        const newY = Math.floor(grid.value[x]![y]!.y + 0.5);
-
-        // Check if the new position is within bounds and not occupied by another ship
-        if (
-          newX < 0 ||
-          newX >= gridSize ||
-          newY < 0 ||
-          newY >= gridSize ||
-          (grid.value[newX]![newY]!.shipData !== undefined &&
-            grid.value[newX]![newY]!.shipData!.connectsTo !==
-              currentCell.shipData!.connectsTo)
-        ) {
-          isValidMove = false;
-          break;
-        }
-
-        newPositions.push({ x: newX, y: newY });
       }
     }
-    if (!isValidMove) break;
+  }
+
+  return shipCells;
+}
+
+function placeShipToVisualCord() {
+  if (!currentCell) return;
+
+  const shipCells = getShipCells(currentCell);
+
+  let isValidMove = true;
+
+  for (const cell of shipCells) {
+    const newX = Math.floor(cell.visualCord.x + 0.5);
+    const newY = Math.floor(cell.visualCord.y + 0.5);
+
+    cell.visualCord.x = newX;
+    cell.visualCord.y = newY;
+
+    if (!isValidMove) continue;
+
+    if (
+      newX < 0 ||
+      newX >= gridSize ||
+      newY < 0 ||
+      newY >= gridSize ||
+      (grid.value[newX]![newY]!.shipData !== undefined &&
+        grid.value[newX]![newY]!.shipData!.connectsTo !==
+          currentCell.shipData!.connectsTo)
+    ) {
+      isValidMove = false;
+    }
   }
 
   if (isValidMove) {
-    // Alte Positionen löschen
-    for (let x = 0; x < gridSize; x++) {
-      for (let y = 0; y < gridSize; y++) {
-        if (
-          grid.value[x]?.[y]?.shipData?.connectsTo ===
-          currentCell.shipData?.connectsTo
-        ) {
-          grid.value[x]![y] = {
-            shipData: undefined,
-            isHit: false,
-            x: x,
-            y: y,
-            originX: x,
-            originY: y,
-          } as Cell;
-        }
-      }
+    //removing and adding needs to be in 2 steps else a ship might overwrite itself
+
+    //remove old cell
+    for (const cell of shipCells) {
+      const oldPos = cell.gridCord;
+
+      grid.value[oldPos.x]![oldPos.y] = {
+        shipData: undefined,
+        isHit: false,
+        visualCord: { x: oldPos.x, y: oldPos.y },
+        gridCord: { x: oldPos.x, y: oldPos.y },
+      } as Cell;
     }
 
-    // Neue Positionen zuweisen mit individuellen shipData von shipCells
-    for (let i = 0; i < newPositions.length; i++) {
-      const pos = newPositions[i]!;
-      const cell = shipCells[i]!;
-
-      grid.value[pos.x]![pos.y] = {
+    //set new cell
+    for (const cell of shipCells) {
+      const newPos = cell.visualCord;
+      grid.value[newPos.x]![newPos.y] = {
         ...cell,
-        x: pos.x,
-        y: pos.y,
-        originX: pos.x,
-        originY: pos.y,
+        visualCord: { x: newPos.x, y: newPos.y },
+        gridCord: { x: newPos.x, y: newPos.y },
       };
     }
   } else {
-    // Wenn ungültig, Positionen zurücksetzen
-    for (let x = 0; x < gridSize; x++) {
-      for (let y = 0; y < gridSize; y++) {
-        if (
-          grid.value[x]?.[y]?.shipData?.connectsTo ===
-          currentCell.shipData?.connectsTo
-        ) {
-          grid.value[x]![y]!.x = grid.value[x]![y]!.originX;
-          grid.value[x]![y]!.y = grid.value[x]![y]!.originY;
-        }
-      }
+    // reset cell to gridCoordinate
+    for (const cell of shipCells) {
+      cell.visualCord.x = cell.gridCord.x;
+      cell.visualCord.y = cell.gridCord.y;
     }
+  }
+}
+
+const mouseUp = (event: MouseEvent) => {
+  if (!currentCell) return;
+
+  const mousePos = mouseGridPosition(event);
+
+  if (
+    Math.abs(mousePos.x - mouseDownPos!.x) < 0.1 &&
+    Math.abs(mousePos.y - mouseDownPos!.y) < 0.1
+  ) {
+    handleClick();
+  } else {
+    placeShipToVisualCord();
   }
 
   currentCell = undefined;
-  mouseDownX = undefined;
-  mouseDownY = undefined;
+  mouseDownPos = undefined;
 
   drawGrid();
 };
@@ -436,7 +471,6 @@ async function start() {
   canvas.value!.removeEventListener("mouseup", mouseUp);
   canvas.value!.removeEventListener("mousedown", mouseDown);
 
-  //post to backend
   try {
     await $fetch("/api/place", {
       method: "POST",
@@ -448,13 +482,17 @@ async function start() {
     });
 
     navigateTo(`/game/${route.params.gameId}/${route.params.id}`);
-  } catch (error: any) {
-    if (error?.status === 401) {
-      console.error("Nicht autorisiert:", error.statusMessage);
-    } else if (error?.status === 400) {
-      console.error("Fehlerhafte Anfrage:", error.statusMessage);
+  } catch (error) {
+    if (error instanceof FetchError) {
+      if (error?.status === 401) {
+        console.error("unauthorized: ", error.statusMessage);
+      } else if (error?.status === 400) {
+        console.error("illegal request: ", error.statusMessage);
+      } else {
+        console.error("unknown error: ", error);
+      }
     } else {
-      console.error("Unbekannter Fehler:", error);
+      console.error("unknown error: ", error);
     }
   }
 }

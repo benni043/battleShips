@@ -3,10 +3,8 @@ import type { Socket } from "socket.io";
 export interface Cell {
   shipData: ShipData | undefined;
   isHit: boolean;
-  x: number;
-  y: number;
-  originX: number;
-  originY: number;
+  visualCord: Cord;
+  gridCord: Cord;
 }
 
 export interface ShipData {

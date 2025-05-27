@@ -23,29 +23,33 @@ function handleSubmit() {
 </script>
 
 <template>
-  <form class="max-w-md mx-auto p-6 bg-white rounded-lg shadow" @submit.prevent="handleSubmit">
+  <form
+    class="mx-auto max-w-md rounded-lg bg-white p-6 shadow"
+    @submit.prevent="handleSubmit"
+  >
     <h2 class="pb-4 text-2xl font-semibold text-gray-800">Benutzername</h2>
 
-    <div class="flex flex-col mb-4">
-      <label for="lobbyName" class="mb-1 text-neutral-600 font-medium">Benutzername</label>
+    <div class="mb-4 flex flex-col">
+      <label for="lobbyName" class="mb-1 font-medium text-neutral-600"
+        >Benutzername</label
+      >
       <input
         id="lobbyName"
         v-model="username"
         type="text"
         placeholder="Benutzername"
-        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        class="w-full rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
       />
       <p v-if="error" class="mt-1 text-sm text-red-600">{{ error }}</p>
     </div>
 
     <button
       type="submit"
-      class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition hover:cursor-pointer"
+      class="w-full rounded-md bg-blue-600 py-2 text-white transition hover:cursor-pointer hover:bg-blue-700"
     >
       Erstellen
     </button>
   </form>
 </template>
-
 
 <style scoped></style>
