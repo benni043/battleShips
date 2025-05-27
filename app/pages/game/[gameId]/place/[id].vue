@@ -353,88 +353,80 @@ function handleClick() {
   //todo - handle click
 }
 
-function handleDrop() {
-  if (!currentCell) return;
-
-  const newPositions: { x: number; y: number }[] = [];
-  let isValidMove = true;
-
-  // Alle Schiffsteile mit ihren individuellen Daten speichern
+function getShipCells(cell: Cell): Cell[] {
   const shipCells: Cell[] = [];
+
   for (let x = 0; x < gridSize; x++) {
     for (let y = 0; y < gridSize; y++) {
       if (
-        grid.value[x]?.[y]?.shipData?.connectsTo ===
-        currentCell.shipData?.connectsTo
+        grid.value[x]?.[y]?.shipData?.connectsTo === cell.shipData?.connectsTo
       ) {
         shipCells.push(grid.value[x]![y]!);
-
-        console.log(grid.value[x]![y]!);
-
-        const newX = Math.floor(grid.value[x]![y]!.visualCord.x + 0.5);
-        const newY = Math.floor(grid.value[x]![y]!.visualCord.y + 0.5);
-
-        // Check if the new position is within bounds and not occupied by another ship
-        if (
-          newX < 0 ||
-          newX >= gridSize ||
-          newY < 0 ||
-          newY >= gridSize ||
-          (grid.value[newX]![newY]!.shipData !== undefined &&
-            grid.value[newX]![newY]!.shipData!.connectsTo !==
-              currentCell.shipData!.connectsTo)
-        ) {
-          isValidMove = false;
-          break;
-        }
-
-        newPositions.push({ x: newX, y: newY });
       }
     }
-    if (!isValidMove) break;
+  }
+
+  return shipCells;
+}
+
+function handleDrop() {
+  if (!currentCell) return;
+
+  const shipCells = getShipCells(currentCell);
+
+  let isValidMove = true;
+
+  for (const cell of shipCells) {
+    const newX = Math.floor(cell.visualCord.x + 0.5);
+    const newY = Math.floor(cell.visualCord.y + 0.5);
+
+    cell.visualCord.x = newX;
+    cell.visualCord.y = newY;
+
+    if (!isValidMove) continue;
+
+    if (
+      newX < 0 ||
+      newX >= gridSize ||
+      newY < 0 ||
+      newY >= gridSize ||
+      (grid.value[newX]![newY]!.shipData !== undefined &&
+        grid.value[newX]![newY]!.shipData!.connectsTo !==
+          currentCell.shipData!.connectsTo)
+    ) {
+      isValidMove = false;
+    }
   }
 
   if (isValidMove) {
-    // Alte Positionen löschen
-    for (let x = 0; x < gridSize; x++) {
-      for (let y = 0; y < gridSize; y++) {
-        if (
-          grid.value[x]?.[y]?.shipData?.connectsTo ===
-          currentCell.shipData?.connectsTo
-        ) {
-          grid.value[x]![y] = {
-            shipData: undefined,
-            isHit: false,
-            visualCord: { x: x, y: y },
-            gridCord: { x: x, y: y },
-          } as Cell;
-        }
-      }
+    //removing and adding needs to be in 2 steps else a ship might overwrite it self
+
+    //remove old cell
+    for (const cell of shipCells) {
+      const oldPos = cell.gridCord;
+
+      grid.value[oldPos.x]![oldPos.y] = {
+        shipData: undefined,
+        isHit: false,
+        visualCord: { x: oldPos.x, y: oldPos.y },
+        gridCord: { x: oldPos.x, y: oldPos.y },
+      } as Cell;
     }
 
-    // Neue Positionen zuweisen mit individuellen shipData von shipCells
-    for (let i = 0; i < newPositions.length; i++) {
-      const pos = newPositions[i]!;
-      const cell = shipCells[i]!;
-
-      grid.value[pos.x]![pos.y] = {
+    //set new cell
+    for (const cell of shipCells) {
+      const newPos = cell.visualCord;
+      grid.value[newPos.x]![newPos.y] = {
         ...cell,
-        visualCord: { x: pos.x, y: pos.y },
-        gridCord: { x: pos.x, y: pos.y },
+        visualCord: { x: newPos.x, y: newPos.y },
+        gridCord: { x: newPos.x, y: newPos.y },
       };
     }
   } else {
-    // Wenn ungültig, Positionen zurücksetzen
-    for (let x = 0; x < gridSize; x++) {
-      for (let y = 0; y < gridSize; y++) {
-        if (
-          grid.value[x]?.[y]?.shipData?.connectsTo ===
-          currentCell.shipData?.connectsTo
-        ) {
-          grid.value[x]![y]!.visualCord.x = grid.value[x]![y]!.gridCord.x;
-          grid.value[x]![y]!.visualCord.y = grid.value[x]![y]!.gridCord.y;
-        }
-      }
+    // reset cell to gridCordinate
+    for (const cell of shipCells) {
+      cell.visualCord.x = cell.gridCord.x;
+      cell.visualCord.y = cell.gridCord.y;
     }
   }
 }
