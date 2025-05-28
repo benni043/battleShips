@@ -442,6 +442,8 @@ function placeShipToVisualCord() {
       cell.visualCord.x = cell.gridCord.x;
       cell.visualCord.y = cell.gridCord.y;
     }
+
+    toast.warning(`Das Schiff kann hier nicht plaziert werden!`);
   }
 }
 
