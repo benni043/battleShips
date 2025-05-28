@@ -2,6 +2,8 @@
 import type { Cell, ShipData } from "#shared/gameTypes";
 import { useMyGridStore } from "~/stores/myGrid";
 import { FetchError } from "ofetch";
+import { Toaster, toast } from "vue-sonner";
+import "vue-sonner/style.css";
 
 const route = useRoute();
 
@@ -486,10 +488,13 @@ async function start() {
     if (error instanceof FetchError) {
       if (error?.status === 401) {
         console.error("unauthorized: ", error.statusMessage);
+        toast.error(`Unauthorized: ${error.statusMessage}`);
       } else if (error?.status === 400) {
         console.error("illegal request: ", error.statusMessage);
+        toast.error(`Illegal request: ${error.statusMessage}`);
       } else {
         console.error("unknown error: ", error);
+        toast.error(`Unknown error occurred: ${error.statusMessage}`);
       }
     } else {
       console.error("unknown error: ", error);
@@ -502,6 +507,8 @@ async function start() {
   <div
     class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-6"
   >
+    <Toaster close-button rich-colors position="top-right" />
+
     <h1 class="mb-8 text-3xl font-bold text-gray-800">
       Platziere deine Schiffe!
     </h1>

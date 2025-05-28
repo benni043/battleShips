@@ -9,6 +9,8 @@ import {
 } from "#shared/gameTypes";
 import { io } from "socket.io-client";
 import { useUserNameStore } from "~/stores/username";
+import { Toaster, toast } from "vue-sonner";
+import 'vue-sonner/style.css';
 
 const socket = io({
   path: "/api/socket.io",
@@ -61,27 +63,27 @@ function click(cord: Cord) {
 function handleError<T>(err: GameError | T): T | undefined {
   switch (err) {
     case GameError.WRONG_PLAYER: {
-      alert("Dein Gegner ist an der Reihe!");
+      toast.warning(`${userNameStore.opponent} ist an der Reihe!`)
       return undefined;
     }
     case GameError.INVALID_CORD: {
-      alert("Ungültige Coordinaten");
+      toast.error(`Ungültige Koordinaten`)
       return undefined;
     }
     case GameError.ALREADY_HIT: {
-      alert("Auf dieses Feld hast du bereits geschossen");
+      toast.warning(`Auf dieses Feld hast du bereits geschossen!`)
       return undefined;
     }
     case GameError.NOT_STARTED: {
-      alert("Spiel hat noch nicht gestartet");
+      toast.error(`Das Spiel hat noch nicht gestartet!`)
       return undefined;
     }
     case GameError.INVALID_ID: {
-      alert("invalid id");
+      toast.error(`Ungültige ID!`)
       return undefined;
     }
     case GameError.INVALID_GAME: {
-      alert("invalid game");
+      toast.error(`Ungültiges Spiel!`)
       return undefined;
     }
     default:
@@ -148,9 +150,10 @@ function disconnect() {
   <div
     class="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 px-6 py-12"
   >
-    <!-- Leave Button oben rechts -->
+    <Toaster close-button rich-colors position="top-right" />
+
     <button
-      class="absolute top-6 right-6 rounded border border-red-600 bg-red-500 px-4 py-2 text-white transition hover:cursor-pointer hover:bg-red-600"
+      class="absolute top-6 left-6 rounded border border-red-600 bg-red-500 px-4 py-2 text-white transition hover:cursor-pointer hover:bg-red-600"
       @click="leave()"
     >
       Verlassen
