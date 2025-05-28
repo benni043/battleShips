@@ -10,7 +10,7 @@ import {
 import { io } from "socket.io-client";
 import { useUserNameStore } from "~/stores/username";
 import { Toaster, toast } from "vue-sonner";
-import 'vue-sonner/style.css';
+import "vue-sonner/style.css";
 
 const socket = io({
   path: "/api/socket.io",
@@ -63,27 +63,27 @@ function click(cord: Cord) {
 function handleError<T>(err: GameError | T): T | undefined {
   switch (err) {
     case GameError.WRONG_PLAYER: {
-      toast.warning(`${userNameStore.opponent} ist an der Reihe!`)
+      toast.warning(`${userNameStore.opponent} ist an der Reihe!`);
       return undefined;
     }
     case GameError.INVALID_CORD: {
-      toast.error(`Ungültige Koordinaten`)
+      toast.error(`Ungültige Koordinaten`);
       return undefined;
     }
     case GameError.ALREADY_HIT: {
-      toast.warning(`Auf dieses Feld hast du bereits geschossen!`)
+      toast.warning(`Auf dieses Feld hast du bereits geschossen!`);
       return undefined;
     }
     case GameError.NOT_STARTED: {
-      toast.error(`Das Spiel hat noch nicht gestartet!`)
+      toast.error(`Das Spiel hat noch nicht gestartet!`);
       return undefined;
     }
     case GameError.INVALID_ID: {
-      toast.error(`Ungültige ID!`)
+      toast.error(`Ungültige ID!`);
       return undefined;
     }
     case GameError.INVALID_GAME: {
-      toast.error(`Ungültiges Spiel!`)
+      toast.error(`Ungültiges Spiel!`);
       return undefined;
     }
     default:
@@ -170,23 +170,21 @@ function disconnect() {
       Gewinner: {{ winner }}
     </h1>
 
-    <div id="fields" class="w-full max-w-5xl">
-      <div class="grid grid-cols-1 gap-10 md:grid-cols-2">
-        <div
-          class="player-grid flex flex-col items-center rounded-lg bg-white p-6 shadow-md"
-        >
-          <h3 class="mb-4 text-2xl font-semibold text-gray-700">
-            {{ userNameStore.me }}
-          </h3>
+    <div id="fields" class="w-full max-w-5xl space-y-4">
+      <div class="grid grid-cols-2 gap-10">
+        <h3 class="text-center text-xl font-semibold text-gray-700 h-6 leading-6">
+          {{ userNameStore.me }}
+        </h3>
+        <h3 class="text-center text-xl font-semibold text-gray-700 h-6 leading-6">
+          {{ userNameStore.opponent }}
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-2 gap-10">
+        <div class="w-[490px] h-[490px] rounded-lg bg-white shadow-md pl-[15px] pt-[15px]">
           <SimpleGrid :grid="myGrid" :has-listener="false" />
         </div>
-
-        <div
-          class="player-grid flex flex-col items-center rounded-lg bg-white p-6 shadow-md"
-        >
-          <h3 class="mb-4 text-2xl font-semibold text-gray-700">
-            {{ userNameStore.opponent }}
-          </h3>
+        <div class="w-[490px] h-[490px] rounded-lg bg-white shadow-md pl-[15px] pt-[15px]">
           <SimpleGrid
             :grid="opponentsGrid"
             :has-listener="!isGameFinished"
