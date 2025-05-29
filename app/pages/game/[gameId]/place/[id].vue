@@ -4,19 +4,21 @@ import { useMyGridStore } from "~/stores/myGrid";
 import { FetchError } from "ofetch";
 import { Toaster, toast } from "vue-sonner";
 import "vue-sonner/style.css";
+import {
+  gridSize,
+  labelMargin,
+  canvasWidth,
+  canvasHeight,
+  cellSize,
+  getShipConnections,
+  drawHeaderOfGrid,
+} from "~/utils/ship";
 
 const route = useRoute();
 
 const gridStore = useMyGridStore();
 
 const gridSent = ref(false);
-
-const gridSize = 10;
-const labelMargin = 20;
-const baseSize = 400;
-const canvasWidth = baseSize + labelMargin;
-const canvasHeight = baseSize + labelMargin;
-const cellSize = baseSize / gridSize;
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null);
 const ctx: Ref<CanvasRenderingContext2D | null> = ref(null);
@@ -146,58 +148,15 @@ function initShips() {
   } as ShipData;
 
   grid.value[9]![1]!.shipData = ship1Data4;
-
-  // //8er
-  // const ship8Data = {
-  //   connectsTo: 13,
-  //   color: "green",
-  // } as ShipData;
-  //
-  // grid.value[9]![9]!.shipData = ship8Data;
-  // grid.value[8]![9]!.shipData = ship8Data;
-  // grid.value[7]![9]!.shipData = ship8Data;
-  // grid.value[8]![8]!.shipData = ship8Data;
-  // grid.value[8]![7]!.shipData = ship8Data;
-  // grid.value[9]![7]!.shipData = ship8Data;
-  // grid.value[9]![7]!.shipData = ship8Data;
-  // grid.value[7]![7]!.shipData = ship8Data;
-  // grid.value[6]![9]!.shipData = ship8Data;
 }
 
 function drawGrid() {
-  ctx.value!.clearRect(0, 0, canvasWidth, canvasHeight);
+  if (!ctx.value) return;
 
-  ctx.value!.font = "14px sans-serif";
-  ctx.value!.textAlign = "center";
-  ctx.value!.textBaseline = "middle";
+  ctx.value.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  for (let i = 0; i < gridSize; i++) {
-    for (let j = 0; j < gridSize; j++) {
-      const x = i * cellSize + labelMargin;
-      const y = j * cellSize + labelMargin;
-
-      ctx.value!.strokeStyle = "black";
-      ctx.value!.lineWidth = 1;
-      ctx.value!.strokeRect(x, y, cellSize, cellSize);
-
-      // number axis
-      if (i === 0) {
-        ctx.value!.fillStyle = "black";
-        ctx.value!.fillText(
-          (j + 1).toString(),
-          labelMargin / 2,
-          y + cellSize / 2,
-        );
-      }
-
-      // letter axis
-      if (j === 0) {
-        ctx.value!.fillStyle = "black";
-        const char = String.fromCharCode(65 + i); // 'A' = 65
-        ctx.value!.fillText(char, x + cellSize / 2, labelMargin / 2);
-      }
-    }
-  }
+  //draw header
+  drawHeaderOfGrid(ctx.value);
 
   // Draw all ships except the one being moved
   for (let x = 0; x < gridSize; x++) {
@@ -224,7 +183,8 @@ function drawGrid() {
           grid.value[x]?.[y]?.shipData?.connectsTo ===
           currentCell.shipData?.connectsTo
         ) {
-          ctx.value!.fillStyle = grid.value[x]![y]!.shipData!.color;
+          ctx.value.fillStyle = grid.value[x]![y]!.shipData!.color;
+
           drawShip(
             x,
             y,
@@ -237,44 +197,24 @@ function drawGrid() {
   }
 }
 
-function drawShip(idxX: number, idxY: number, x: number, y: number) {
+function drawShip(visualX: number, visualY: number, x: number, y: number) {
   const rows = grid.value.length;
-  const cols = grid.value[0]!.length;
+  const cols = grid.value[0]?.length ?? 0;
 
-  const shipData = grid.value[idxX]![idxY]!.shipData;
-
-  if (!shipData) return;
-
-  const hasTopNeighbor =
-    idxY > 0 &&
-    grid.value[idxX]?.[idxY - 1]?.shipData &&
-    grid.value[idxX]![idxY - 1]!.shipData!.connectsTo === shipData.connectsTo;
-
-  const hasBottomNeighbor =
-    idxY < rows - 1 &&
-    grid.value[idxX]?.[idxY + 1]?.shipData &&
-    grid.value[idxX]![idxY + 1]!.shipData!.connectsTo === shipData.connectsTo;
-
-  const hasLeftNeighbor =
-    idxX > 0 &&
-    grid.value[idxX - 1]?.[idxY]?.shipData &&
-    grid.value[idxX - 1]![idxY]!.shipData!.connectsTo === shipData.connectsTo;
-
-  const hasRightNeighbor =
-    idxX < cols - 1 &&
-    grid.value[idxX + 1]?.[idxY]?.shipData &&
-    grid.value[idxX + 1]![idxY]!.shipData!.connectsTo === shipData.connectsTo;
-
-  const leftX = hasLeftNeighbor ? 0 : 5;
-  const rightX = hasRightNeighbor ? 0 : 5;
-  const topY = hasTopNeighbor ? 0 : 5;
-  const bottomY = hasBottomNeighbor ? 0 : 5;
+  const shipConnections = getShipConnections(
+    visualX,
+    visualY,
+    rows,
+    cols,
+    grid.value,
+  );
+  if (!shipConnections) return;
 
   ctx.value!.fillRect(
-    x * cellSize + leftX + labelMargin,
-    y * cellSize + topY + labelMargin,
-    cellSize - leftX - rightX,
-    cellSize - topY - bottomY,
+    x * cellSize + shipConnections.left + labelMargin,
+    y * cellSize + shipConnections.top + labelMargin,
+    cellSize - shipConnections.left - shipConnections.right,
+    cellSize - shipConnections.top - shipConnections.bottom,
   );
 }
 
@@ -507,27 +447,29 @@ async function start() {
 
 <template>
   <div
-    class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-6"
+    class="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 px-6 py-12"
   >
     <Toaster close-button rich-colors position="top-right" />
 
-    <h1 class="mb-8 text-3xl font-bold text-gray-800">
-      Platziere deine Schiffe!
-    </h1>
+    <div id="fields" class="w-full max-w-5xl space-y-4">
+      <h1 class="h-6 text-center text-xl leading-6 font-semibold text-gray-700">
+        Plaziere deine Schiffe!
+      </h1>
 
-    <div
-      class="flex flex-col items-center rounded-lg bg-white p-8 shadow-xl"
-      style="width: 460px"
-    >
-      <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" />
-      <button
-        class="mt-6 w-full rounded-xl border border-gray-400 bg-blue-600 py-3 text-white transition hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-green-500"
-        :disabled="gridSent"
-        @click="start()"
+      <div
+        class="mx-auto h-[490px] w-[490px] rounded-lg bg-white p-[15px] shadow-md"
       >
-        Start Game
-      </button>
+        <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" />
+      </div>
     </div>
+
+    <button
+      class="mt-6 w-40 rounded-xl border border-gray-400 bg-blue-600 py-3 text-white transition hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-green-500"
+      :disabled="gridSent"
+      @click="start()"
+    >
+      Start Game
+    </button>
   </div>
 </template>
 
