@@ -116,12 +116,15 @@ export function drawHeaderOfGrid(ctx: CanvasRenderingContext2D) {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
+  ctx.fillStyle = "#249fde";
+  ctx.fillRect(labelMargin, labelMargin, canvasWidth, canvasHeight);
+
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       const x = i * cellSize + labelMargin;
       const y = j * cellSize + labelMargin;
 
-      ctx.strokeStyle = "black";
+      ctx.strokeStyle = "#285cc4";
       ctx.lineWidth = 1;
       ctx.strokeRect(x, y, cellSize, cellSize);
 
