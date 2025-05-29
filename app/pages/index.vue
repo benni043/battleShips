@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import { LobbyError, type LobbyResponse } from "#shared/lobbyTypes";
 import Username from "~/components/lobby/Username.vue";
 import { Toaster, toast } from "vue-sonner";
-import 'vue-sonner/style.css';
+import "vue-sonner/style.css";
 
 const socket = io({
   path: "/api/socket.io",
@@ -94,7 +94,7 @@ onBeforeUnmount(() => {
   <div
     class="mx-auto min-h-screen w-full bg-gradient-to-br from-blue-50 to-blue-100 p-6 font-sans"
   >
-      <Toaster close-button rich-colors position="top-right" />
+    <Toaster close-button rich-colors position="top-right" />
 
     <div v-if="userNameStore.me.length === 0">
       <Username

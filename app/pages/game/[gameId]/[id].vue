@@ -172,19 +172,27 @@ function disconnect() {
 
     <div id="fields" class="w-full max-w-5xl space-y-4">
       <div class="grid grid-cols-2 gap-10">
-        <h3 class="text-center text-xl font-semibold text-gray-700 h-6 leading-6">
+        <h3
+          class="h-6 text-center text-xl leading-6 font-semibold text-gray-700"
+        >
           {{ userNameStore.me }}
         </h3>
-        <h3 class="text-center text-xl font-semibold text-gray-700 h-6 leading-6">
+        <h3
+          class="h-6 text-center text-xl leading-6 font-semibold text-gray-700"
+        >
           {{ userNameStore.opponent }}
         </h3>
       </div>
 
       <div class="grid grid-cols-2 gap-10">
-        <div class="w-[490px] h-[490px] rounded-lg bg-white shadow-md pl-[15px] pt-[15px]">
+        <div
+          class="h-[490px] w-[490px] rounded-lg bg-white pt-[15px] pl-[15px] shadow-md"
+        >
           <SimpleGrid :grid="myGrid" :has-listener="false" />
         </div>
-        <div class="w-[490px] h-[490px] rounded-lg bg-white shadow-md pl-[15px] pt-[15px]">
+        <div
+          class="h-[490px] w-[490px] rounded-lg bg-white pt-[15px] pl-[15px] shadow-md"
+        >
           <SimpleGrid
             :grid="opponentsGrid"
             :has-listener="!isGameFinished"
