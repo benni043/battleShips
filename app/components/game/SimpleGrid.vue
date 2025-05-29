@@ -54,7 +54,6 @@ function drawGrid() {
         continue;
       }
 
-      ctx.value.fillStyle = shipData.color;
       drawShip(i, j, props.grid, ctx.value!);
 
       if (cell.isHit && !props.hasListener) drawRedCross(i, j);

@@ -9,7 +9,6 @@ export interface Cell {
 
 export interface ShipData {
   connectsTo: number;
-  color: string;
 }
 
 export interface Cord {
