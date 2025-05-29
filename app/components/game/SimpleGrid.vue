@@ -9,7 +9,7 @@ import {
   cellSize,
   drawHeaderOfGrid,
   drawShip,
-  getTileSet,
+  getTileSet, drawGrid
 } from "~/utils/ship";
 
 const props = defineProps<{
@@ -23,7 +23,7 @@ const canvas: Ref<HTMLCanvasElement | null> = ref(null);
 const ctx: Ref<CanvasRenderingContext2D | null> = ref(null);
 
 watch(props.grid, () => {
-  drawGrid();
+  draw();
 });
 
 watch(
@@ -33,13 +33,15 @@ watch(
   },
 );
 
-function drawGrid() {
+function draw() {
   if (!ctx.value) return;
 
   ctx.value.clearRect(0, 0, canvasWidth, canvasHeight);
 
   //draw header
-  drawHeaderOfGrid(ctx.value);
+  // drawHeaderOfGrid(ctx.value);
+
+  drawGrid(ctx.value);
 
   // draw ships and hits
   for (let i = 0; i < gridSize; i++) {
@@ -96,9 +98,9 @@ onMounted(() => {
   ctx.value = canvas.value!.getContext("2d");
   ctx.value!.imageSmoothingEnabled = false;
 
-  drawGrid();
+  draw();
   getTileSet().onload = () => {
-    drawGrid();
+    draw();
   };
 
   if (props.hasListener) canvas.value!.addEventListener("mousedown", click);

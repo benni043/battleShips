@@ -13,6 +13,7 @@ import {
   drawHeaderOfGrid,
   drawShip,
   getTileSet,
+  drawGrid,
 } from "~/utils/ship";
 
 const route = useRoute();
@@ -115,13 +116,15 @@ function initShips() {
   grid.value[9]![1]!.shipData = ship1Data4;
 }
 
-function drawGrid() {
+function draw() {
   if (!ctx.value) return;
 
   ctx.value.clearRect(0, 0, canvasWidth, canvasHeight);
 
   //draw header
-  drawHeaderOfGrid(ctx.value);
+  // drawHeaderOfGrid(ctx.value);
+
+  drawGrid(ctx.value);
 
   // Draw all ships except the one being moved
   for (let x = 0; x < gridSize; x++) {
@@ -155,9 +158,9 @@ onMounted(() => {
   ctx.value = canvas.value!.getContext("2d");
   ctx.value!.imageSmoothingEnabled = false;
 
-  drawGrid();
+  draw();
   getTileSet().onload = () => {
-    drawGrid();
+    draw();
   };
 
   canvas.value!.addEventListener("mousedown", mouseDown);
@@ -181,7 +184,7 @@ const mouseDown = (event: MouseEvent) => {
   currentCell = undefined;
   mouseDownPos = undefined;
 
-  drawGrid();
+  draw();
 
   const mousePos = mouseGridPosition(event);
 
@@ -221,7 +224,7 @@ const mouseMove = (event: MouseEvent) => {
     }
   }
 
-  drawGrid();
+  draw();
 };
 
 function handleClick() {
@@ -338,7 +341,7 @@ const mouseUp = (event: MouseEvent) => {
   currentCell = undefined;
   mouseDownPos = undefined;
 
-  drawGrid();
+  draw();
 };
 
 async function start() {
@@ -386,15 +389,49 @@ async function start() {
   >
     <Toaster close-button rich-colors position="top-right" />
 
-    <div id="fields" class="w-full max-w-5xl space-y-4">
+    <div id="fields" class="w-min">
       <h1 class="h-6 text-center text-xl leading-6 font-semibold text-gray-700">
         Plaziere deine Schiffe!
       </h1>
 
-      <div
-        class="mx-auto h-[490px] w-[490px] rounded-lg bg-white p-[15px] shadow-md"
-      >
-        <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" />
+      <div class="m-[40px]">
+        <div class="flex ml-[40px]">
+          <div
+            v-for="n in 10"
+            :key="'top-' + n"
+            class="text-xl flex h-[40px] w-[40px] pb-7 items-center justify-center font-medium text-gray-700"
+          >
+            {{ String.fromCharCode(64 + n) }}
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center">
+          <div class="flex flex-col">
+            <div
+              v-for="n in 10"
+              :key="'top-' + n"
+              class="text-xl flex h-[40px] w-[40px] pr-7 items-center justify-center font-medium text-gray-700"
+            >
+              {{ n }}
+            </div>
+          </div>
+
+          <div class="flex items-center justify-center">
+            <canvas
+              ref="canvas"
+              :width="canvasWidth"
+              :height="canvasHeight"
+              class="z-1"
+            />
+
+            <img
+              src="assets/img/border.png"
+              alt="border"
+              class="absolute h-[480px] w-[480px]"
+              style="image-rendering: pixelated"
+            />
+          </div>
+        </div>
       </div>
     </div>
 

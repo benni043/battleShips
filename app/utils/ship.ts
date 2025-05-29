@@ -4,7 +4,7 @@ import shipImg from "@/assets/img/ships.png";
 
 export const gridSize = 10;
 
-export const labelMargin = 30;
+export const labelMargin = 0;
 export const baseSize = 400;
 
 export const canvasWidth = baseSize + labelMargin;
@@ -116,17 +116,10 @@ export function drawHeaderOfGrid(ctx: CanvasRenderingContext2D) {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  ctx.fillStyle = "#249fde";
-  ctx.fillRect(labelMargin, labelMargin, canvasWidth, canvasHeight);
-
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       const x = i * cellSize + labelMargin;
       const y = j * cellSize + labelMargin;
-
-      ctx.strokeStyle = "#285cc4";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(x, y, cellSize, cellSize);
 
       // number axis
       if (i === 0) {
@@ -140,6 +133,22 @@ export function drawHeaderOfGrid(ctx: CanvasRenderingContext2D) {
         const char = String.fromCharCode(65 + i); // 'A' = 65
         ctx.fillText(char, x + cellSize / 2, labelMargin / 2);
       }
+    }
+  }
+}
+
+export function drawGrid(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = "#249fde";
+  ctx.fillRect(labelMargin, labelMargin, canvasWidth, canvasHeight);
+
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+      const x = i * cellSize + labelMargin;
+      const y = j * cellSize + labelMargin;
+
+      ctx.strokeStyle = "#285cc4";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x, y, cellSize, cellSize);
     }
   }
 }
