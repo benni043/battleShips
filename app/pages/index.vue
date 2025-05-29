@@ -6,6 +6,7 @@ import { LobbyError, type LobbyResponse } from "#shared/lobbyTypes";
 import Username from "~/components/lobby/Username.vue";
 import { Toaster, toast } from "vue-sonner";
 import "vue-sonner/style.css";
+import router from "#app/plugins/router";
 
 const socket = io({
   path: "/api/socket.io",
