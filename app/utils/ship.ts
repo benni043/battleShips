@@ -1,5 +1,6 @@
 import type { Cell } from "#shared/gameTypes";
 import type { ShipsConnections } from "~/utils/types";
+import shipImg from "@/assets/img/ships.png";
 
 export const gridSize = 10;
 
@@ -10,13 +11,15 @@ export const canvasWidth = baseSize + labelMargin;
 export const canvasHeight = baseSize + labelMargin;
 export const cellSize = baseSize / gridSize;
 
+const tileSize = 16;
+
 export function getShipConnections(
   x: number,
   y: number,
   rows: number,
   cols: number,
   grid: Cell[][],
-) {
+): ShipsConnections | undefined {
   const shipData = grid[x]?.[y]?.shipData;
   if (!shipData) return;
 
@@ -34,17 +37,46 @@ export function getShipConnections(
     x < cols - 1 &&
     grid[x + 1]?.[y]?.shipData?.connectsTo === shipData.connectsTo;
 
-  const left = hasLeftNeighbor ? 0 : 5;
-  const right = hasRightNeighbor ? 0 : 5;
-  const top = hasTopNeighbor ? 0 : 5;
-  const bottom = hasBottomNeighbor ? 0 : 5;
-
   return {
-    left: left,
-    right: right,
-    top: top,
-    bottom: bottom,
-  } as ShipsConnections;
+    left: hasLeftNeighbor,
+    right: hasRightNeighbor,
+    top: hasTopNeighbor,
+    bottom: hasBottomNeighbor,
+  };
+}
+
+export function getTileSet() {
+  const image = new Image();
+  image.crossOrigin = "anonymous";
+  image.src = shipImg;
+
+  return image;
+}
+
+export function getTileSetIndex(connections: ShipsConnections): number {
+  const l = connections.left;
+  const r = connections.right;
+  const t = connections.top;
+  const b = connections.bottom;
+
+  if (!l && !r && t && b) return 1;
+  if (l && r && !t && !b) return 2;
+  if (!l && !r && t && !b) return 3;
+  if (l && !r && !t && !b) return 4;
+  if (!l && r && !t && !b) return 5;
+  if (!l && !r && !t && b) return 6;
+  if (!l && r && !t && b) return 7;
+  if (l && !r && !t && b) return 8;
+  if (!l && r && t && !b) return 9;
+  if (l && !r && t && !b) return 10;
+  if (l && r && t && b) return 11;
+  if (l && r && !t && b) return 12;
+  if (!l && r && t && b) return 13;
+  if (l && r && t && !b) return 14;
+  if (l && !r && t && b) return 15;
+  if (!l && !r && !t && !b) return 16;
+
+  return 17;
 }
 
 export function drawShip(
@@ -61,11 +93,21 @@ export function drawShip(
 
   const ship = grid[x]![y]!;
 
-  ctx.fillRect(
-    ship.visualCord.x * cellSize + shipConnections.left + labelMargin,
-    ship.visualCord.y * cellSize + shipConnections.top + labelMargin,
-    cellSize - shipConnections.left - shipConnections.right,
-    cellSize - shipConnections.top - shipConnections.bottom,
+  const canvasX = ship.visualCord.x * cellSize + labelMargin;
+  const canvasY = ship.visualCord.y * cellSize + labelMargin;
+
+  const image = getTileSet();
+
+  ctx.drawImage(
+    image,
+    16 * getTileSetIndex(shipConnections),
+    0,
+    tileSize,
+    tileSize,
+    canvasX,
+    canvasY,
+    cellSize,
+    cellSize,
   );
 }
 

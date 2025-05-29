@@ -12,6 +12,7 @@ import {
   cellSize,
   drawHeaderOfGrid,
   drawShip,
+  getTileSet,
 } from "~/utils/ship";
 
 const route = useRoute();
@@ -192,8 +193,12 @@ initShips();
 
 onMounted(() => {
   ctx.value = canvas.value!.getContext("2d");
+  ctx.value!.imageSmoothingEnabled = false;
 
   drawGrid();
+  getTileSet().onload = () => {
+    drawGrid();
+  };
 
   canvas.value!.addEventListener("mousedown", mouseDown);
   canvas.value!.addEventListener("mousemove", mouseMove);

@@ -9,6 +9,7 @@ import {
   cellSize,
   drawHeaderOfGrid,
   drawShip,
+  getTileSet,
 } from "~/utils/ship";
 
 const props = defineProps<{
@@ -94,8 +95,12 @@ function click(event: MouseEvent) {
 
 onMounted(() => {
   ctx.value = canvas.value!.getContext("2d");
+  ctx.value!.imageSmoothingEnabled = false;
 
   drawGrid();
+  getTileSet().onload = () => {
+    drawGrid();
+  };
 
   if (props.hasListener) canvas.value!.addEventListener("mousedown", click);
 });
