@@ -159,16 +159,22 @@ function disconnect() {
       Verlassen
     </button>
 
-    <h1 class="mb-8 text-3xl font-bold text-gray-800">
-      Lobby: {{ route.params.gameId }}
-    </h1>
-    <h1 class="mb-8 text-3xl font-bold text-gray-800">
-      {{ current }} ist an der Reihe!
-    </h1>
+    <div>
+      <h1 class="mb-8 text-center text-3xl font-bold text-gray-800">
+        Lobby: {{ route.params.gameId }}
+      </h1>
 
-    <h1 v-if="isGameFinished" class="mb-8 text-xl font-semibold text-green-700">
-      Gewinner: {{ winner }}
-    </h1>
+      <h1 class="mb-8 text-center text-3xl font-bold text-gray-800">
+        {{ current }} ist an der Reihe!
+      </h1>
+
+      <h1
+        v-if="isGameFinished"
+        class="mb-8 text-center text-xl font-semibold text-green-700"
+      >
+        Gewinner: {{ winner }}
+      </h1>
+    </div>
 
     <div id="fields" class="w-full max-w-5xl space-y-4">
       <div class="grid grid-cols-2 gap-10">
@@ -185,20 +191,12 @@ function disconnect() {
       </div>
 
       <div class="grid grid-cols-2 gap-10">
-        <div
-          class="h-[490px] w-[490px] rounded-lg bg-white pt-[15px] pl-[15px] shadow-md"
-        >
-          <SimpleGrid :grid="myGrid" :has-listener="false" />
-        </div>
-        <div
-          class="h-[490px] w-[490px] rounded-lg bg-white pt-[15px] pl-[15px] shadow-md"
-        >
-          <SimpleGrid
-            :grid="opponentsGrid"
-            :has-listener="!isGameFinished"
-            @clicked="(args) => click(args)"
-          />
-        </div>
+        <SimpleGrid :grid="myGrid" :has-listener="false" />
+        <SimpleGrid
+          :grid="opponentsGrid"
+          :has-listener="!isGameFinished"
+          @clicked="(args) => click(args)"
+        />
       </div>
     </div>
   </div>

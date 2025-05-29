@@ -184,6 +184,7 @@ function drawGrid() {
           currentCell.shipData?.connectsTo
         ) {
           ctx.value.fillStyle = grid.value[x]![y]!.shipData!.color;
+
           drawShip(
             x,
             y,
@@ -200,12 +201,18 @@ function drawShip(visualX: number, visualY: number, x: number, y: number) {
   const rows = grid.value.length;
   const cols = grid.value[0]?.length ?? 0;
 
-  const shipConnections = getShipConnections(x, y, rows, cols, grid.value);
+  const shipConnections = getShipConnections(
+    visualX,
+    visualY,
+    rows,
+    cols,
+    grid.value,
+  );
   if (!shipConnections) return;
 
   ctx.value!.fillRect(
-    visualX * cellSize + shipConnections.left + labelMargin,
-    visualY * cellSize + shipConnections.top + labelMargin,
+    x * cellSize + shipConnections.left + labelMargin,
+    y * cellSize + shipConnections.top + labelMargin,
     cellSize - shipConnections.left - shipConnections.right,
     cellSize - shipConnections.top - shipConnections.bottom,
   );
@@ -440,28 +447,29 @@ async function start() {
 
 <template>
   <div
-    class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-6"
+    class="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 px-6 py-12"
   >
     <Toaster close-button rich-colors position="top-right" />
 
-    <h1 class="mb-8 text-3xl font-bold text-gray-800">
-      Platziere deine Schiffe!
-    </h1>
+    <div id="fields" class="w-full max-w-5xl space-y-4">
+      <h1 class="h-6 text-center text-xl leading-6 font-semibold text-gray-700">
+        Plaziere deine Schiffe!
+      </h1>
 
-    <div
-      class="flex flex-col items-center rounded-lg bg-white p-8 shadow-xl"
-      style="width: 460px"
-    >
-      <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" />
-
-      <button
-        class="mt-6 w-full rounded-xl border border-gray-400 bg-blue-600 py-3 text-white transition hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-green-500"
-        :disabled="gridSent"
-        @click="start()"
+      <div
+        class="mx-auto h-[490px] w-[490px] rounded-lg bg-white p-[15px] shadow-md"
       >
-        Start Game
-      </button>
+        <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" />
+      </div>
     </div>
+
+    <button
+      class="mt-6 w-40 rounded-xl border border-gray-400 bg-blue-600 py-3 text-white transition hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-green-500"
+      :disabled="gridSent"
+      @click="start()"
+    >
+      Start Game
+    </button>
   </div>
 </template>
 

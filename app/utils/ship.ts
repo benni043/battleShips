@@ -64,11 +64,7 @@ export function drawHeaderOfGrid(ctx: CanvasRenderingContext2D) {
       // number axis
       if (i === 0) {
         ctx.fillStyle = "black";
-        ctx.fillText(
-          (j + 1).toString(),
-          labelMargin / 2,
-          y + cellSize / 2,
-        );
+        ctx.fillText((j + 1).toString(), labelMargin / 2, y + cellSize / 2);
       }
 
       // letter axis

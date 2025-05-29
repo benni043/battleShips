@@ -117,7 +117,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <div
+    class="mx-auto h-[490px] w-[490px] rounded-lg bg-white p-[15px] shadow-md"
+  >
     <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" />
   </div>
 </template>

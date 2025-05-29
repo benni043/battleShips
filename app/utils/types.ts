@@ -3,4 +3,4 @@ export type ShipsConnections = {
   right: number;
   top: number;
   bottom: number;
-}
+};
