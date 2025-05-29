@@ -1,6 +1,6 @@
 export type ShipsConnections = {
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
+  left: boolean;
+  right: boolean;
+  top: boolean;
+  bottom: boolean;
 };
