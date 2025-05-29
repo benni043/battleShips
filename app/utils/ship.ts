@@ -47,6 +47,28 @@ export function getShipConnections(
   } as ShipsConnections;
 }
 
+export function drawShip(
+  x: number,
+  y: number,
+  grid: Cell[][],
+  ctx: CanvasRenderingContext2D,
+) {
+  const rows = grid.length;
+  const cols = grid[0]?.length ?? 0;
+
+  const shipConnections = getShipConnections(x, y, rows, cols, grid);
+  if (!shipConnections) return;
+
+  const ship = grid[x]![y]!;
+
+  ctx.fillRect(
+    ship.visualCord.x * cellSize + shipConnections.left + labelMargin,
+    ship.visualCord.y * cellSize + shipConnections.top + labelMargin,
+    cellSize - shipConnections.left - shipConnections.right,
+    cellSize - shipConnections.top - shipConnections.bottom,
+  );
+}
+
 export function drawHeaderOfGrid(ctx: CanvasRenderingContext2D) {
   ctx.font = "18px sans-serif";
   ctx.textAlign = "center";

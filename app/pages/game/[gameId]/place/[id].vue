@@ -10,8 +10,8 @@ import {
   canvasWidth,
   canvasHeight,
   cellSize,
-  getShipConnections,
   drawHeaderOfGrid,
+  drawShip,
 } from "~/utils/ship";
 
 const route = useRoute();
@@ -165,12 +165,7 @@ function drawGrid() {
         if (!grid.value[x]![y]!.shipData!) continue;
 
         ctx.value!.fillStyle = grid.value[x]![y]!.shipData!.color;
-        drawShip(
-          x,
-          y,
-          grid.value[x]![y]!.visualCord.x,
-          grid.value[x]![y]!.visualCord.y,
-        );
+        drawShip(x, y, grid.value, ctx.value!);
       }
     }
   }
@@ -185,37 +180,11 @@ function drawGrid() {
         ) {
           ctx.value.fillStyle = grid.value[x]![y]!.shipData!.color;
 
-          drawShip(
-            x,
-            y,
-            grid.value[x]![y]!.visualCord.x,
-            grid.value[x]![y]!.visualCord.y,
-          );
+          drawShip(x, y, grid.value, ctx.value!);
         }
       }
     }
   }
-}
-
-function drawShip(visualX: number, visualY: number, x: number, y: number) {
-  const rows = grid.value.length;
-  const cols = grid.value[0]?.length ?? 0;
-
-  const shipConnections = getShipConnections(
-    visualX,
-    visualY,
-    rows,
-    cols,
-    grid.value,
-  );
-  if (!shipConnections) return;
-
-  ctx.value!.fillRect(
-    x * cellSize + shipConnections.left + labelMargin,
-    y * cellSize + shipConnections.top + labelMargin,
-    cellSize - shipConnections.left - shipConnections.right,
-    cellSize - shipConnections.top - shipConnections.bottom,
-  );
 }
 
 initGrid();

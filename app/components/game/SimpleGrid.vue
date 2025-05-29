@@ -7,8 +7,8 @@ import {
   canvasWidth,
   canvasHeight,
   cellSize,
-  getShipConnections,
   drawHeaderOfGrid,
+  drawShip,
 } from "~/utils/ship";
 
 const props = defineProps<{
@@ -54,26 +54,11 @@ function drawGrid() {
       }
 
       ctx.value.fillStyle = shipData.color;
-      drawShips(i, j);
+      drawShip(i, j, props.grid, ctx.value!);
 
       if (cell.isHit && !props.hasListener) drawRedCross(i, j);
     }
   }
-}
-
-function drawShips(x: number, y: number) {
-  const rows = props.grid.length;
-  const cols = props.grid[0]?.length ?? 0;
-
-  const shipConnections = getShipConnections(x, y, rows, cols, props.grid);
-  if (!shipConnections) return;
-
-  ctx.value!.fillRect(
-    x * cellSize + shipConnections.left + labelMargin,
-    y * cellSize + shipConnections.top + labelMargin,
-    cellSize - shipConnections.left - shipConnections.right,
-    cellSize - shipConnections.top - shipConnections.bottom,
-  );
 }
 
 function drawRedCross(i: number, j: number) {
