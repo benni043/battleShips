@@ -53,7 +53,7 @@ function initGrid() {
 function click(cord: Cord) {
   socket.emit(
     "click",
-    route.params.id,
+    route.params.playerId,
     route.params.gameId,
     cord,
     hitResponseCallBack,
@@ -127,7 +127,7 @@ socket.on("current", (currentRes: string) => {
 socket.emit(
   "post-socket",
   route.params.gameId,
-  route.params.id,
+  route.params.playerId,
   userNameStore.me,
   joined,
 );

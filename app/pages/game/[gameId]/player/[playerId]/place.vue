@@ -343,23 +343,24 @@ const mouseUp = (event: MouseEvent) => {
 
 async function start() {
   gridStore.grid = grid.value;
-  gridSent.value = true;
-
-  canvas.value!.removeEventListener("mousemove", mouseMove);
-  canvas.value!.removeEventListener("mouseup", mouseUp);
-  canvas.value!.removeEventListener("mousedown", mouseDown);
 
   try {
     await $fetch("/api/place", {
       method: "POST",
       body: {
         lobby: route.params.gameId,
-        id: route.params.id,
+        id: route.params.playerId,
         grid: JSON.stringify(grid.value),
       },
     });
 
-    navigateTo(`/game/${route.params.gameId}/${route.params.id}`);
+    gridSent.value = true;
+
+    canvas.value!.removeEventListener("mousemove", mouseMove);
+    canvas.value!.removeEventListener("mouseup", mouseUp);
+    canvas.value!.removeEventListener("mousedown", mouseDown);
+
+    navigateTo(`/game/${route.params.gameId}/player/${route.params.playerId}`);
   } catch (error) {
     if (error instanceof FetchError) {
       if (error?.status === 401) {

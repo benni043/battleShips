@@ -42,7 +42,9 @@ function lobbyResponse(response: LobbyResponse | LobbyError) {
       break;
     }
     default: {
-      navigateTo(`/game/${response.lobbyName}/place/${userNameStore.uuid}`);
+      navigateTo(
+        `/game/${response.lobbyName}/player/${userNameStore.uuid}/place`,
+      );
       break;
     }
   }
