@@ -4,6 +4,8 @@ import LobbyList from "~/components/lobby/LobbyList.vue";
 import { io } from "socket.io-client";
 import { LobbyError, type LobbyResponse } from "#shared/lobbyTypes";
 import Username from "~/components/lobby/Username.vue";
+import { Toaster, toast } from "vue-sonner";
+import "vue-sonner/style.css";
 
 const socket = io({
   path: "/api/socket.io",
@@ -24,19 +26,19 @@ function joinLobby(lobbyName: string) {
 function lobbyResponse(response: LobbyResponse | LobbyError) {
   switch (response) {
     case LobbyError.ALREADY_TAKEN: {
-      alert("Dieser Lobbyname wird bereits verwendet!");
+      toast.warning("Dieser Lobbyname wird bereits verwendet!");
       break;
     }
     case LobbyError.INVALID_GAME: {
-      alert("Dieser Lobbyname ist nicht erlaubt!");
+      toast.warning("Dieser Lobbyname ist nicht erlaubt!");
       break;
     }
     case LobbyError.FULL: {
-      alert("Diese Lobby ist voll!");
+      toast.warning("Diese Lobby ist bereits voll!");
       break;
     }
     case LobbyError.INVALID_ID: {
-      alert("Ungültige ID!");
+      toast.error("Error: Ungültige ID!");
       break;
     }
     default: {
@@ -89,7 +91,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="mx-auto min-h-screen max-w-md p-4 font-sans">
+  <div
+    class="mx-auto min-h-screen w-full bg-gradient-to-br from-blue-50 to-blue-100 p-6 font-sans"
+  >
+    <Toaster close-button rich-colors position="top-right" />
+
     <div v-if="userNameStore.me.length === 0">
       <Username
         class="mb-6 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"

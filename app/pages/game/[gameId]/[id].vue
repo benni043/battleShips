@@ -9,6 +9,8 @@ import {
 } from "#shared/gameTypes";
 import { io } from "socket.io-client";
 import { useUserNameStore } from "~/stores/username";
+import { Toaster, toast } from "vue-sonner";
+import "vue-sonner/style.css";
 
 const socket = io({
   path: "/api/socket.io",
@@ -61,27 +63,27 @@ function click(cord: Cord) {
 function handleError<T>(err: GameError | T): T | undefined {
   switch (err) {
     case GameError.WRONG_PLAYER: {
-      alert("Dein Gegner ist an der Reihe!");
+      toast.warning(`${userNameStore.opponent} ist an der Reihe!`);
       return undefined;
     }
     case GameError.INVALID_CORD: {
-      alert("Ungültige Coordinaten");
+      toast.error(`Ungültige Koordinaten`);
       return undefined;
     }
     case GameError.ALREADY_HIT: {
-      alert("Auf dieses Feld hast du bereits geschossen");
+      toast.warning(`Auf dieses Feld hast du bereits geschossen!`);
       return undefined;
     }
     case GameError.NOT_STARTED: {
-      alert("Spiel hat noch nicht gestartet");
+      toast.error(`Das Spiel hat noch nicht gestartet!`);
       return undefined;
     }
     case GameError.INVALID_ID: {
-      alert("invalid id");
+      toast.error(`Ungültige ID!`);
       return undefined;
     }
     case GameError.INVALID_GAME: {
-      alert("invalid game");
+      toast.error(`Ungültiges Spiel!`);
       return undefined;
     }
     default:
@@ -148,9 +150,10 @@ function disconnect() {
   <div
     class="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 px-6 py-12"
   >
-    <!-- Leave Button oben rechts -->
+    <Toaster close-button rich-colors position="top-right" />
+
     <button
-      class="absolute top-6 right-6 rounded border border-red-600 bg-red-500 px-4 py-2 text-white transition hover:cursor-pointer hover:bg-red-600"
+      class="absolute top-6 left-6 rounded border border-red-600 bg-red-500 px-4 py-2 text-white transition hover:cursor-pointer hover:bg-red-600"
       @click="leave()"
     >
       Verlassen
@@ -167,23 +170,29 @@ function disconnect() {
       Gewinner: {{ winner }}
     </h1>
 
-    <div id="fields" class="w-full max-w-5xl">
-      <div class="grid grid-cols-1 gap-10 md:grid-cols-2">
-        <div
-          class="player-grid flex flex-col items-center rounded-lg bg-white p-6 shadow-md"
+    <div id="fields" class="w-full max-w-5xl space-y-4">
+      <div class="grid grid-cols-2 gap-10">
+        <h3
+          class="h-6 text-center text-xl leading-6 font-semibold text-gray-700"
         >
-          <h3 class="mb-4 text-2xl font-semibold text-gray-700">
-            {{ userNameStore.me }}
-          </h3>
+          {{ userNameStore.me }}
+        </h3>
+        <h3
+          class="h-6 text-center text-xl leading-6 font-semibold text-gray-700"
+        >
+          {{ userNameStore.opponent }}
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-2 gap-10">
+        <div
+          class="h-[490px] w-[490px] rounded-lg bg-white pt-[15px] pl-[15px] shadow-md"
+        >
           <SimpleGrid :grid="myGrid" :has-listener="false" />
         </div>
-
         <div
-          class="player-grid flex flex-col items-center rounded-lg bg-white p-6 shadow-md"
+          class="h-[490px] w-[490px] rounded-lg bg-white pt-[15px] pl-[15px] shadow-md"
         >
-          <h3 class="mb-4 text-2xl font-semibold text-gray-700">
-            {{ userNameStore.opponent }}
-          </h3>
           <SimpleGrid
             :grid="opponentsGrid"
             :has-listener="!isGameFinished"

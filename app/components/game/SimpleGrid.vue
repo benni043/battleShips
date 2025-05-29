@@ -10,7 +10,7 @@ const props = defineProps<{
 const emit = defineEmits(["clicked"]);
 
 const gridSize = 10;
-const labelMargin = 20;
+const labelMargin = 30;
 const baseSize = 400;
 const canvasWidth = baseSize + labelMargin;
 const canvasHeight = baseSize + labelMargin;
@@ -35,7 +35,7 @@ function drawGrid() {
 
   ctx.value.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  ctx.value.font = "14px sans-serif";
+  ctx.value.font = "18px sans-serif";
   ctx.value.textAlign = "center";
   ctx.value.textBaseline = "middle";
 
