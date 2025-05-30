@@ -6,6 +6,7 @@ import { LobbyError, type LobbyResponse } from "#shared/lobbyTypes";
 import Username from "~/components/lobby/Username.vue";
 import { Toaster, toast } from "vue-sonner";
 import "vue-sonner/style.css";
+import Test from "~/components/game/Test.vue";
 
 const socket = io({
   path: "/api/socket.io",
@@ -93,30 +94,30 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div
-    class="mx-auto min-h-screen w-full bg-gradient-to-br from-blue-50 to-blue-100 p-6 font-sans"
-  >
-    <Toaster close-button rich-colors position="top-right" />
+    <div
+      class="mx-auto min-h-screen w-full bg-gradient-to-br from-blue-50 to-blue-100 p-6 font-sans"
+    >
+      <Toaster close-button rich-colors position="top-right" />
 
-    <div v-if="userNameStore.me.length === 0">
-      <Username
-        class="mb-6 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
-        @submit="(args) => setUserName(args)"
-      />
-    </div>
+      <div v-if="userNameStore.me.length === 0">
+        <Username
+          class="mb-6 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
+          @submit="(args) => setUserName(args)"
+        />
+      </div>
 
-    <div v-if="userNameStore.me.length !== 0">
-      <LobbyForm
-        class="mb-6 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
-        @submit="(args) => createLobby(args)"
-      />
-      <LobbyList
-        :games="games"
-        class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
-        @submit="(args) => joinLobby(args)"
-      />
+      <div v-if="userNameStore.me.length !== 0">
+        <LobbyForm
+          class="mb-6 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
+          @submit="(args) => createLobby(args)"
+        />
+        <LobbyList
+          :games="games"
+          class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
+          @submit="(args) => joinLobby(args)"
+        />
+      </div>
     </div>
-  </div>
 </template>
 
 <style scoped></style>
