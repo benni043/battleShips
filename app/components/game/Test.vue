@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { canvasHeight, canvasWidth } from "~/utils/ship";
+import PlaceGrid from "~/components/game/PlaceGrid.vue";
 
 defineProps<{
   header: string;
@@ -8,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-  <div id="fields" class="flex w-full h-[100vh] justify-around items-center">
+  <div id="fields" class="flex w-full justify-around items-center">
     <div v-for="i in count" :key="i">
       <h1 class="h-6 text-center text-xl leading-6 font-semibold text-gray-700">
         {{ header }}
@@ -37,12 +37,7 @@ defineProps<{
           </div>
 
           <div class="flex items-center justify-center">
-            <canvas
-              ref="canvas"
-              :width="canvasWidth"
-              :height="canvasHeight"
-              class="z-1"
-            />
+            <PlaceGrid></PlaceGrid>
 
             <img
               src="assets/img/border.png"
