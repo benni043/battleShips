@@ -1,17 +1,24 @@
 <script setup lang="ts">
 import PlaceGrid from "~/components/game/PlaceGrid.vue";
+import type { GameDisplayData } from "~/utils/types";
+import { GridDisplayType } from "~/utils/types";
+import GameGrid from "~/components/game/GameGrid.vue";
 
 defineProps<{
-  header: string;
+  headers: string[];
   count: number;
+  gridDisplayType: GridDisplayType;
+  gameDisplayData: GameDisplayData[] | undefined;
 }>();
+
+const emit = defineEmits(["clicked"]);
 </script>
 
 <template>
-  <div id="fields" class="flex w-full justify-around items-center">
+  <div id="fields" class="flex w-full items-center justify-around">
     <div v-for="i in count" :key="i">
       <h1 class="h-6 text-center text-xl leading-6 font-semibold text-gray-700">
-        {{ header }}
+        {{ headers[i - 1] }}
       </h1>
 
       <div class="m-[40px]">
@@ -37,7 +44,16 @@ defineProps<{
           </div>
 
           <div class="flex items-center justify-center">
-            <PlaceGrid></PlaceGrid>
+            <PlaceGrid
+              v-if="gridDisplayType === GridDisplayType.PLACE"
+            ></PlaceGrid>
+
+            <GameGrid
+              v-if="gridDisplayType === GridDisplayType.GAME"
+              :has-listener="gameDisplayData!.at(i - 1)!.hasListener"
+              :grid="gameDisplayData!.at(i - 1)!.grid"
+              @clicked="(args) => emit('clicked', args)"
+            ></GameGrid>
 
             <img
               src="assets/img/border.png"

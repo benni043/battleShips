@@ -2,9 +2,10 @@
 import { toast, Toaster } from "vue-sonner";
 import "vue-sonner/style.css";
 
-import Test from "~/components/game/Test.vue";
+import GridLayout from "~/components/game/GridLayout.vue";
 import { FetchError } from "ofetch";
 import { useMyGridStore } from "~/stores/myGrid";
+import { GridDisplayType } from "~/utils/types";
 
 const route = useRoute();
 const gridStore = useMyGridStore();
@@ -20,8 +21,6 @@ async function start() {
       },
     });
 
-    // gridSent.value = true;
-    //
     // canvas.value!.removeEventListener("mousemove", mouseMove);
     // canvas.value!.removeEventListener("mouseup", mouseUp);
     // canvas.value!.removeEventListener("mousedown", mouseDown);
@@ -52,7 +51,12 @@ async function start() {
   >
     <Toaster close-button rich-colors position="top-right" />
 
-    <Test header="Plaziere deine Schiffe" :count="1"></Test>
+    <GridLayout
+      :headers="['Plaziere deine Schiffe']"
+      :count="1"
+      :grid-display-type="GridDisplayType.PLACE"
+      :game-display-data="undefined"
+    ></GridLayout>
 
     <button
       class="mt-6 w-40 rounded-xl border border-gray-400 bg-blue-600 py-3 text-white transition hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-green-500"

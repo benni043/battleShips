@@ -7,9 +7,9 @@ import {
   canvasWidth,
   canvasHeight,
   cellSize,
-  drawHeaderOfGrid,
   drawShip,
-  getTileSet, drawGrid
+  getTileSet,
+  drawGrid,
 } from "~/utils/ship";
 
 const props = defineProps<{
@@ -37,9 +37,6 @@ function draw() {
   if (!ctx.value) return;
 
   ctx.value.clearRect(0, 0, canvasWidth, canvasHeight);
-
-  //draw header
-  // drawHeaderOfGrid(ctx.value);
 
   drawGrid(ctx.value);
 
@@ -108,11 +105,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div
-    class="mx-auto h-[490px] w-[490px] rounded-lg bg-white p-[15px] shadow-md"
-  >
-    <canvas ref="canvas" :width="canvasWidth" :height="canvasHeight" />
-  </div>
+  <canvas
+    ref="canvas"
+    :width="canvasWidth"
+    :height="canvasHeight"
+    class="z-1"
+  />
 </template>
 
 <style scoped>

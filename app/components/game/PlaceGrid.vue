@@ -9,14 +9,11 @@ import {
   drawShip,
   getTileSet,
   gridSize,
-  labelMargin
+  labelMargin,
 } from "~/utils/ship";
 import { toast } from "vue-sonner";
 
-
 const gridStore = useMyGridStore();
-
-const gridSent = ref(false);
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null);
 const ctx: Ref<CanvasRenderingContext2D | null> = ref(null);
@@ -116,9 +113,6 @@ function draw() {
   if (!ctx.value) return;
 
   ctx.value.clearRect(0, 0, canvasWidth, canvasHeight);
-
-  //draw header
-  // drawHeaderOfGrid(ctx.value);
 
   drawGrid(ctx.value);
 
@@ -279,7 +273,7 @@ function placeShipToVisualCord() {
       newY >= gridSize ||
       (grid.value[newX]![newY]!.shipData !== undefined &&
         grid.value[newX]![newY]!.shipData!.connectsTo !==
-        currentCell.shipData!.connectsTo)
+          currentCell.shipData!.connectsTo)
     ) {
       isValidMove = false;
     }
@@ -352,6 +346,4 @@ const mouseUp = (event: MouseEvent) => {
   />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
