@@ -14,22 +14,18 @@ const socket = io({
 
 const userNameStore = useUserNameStore();
 
-const games: Ref<string[]> = ref([]);
+const games: Ref<LobbyResponse[]> = ref([]);
 
 function createLobby(lobbyName: string) {
   socket.emit("create-game", lobbyName, userNameStore.uuid, lobbyResponse);
 }
 
-function joinLobby(lobbyName: string) {
-  socket.emit("join-game", lobbyName, userNameStore.uuid, lobbyResponse);
+function joinLobby(lobbyId: string) {
+  socket.emit("join-game", lobbyId, userNameStore.uuid, lobbyResponse);
 }
 
 function lobbyResponse(response: LobbyResponse | LobbyError) {
   switch (response) {
-    case LobbyError.ALREADY_TAKEN: {
-      toast.warning("Dieser Lobbyname wird bereits verwendet!");
-      break;
-    }
     case LobbyError.INVALID_GAME: {
       toast.warning("Dieser Lobbyname ist nicht erlaubt!");
       break;
@@ -44,25 +40,25 @@ function lobbyResponse(response: LobbyResponse | LobbyError) {
     }
     default: {
       navigateTo(
-        `/game/${response.lobbyName}/player/${userNameStore.uuid}/place`,
+        `/game/${response.lobbyId}/player/${userNameStore.uuid}/place`,
       );
       break;
     }
   }
 }
 
-function getLobbies(initGames: string[]) {
+function getLobbies(initGames: LobbyResponse[]) {
   games.value = initGames;
 }
 
-socket.on("new-game", (lobbyName: string) => {
-  games.value.push(lobbyName);
+socket.on("new-game", (lobbyData: LobbyResponse) => {
+  games.value.push(lobbyData);
 });
 
-socket.on("remove-game", (lobbyName: string) => {
-  const index = games.value.indexOf(lobbyName);
-
-  if (index !== -1) games.value.splice(index, 1);
+socket.on("remove-game", (removalId: string) => {
+  for (let i = 0; i < games.value.length; i++) {
+    if (games.value[i]!.lobbyId === removalId) games.value.splice(i, 1);
+  }
 });
 
 function setUserName(usernameRes: string) {

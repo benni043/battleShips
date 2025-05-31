@@ -4,58 +4,58 @@ import { gameRepository } from "~~/server/utils/repositories/gameRepository";
 import type { Socket } from "socket.io";
 
 export class GameService {
-  postField(gameName: string, id: string, field: Cell[][]) {
-    return gameRepository.postField(gameName, id, field);
+  postField(gameName: string, gameId: string, id: string, field: Cell[][]) {
+    return gameRepository.postField(gameName, gameId, id, field);
   }
 
-  setSocket(id: string, gameName: string, username: string, socket: Socket) {
-    return gameRepository.setSocket(id, gameName, username, socket);
+  setSocket(id: string, gameId: string, username: string, socket: Socket) {
+    return gameRepository.setSocket(id, gameId, username, socket);
   }
 
-  getOpponentSocket(gameName: string) {
-    return gameRepository.getOpponentSocket(gameName);
+  getOpponentSocket(gameId: string) {
+    return gameRepository.getOpponentSocket(gameId);
   }
 
-  handleClick(id: string, gameName: string, cord: Cord) {
-    return gameRepository.handleClick(id, gameName, cord);
+  handleClick(id: string, gameId: string, cord: Cord) {
+    return gameRepository.handleClick(id, gameId, cord);
   }
 
-  isStarted(gameName: string) {
-    const game = gameRepository.getGameByName(gameName);
+  isStarted(gameId: string) {
+    const game = gameRepository.getGameById(gameId);
 
     return !(!game || game!.state === GameState.WAITING);
   }
 
-  removeGame(gameName: string) {
-    return gameRepository.removeGame(gameName);
+  removeGame(gameId: string) {
+    return gameRepository.removeGame(gameId);
   }
 
-  getGameByName(gameName: string) {
-    const game = gameRepository.getGameByName(gameName);
+  getGameByName(gameId: string) {
+    const game = gameRepository.getGameById(gameId);
 
     if (!game) return GameError.INVALID_GAME;
 
     return game;
   }
 
-  getCurrentPlayer(gameName: string) {
-    const game = gameRepository.getGameByName(gameName);
+  getCurrentPlayer(gameId: string) {
+    const game = gameRepository.getGameById(gameId);
 
     if (!game) return GameError.INVALID_GAME;
 
-    return gameRepository.getCurrentPlayer(gameName);
+    return gameRepository.getCurrentPlayer(gameId);
   }
 
-  getWinner(gameName: string) {
-    const game = gameRepository.getGameByName(gameName);
+  getWinner(gameId: string) {
+    const game = gameRepository.getGameById(gameId);
 
     if (!game) return GameError.INVALID_GAME;
 
-    return gameRepository.getWinner(gameName);
+    return gameRepository.getWinner(gameId);
   }
 
-  tryRemove(gameName: string, socket: Socket) {
-    const game = gameRepository.getGameByName(gameName);
+  tryRemove(gameId: string, socket: Socket) {
+    const game = gameRepository.getGameById(gameId);
 
     if (!game) return GameError.INVALID_GAME;
     if (
@@ -64,15 +64,15 @@ export class GameService {
     )
       return GameError.INVALID_ID;
 
-    gameRepository.tryRemove(gameName, socket);
+    gameRepository.tryRemove(gameId, socket);
   }
 
-  isGameStarted(gameName: string) {
-    const game = gameRepository.getGameByName(gameName)!;
+  isGameStarted(gameId: string) {
+    const game = gameRepository.getGameById(gameId)!;
 
     if (!game) return GameError.INVALID_GAME;
 
-    return gameRepository.isGameStarted(gameName);
+    return gameRepository.isGameStarted(gameId);
   }
 
   getAllGames(): string[] {

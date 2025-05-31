@@ -43,6 +43,7 @@ export type Game = {
   player1: Player;
   player2: Player | undefined;
   gameName: string;
+  id: string;
   state: GameState;
   isPlayer1Active: boolean;
 };

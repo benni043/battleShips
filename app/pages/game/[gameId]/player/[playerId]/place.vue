@@ -15,7 +15,7 @@ async function start() {
     await $fetch("/api/place", {
       method: "POST",
       body: {
-        lobby: route.params.gameId,
+        gameId: route.params.gameId,
         id: route.params.playerId,
         grid: JSON.stringify(gridStore.grid),
       },

@@ -8,14 +8,14 @@ export default defineEventHandler(async (event: H3Event) => {
   try {
     const body = await readBody(event);
 
-    const { lobby, id, grid } = body;
+    const { gameId, id, grid } = body;
 
-    if (!lobby || !id || !grid) {
+    if (!gameId || !id || !grid) {
       return sendError(
         event,
         createError({
           statusCode: 400,
-          statusMessage: "Missing required fields: lobby, id, or grid",
+          statusMessage: "Missing required fields: gameId, id, or grid",
         }),
       );
     }
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event: H3Event) => {
       );
     }
 
-    const isValid = lobbyService.checkData(lobby, id);
+    const isValid = lobbyService.checkData(gameId, id);
     switch (isValid) {
       case LobbyError.INVALID_GAME: {
         return sendError(
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event: H3Event) => {
       }
     }
 
-    const game = gameService.postField(lobby, id, parsedGrid);
+    const game = gameService.postField("dummy", gameId, id, parsedGrid);
 
     return {
       statusCode: 200,

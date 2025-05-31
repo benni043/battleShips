@@ -1,6 +1,5 @@
 import { LobbyError } from "#shared/lobbyTypes";
 import { lobbyRepository } from "~~/server/utils/repositories/lobbyRepository";
-import { gameService } from "~~/server/utils/services/gameService";
 
 export class LobbyService {
   getAvailableLobbies() {
@@ -8,27 +7,18 @@ export class LobbyService {
   }
 
   createLobby(lobbyName: string, id: string) {
-    if (!this.isLobbyNameAvailable(lobbyName)) return LobbyError.ALREADY_TAKEN;
-
     if (!this.isLobbyNameValid(lobbyName)) return LobbyError.INVALID_GAME;
 
     return lobbyRepository.createLobby(lobbyName, id);
   }
 
-  joinLobby(lobbyName: string, id: string) {
-    const lobby = lobbyRepository.getLobbyByName(lobbyName);
+  joinLobby(lobbyId: string, id: string) {
+    const lobby = lobbyRepository.getLobbyById(lobbyId);
 
     if (!lobby) return LobbyError.INVALID_GAME;
     if (lobby.player2Id !== undefined) return LobbyError.FULL;
 
-    return lobbyRepository.joinLobby(lobbyName, id);
-  }
-
-  private isLobbyNameAvailable(lobbyName: string) {
-    const lobbies = lobbyRepository.getAvailableLobbies();
-    const games = gameService.getAllGames();
-
-    return !lobbies.includes(lobbyName) && !games.includes(lobbyName);
+    return lobbyRepository.joinLobby(lobbyId, id);
   }
 
   private isLobbyNameValid(lobbyName: string): boolean {
@@ -43,8 +33,8 @@ export class LobbyService {
     );
   }
 
-  checkData(lobbyName: string, id: string) {
-    const lobby = lobbyRepository.getLobbyByName(lobbyName);
+  checkData(lobbyId: string, id: string) {
+    const lobby = lobbyRepository.getLobbyById(lobbyId);
 
     if (!lobby) return LobbyError.INVALID_GAME;
 
@@ -52,8 +42,8 @@ export class LobbyService {
       return LobbyError.INVALID_ID;
   }
 
-  removeLobby(lobbyName: string) {
-    lobbyRepository.removeLobby(lobbyName);
+  removeLobby(lobbyId: string) {
+    lobbyRepository.removeLobby(lobbyId);
   }
 }
 

@@ -6,13 +6,13 @@ import { GameError } from "#shared/gameTypes";
 export function handleGameEvents(socket: Socket, io: Server) {
   socket.on(
     "post-socket",
-    (gameName: string, id: string, username: string, cb) => {
-      const response = gameService.setSocket(id, gameName, username, socket);
+    (gameId: string, id: string, username: string, cb) => {
+      const response = gameService.setSocket(id, gameId, username, socket);
 
-      socket.join(gameName);
+      socket.join(gameId);
 
-      if (gameService.isGameStarted(gameName)) {
-        const game = gameService.getGameByName(gameName);
+      if (gameService.isGameStarted(gameId)) {
+        const game = gameService.getGameByName(gameId);
 
         if (game !== GameError.INVALID_GAME) {
           socket.emit(
@@ -32,32 +32,32 @@ export function handleGameEvents(socket: Socket, io: Server) {
     },
   );
 
-  socket.on("click", (id: string, gameName: string, cord: Cord, cb) => {
-    if (!gameService.isStarted(gameName)) {
+  socket.on("click", (id: string, gameId: string, cord: Cord, cb) => {
+    if (!gameService.isStarted(gameId)) {
       cb(GameError.NOT_STARTED);
       return;
     }
 
-    const shipData = gameService.handleClick(id, gameName, cord);
+    const shipData = gameService.handleClick(id, gameId, cord);
 
     if (
       shipData !== GameError.INVALID_CORD &&
       shipData !== GameError.WRONG_PLAYER &&
       shipData !== GameError.ALREADY_HIT
     ) {
-      const current = gameService.getCurrentPlayer(gameName);
-      io.to(gameName).emit("current", current);
+      const current = gameService.getCurrentPlayer(gameId);
+      io.to(gameId).emit("current", current);
 
-      gameService.getOpponentSocket(gameName).emit("hit-response", cord);
+      gameService.getOpponentSocket(gameId).emit("hit-response", cord);
 
       cb({ cord: cord, shipData: shipData.shipData } as HitResponse);
 
       if (shipData.gameFinished) {
-        io.to(gameName).emit("game-finished", {
-          winner: gameService.getWinner(gameName),
+        io.to(gameId).emit("game-finished", {
+          winner: gameService.getWinner(gameId),
         } as GameFinished);
 
-        gameService.removeGame(gameName);
+        gameService.removeGame(gameId);
       }
 
       return;
