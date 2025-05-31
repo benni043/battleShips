@@ -7,7 +7,7 @@ import {
   type HitResponse,
 } from "#shared/gameTypes";
 import { io } from "socket.io-client";
-import { useUserNameStore } from "~/stores/username";
+import { useUserNameStore } from "~/stores/data";
 import { Toaster, toast } from "vue-sonner";
 import "vue-sonner/style.css";
 import GridLayout from "~/components/game/layout/GridLayout.vue";
@@ -87,6 +87,10 @@ function handleError<T>(err: GameError | T): T | undefined {
       toast.error(`Ungültiges Spiel!`);
       return undefined;
     }
+    case GameError.FINISHED: {
+      toast.error(`Spiel ist bereits beendet!!`);
+      return undefined;
+    }
     default:
       return err;
   }
@@ -115,10 +119,12 @@ socket.on("game-finished", (gameFinished: GameFinished) => {
   winner.value = gameFinished.winner;
 });
 
-socket.on("opponent", (opponentRes: string, currentRes: string) => {
-  current.value = currentRes;
+socket.on("gameName", (gameName: string) => {
+  userNameStore.game = gameName;
+});
 
-  userNameStore.opponent = opponentRes;
+socket.on("opponent", (opponent: string) => {
+  userNameStore.opponent = opponent;
 });
 
 socket.on("current", (currentRes: string) => {
@@ -127,7 +133,7 @@ socket.on("current", (currentRes: string) => {
 
 socket.emit("post-socket", route.params.gameId, route.params.playerId, joined);
 
-function joined(response: GameError | undefined) {
+function joined(response: GameError) {
   handleError(response);
 }
 
@@ -156,7 +162,7 @@ function disconnect() {
 
     <div>
       <h1 class="mb-8 text-center text-3xl font-bold text-gray-800">
-        Lobby: {{ route.params.gameId }}
+        Lobby: {{ userNameStore.game }}
       </h1>
 
       <h1 class="mb-8 text-center text-3xl font-bold text-gray-800">

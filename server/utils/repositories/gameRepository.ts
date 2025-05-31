@@ -33,7 +33,7 @@ export class GameRepository {
 
     this.games.set(gameId, game);
 
-    return gameId;
+    return { gameId, gameName } as GameResponse;
   }
 
   postField(gameId: string, playerId: string, field: Cell[][]) {
@@ -66,10 +66,18 @@ export class GameRepository {
     else return game.player2!.socket!;
   }
 
-  isGameStarted(gameId: string) {
+  getOpponent(gameId: string, playerId: string) {
     const game = this.getGameById(gameId)!;
 
-    return game.state !== GameState.WAITING;
+    if (game.player1.id === playerId) return game.player1!.username!;
+    else if (game.player2?.id === playerId) return game.player2!.username!;
+    else return GameError.INVALID_ID;
+  }
+
+  getGameState(gameId: string) {
+    const game = this.getGameById(gameId)!;
+
+    return game.state;
   }
 
   getCurrentPlayer(gameId: string) {

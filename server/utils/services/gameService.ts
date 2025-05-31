@@ -1,5 +1,5 @@
 import type { Cell, Cord } from "#shared/gameTypes";
-import { GameError, GameState } from "#shared/gameTypes";
+import { GameError } from "#shared/gameTypes";
 import { gameRepository } from "~~/server/utils/repositories/gameRepository";
 import type { Socket } from "socket.io";
 import type { LobbyPlayer } from "#shared/lobbyTypes";
@@ -38,6 +38,14 @@ export class GameService {
     return gameRepository.getOpponentSocket(gameId);
   }
 
+  getOpponent(gameId: string, playerId: string) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (!game) return GameError.INVALID_GAME;
+
+    return gameRepository.getOpponent(gameId, playerId);
+  }
+
   handleClick(id: string, gameId: string, cord: Cord) {
     const game = gameRepository.getGameById(gameId);
 
@@ -46,21 +54,15 @@ export class GameService {
     return gameRepository.handleClick(id, gameId, cord);
   }
 
-  isStarted(gameId: string) {
-    const game = gameRepository.getGameById(gameId);
+  // removeGame(gameId: string) {
+  //   const game = gameRepository.getGameById(gameId);
+  //
+  //   if (!game) return GameError.INVALID_GAME;
+  //
+  //   return gameRepository.removeGame(gameId);
+  // }
 
-    return !(!game || game!.state === GameState.WAITING);
-  }
-
-  removeGame(gameId: string) {
-    const game = gameRepository.getGameById(gameId);
-
-    if (!game) return GameError.INVALID_GAME;
-
-    return gameRepository.removeGame(gameId);
-  }
-
-  getGameByName(gameId: string) {
+  getGameById(gameId: string) {
     const game = gameRepository.getGameById(gameId);
 
     if (!game) return GameError.INVALID_GAME;
@@ -97,12 +99,12 @@ export class GameService {
     gameRepository.tryRemove(gameId, socket);
   }
 
-  isGameStarted(gameId: string) {
+  getGameState(gameId: string) {
     const game = gameRepository.getGameById(gameId)!;
 
     if (!game) return GameError.INVALID_GAME;
 
-    return gameRepository.isGameStarted(gameId);
+    return gameRepository.getGameState(gameId);
   }
 }
 

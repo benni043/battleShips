@@ -1,33 +1,43 @@
 import type { Server, Socket } from "socket.io";
 import { gameService } from "~~/server/utils/services/gameService";
-import type { Cord, GameFinished, HitResponse } from "#shared/gameTypes";
-import { GameError } from "#shared/gameTypes";
+import type { Cord, Game, GameFinished, HitResponse } from "#shared/gameTypes";
+import { GameState, GameError } from "#shared/gameTypes";
 
 export function handleGameEvents(socket: Socket, io: Server) {
   socket.on("post-socket", (gameId: string, id: string, cb) => {
     const response = gameService.setSocket(id, gameId, socket);
 
-    socket.join(gameId);
-
-    if (gameService.isGameStarted(gameId)) {
-      const game = gameService.getGameByName(gameId);
-
-      if (game !== GameError.INVALID_GAME) {
-        socket.emit("opponent", game.player1.username!, game.player1.username!);
-        game.player1.socket!.emit(
-          "opponent",
-          game.player2!.username!,
-          game.player1.username!,
-        );
-      }
+    if (response === GameError.INVALID_GAME) {
+      cb(response);
+      return;
     }
 
-    cb(response);
+    socket.join(gameId);
+
+    const game = gameService.getGameById(gameId) as Game;
+
+    if (game.state === GameState.STARTED) {
+      socket.emit("opponent", game.player2!.username);
+    } else {
+      socket.emit("opponent", game.player1.username);
+    }
+
+    const current = gameService.getCurrentPlayer(gameId);
+
+    socket.emit("current", current);
+    socket.emit("gameName", game.gameName);
   });
 
   socket.on("click", (id: string, gameId: string, cord: Cord, cb) => {
-    if (!gameService.isStarted(gameId)) {
+    const gameState = gameService.getGameState(gameId);
+
+    if (gameState === GameState.WAITING) {
       cb(GameError.NOT_STARTED);
+      return;
+    }
+
+    if (gameState === GameState.FINISHED) {
+      cb(GameError.FINISHED);
       return;
     }
 
@@ -40,6 +50,7 @@ export function handleGameEvents(socket: Socket, io: Server) {
       shipData !== GameError.INVALID_GAME
     ) {
       const current = gameService.getCurrentPlayer(gameId);
+
       io.to(gameId).emit("current", current);
 
       const opponentSocket = gameService.getOpponentSocket(gameId);
@@ -54,7 +65,7 @@ export function handleGameEvents(socket: Socket, io: Server) {
           winner: gameService.getWinner(gameId),
         } as GameFinished);
 
-        gameService.removeGame(gameId);
+        // gameService.removeGame(gameId);
       }
 
       return;

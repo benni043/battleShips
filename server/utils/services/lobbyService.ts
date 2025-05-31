@@ -6,19 +6,19 @@ export class LobbyService {
     return lobbyRepository.getAvailableLobbies();
   }
 
-  createLobby(lobbyName: string, id: string) {
+  createLobby(lobbyName: string, id: string, name: string) {
     if (!this.isLobbyNameValid(lobbyName)) return LobbyError.INVALID_GAME;
 
-    return lobbyRepository.createLobby(lobbyName, id);
+    return lobbyRepository.createLobby(lobbyName, id, name);
   }
 
-  joinLobby(lobbyId: string, id: string) {
+  joinLobby(lobbyId: string, id: string, name: string) {
     const lobby = lobbyRepository.getLobbyById(lobbyId);
 
     if (!lobby) return LobbyError.INVALID_GAME;
     if (lobby.player2 !== undefined) return LobbyError.FULL;
 
-    return lobbyRepository.joinLobby(lobbyId, id);
+    return lobbyRepository.joinLobby(lobbyId, id, name);
   }
 
   private isLobbyNameValid(lobbyName: string): boolean {

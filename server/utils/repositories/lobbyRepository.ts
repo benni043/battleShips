@@ -11,13 +11,13 @@ export class LobbyRepository {
     }));
   }
 
-  createLobby(lobbyName: string, id: string) {
+  createLobby(lobbyName: string, id: string, name: string) {
     const uuid = uuidv4();
 
     const lobby: Lobby = {
       lobbyName: lobbyName,
       id: uuid,
-      player1: { id: id, name: id },
+      player1: { id: id, name: name },
       player2: undefined,
     };
 
@@ -26,10 +26,10 @@ export class LobbyRepository {
     return { lobbyId: uuid, lobbyName: lobby.lobbyName } as LobbyResponse;
   }
 
-  joinLobby(lobbyId: string, id: string) {
+  joinLobby(lobbyId: string, id: string, name: string) {
     const lobby = this.lobbies.get(lobbyId)!;
 
-    lobby.player2 = { id: id, name: id };
+    lobby.player2 = { id: id, name: name };
 
     return lobby;
   }

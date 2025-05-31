@@ -33,11 +33,17 @@ export enum GameError {
   INVALID_GAME = "INVALID_GAME",
   ALREADY_HIT = "ALREADY_HIT",
   NOT_STARTED = "NOT_STARTED",
+  FINISHED = "FINISHED",
 }
 
 export interface GameFinished {
   winner: string;
 }
+
+export type GameResponse = {
+  gameId: string;
+  gameName: string;
+};
 
 export type Game = {
   player1: Player;
