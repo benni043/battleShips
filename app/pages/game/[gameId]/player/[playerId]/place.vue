@@ -24,15 +24,7 @@ async function start() {
     navigateTo(`/game/${route.params.gameId}/player/${route.params.playerId}`);
   } catch (error) {
     if (error instanceof FetchError) {
-      if (error?.status === 403) {
-        toast.error(`${error.statusMessage}`);
-      } else if (error?.status === 404) {
-        toast.error(`${error.statusMessage}`);
-      } else if (error?.status === 405) {
-        toast.error(`${error.statusMessage}`);
-      } else {
-        toast.error(`Unknown error occurred: ${error.statusMessage}`);
-      }
+      toast.error(`Status: ${error.status} - ${error.statusMessage}`);
     } else {
       console.error("unknown error: ", error);
     }

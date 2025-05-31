@@ -148,6 +148,8 @@ onMounted(() => {
   ctx.value = canvas.value!.getContext("2d");
   ctx.value!.imageSmoothingEnabled = false;
 
+  gridStore.grid = grid.value;
+
   draw();
   getTileSet().onload = () => {
     draw();
@@ -320,7 +322,6 @@ function placeShipToVisualCord() {
 }
 
 const handleLostFocus = () => {
-  console.log("mouseLeave");
   if (!currentCell) return;
 
   const shipCells = getShipCells(currentCell);

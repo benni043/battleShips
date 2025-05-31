@@ -17,11 +17,23 @@ const userNameStore = useUserNameStore();
 const games: Ref<LobbyResponse[]> = ref([]);
 
 function createLobby(lobbyName: string) {
-  socket.emit("create-game", lobbyName, userNameStore.uuid, lobbyResponse);
+  socket.emit(
+    "create-game",
+    lobbyName,
+    userNameStore.uuid,
+    userNameStore.me,
+    lobbyResponse,
+  );
 }
 
 function joinLobby(lobbyId: string) {
-  socket.emit("join-game", lobbyId, userNameStore.uuid, lobbyResponse);
+  socket.emit(
+    "join-game",
+    lobbyId,
+    userNameStore.uuid,
+    userNameStore.me,
+    lobbyResponse,
+  );
 }
 
 function lobbyResponse(response: LobbyResponse | LobbyError) {

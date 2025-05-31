@@ -1,11 +1,13 @@
-import {
+import type {
   Cell,
   Cord,
   Game,
-  GameError,
-  GameState,
+  GameResponse,
   Hit,
-  Player,
+  Player} from "#shared/gameTypes";
+import {
+  GameError,
+  GameState
 } from "#shared/gameTypes";
 import type { Socket } from "socket.io";
 import type { LobbyPlayer } from "#shared/lobbyTypes";
@@ -40,7 +42,7 @@ export class GameRepository {
 
     this.games.set(gameId, game);
 
-    return gameId;
+    return { gameId, gameName } as GameResponse;
   }
 
   postField(gameId: string, playerId: string, field: Cell[][]) {
@@ -73,10 +75,17 @@ export class GameRepository {
     else return game.player2!.socket!;
   }
 
-  isGameStarted(gameId: string) {
+  getOpponent(gameId: string) {
     const game = this.getGameById(gameId)!;
 
-    return game.state !== GameState.WAITING;
+    if (game.isPlayer1Active) return game.player1!.username!;
+    else return game.player2!.username!;
+  }
+
+  getGameState(gameId: string) {
+    const game = this.getGameById(gameId)!;
+
+    return game.state;
   }
 
   getCurrentPlayer(gameId: string) {

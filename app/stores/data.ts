@@ -3,5 +3,6 @@ export const useUserNameStore = defineStore("userName", {
     me: "",
     uuid: "",
     opponent: "",
+    game: "",
   }),
 });
