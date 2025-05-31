@@ -2,10 +2,10 @@
 import { toast, Toaster } from "vue-sonner";
 import "vue-sonner/style.css";
 
-import GridLayout from "~/components/game/GridLayout.vue";
+import GridLayout from "~/components/game/layout/GridLayout.vue";
 import { FetchError } from "ofetch";
 import { useMyGridStore } from "~/stores/myGrid";
-import { GridDisplayType } from "~/utils/types";
+import PlaceGrid from "~/components/game/canvas/PlaceGrid.vue";
 
 const route = useRoute();
 const gridStore = useMyGridStore();
@@ -20,10 +20,6 @@ async function start() {
         grid: JSON.stringify(gridStore.grid),
       },
     });
-
-    // canvas.value!.removeEventListener("mousemove", mouseMove);
-    // canvas.value!.removeEventListener("mouseup", mouseUp);
-    // canvas.value!.removeEventListener("mousedown", mouseDown);
 
     navigateTo(`/game/${route.params.gameId}/player/${route.params.playerId}`);
   } catch (error) {
@@ -51,12 +47,9 @@ async function start() {
   >
     <Toaster close-button rich-colors position="top-right" />
 
-    <GridLayout
-      :headers="['Plaziere deine Schiffe']"
-      :count="1"
-      :grid-display-type="GridDisplayType.PLACE"
-      :game-display-data="undefined"
-    ></GridLayout>
+    <GridLayout header="Plaziere deine Schiffe">
+      <PlaceGrid></PlaceGrid>
+    </GridLayout>
 
     <button
       class="mt-6 w-40 rounded-xl border border-gray-400 bg-blue-600 py-3 text-white transition hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-green-500"

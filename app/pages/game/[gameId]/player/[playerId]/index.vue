@@ -10,8 +10,8 @@ import { io } from "socket.io-client";
 import { useUserNameStore } from "~/stores/username";
 import { Toaster, toast } from "vue-sonner";
 import "vue-sonner/style.css";
-import GridLayout from "~/components/game/GridLayout.vue";
-import { type GameDisplayData, GridDisplayType } from "~/utils/types";
+import GridLayout from "~/components/game/layout/GridLayout.vue";
+import GameGrid from "~/components/game/canvas/GameGrid.vue";
 
 const socket = io({
   path: "/api/socket.io",
@@ -177,16 +177,27 @@ function disconnect() {
       </h1>
     </div>
 
-    <GridLayout
-      :headers="[useUserNameStore().me, useUserNameStore().opponent]"
-      :count="2"
-      :grid-display-type="GridDisplayType.GAME"
-      :game-display-data="[
-        { grid: myGrid, hasListener: false } as GameDisplayData,
-        { grid: opponentsGrid, hasListener: true } as GameDisplayData,
-      ]"
-      @clicked="(args) => click(args)"
-    ></GridLayout>
+    <div id="fields" class="flex w-full items-center justify-around">
+      <div>
+        <GridLayout :header="userNameStore.me">
+          <GameGrid
+            :has-listener="false"
+            :grid="myGrid"
+            @clicked="(args: Cord) => click(args)"
+          ></GameGrid>
+        </GridLayout>
+      </div>
+
+      <div>
+        <GridLayout :header="userNameStore.opponent">
+          <GameGrid
+            :has-listener="true"
+            :grid="opponentsGrid"
+            @clicked="(args: Cord) => click(args)"
+          ></GameGrid>
+        </GridLayout>
+      </div>
+    </div>
   </div>
 </template>
 
