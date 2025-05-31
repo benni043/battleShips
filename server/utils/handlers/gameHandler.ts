@@ -17,13 +17,15 @@ export function handleGameEvents(socket: Socket, io: Server) {
     const game = gameService.getGameById(gameId) as Game;
 
     if (game.state === GameState.STARTED) {
-      const opponent = gameService.getOpponent(gameId);
-      const current = gameService.getCurrentPlayer(gameId);
-
-      socket.emit("opponent", opponent);
-      socket.emit("current", current);
-      socket.emit("gameName", game.gameName);
+      socket.emit("opponent", game.player2!.username);
+    } else {
+      socket.emit("opponent", game.player1.username);
     }
+
+    const current = gameService.getCurrentPlayer(gameId);
+
+    socket.emit("current", current);
+    socket.emit("gameName", game.gameName);
   });
 
   socket.on("click", (id: string, gameId: string, cord: Cord, cb) => {

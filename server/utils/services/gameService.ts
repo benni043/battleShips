@@ -1,5 +1,5 @@
 import type { Cell, Cord } from "#shared/gameTypes";
-import { GameError, GameState } from "#shared/gameTypes";
+import { GameError } from "#shared/gameTypes";
 import { gameRepository } from "~~/server/utils/repositories/gameRepository";
 import type { Socket } from "socket.io";
 import type { LobbyPlayer } from "#shared/lobbyTypes";
@@ -38,12 +38,12 @@ export class GameService {
     return gameRepository.getOpponentSocket(gameId);
   }
 
-  getOpponent(gameId: string) {
+  getOpponent(gameId: string, playerId: string) {
     const game = gameRepository.getGameById(gameId);
 
     if (!game) return GameError.INVALID_GAME;
 
-    return gameRepository.getOpponent(gameId);
+    return gameRepository.getOpponent(gameId, playerId);
   }
 
   handleClick(id: string, gameId: string, cord: Cord) {

@@ -4,11 +4,9 @@ import type {
   Game,
   GameResponse,
   Hit,
-  Player} from "#shared/gameTypes";
-import {
-  GameError,
-  GameState
+  Player,
 } from "#shared/gameTypes";
+import { GameError, GameState } from "#shared/gameTypes";
 import type { Socket } from "socket.io";
 import type { LobbyPlayer } from "#shared/lobbyTypes";
 
@@ -75,11 +73,12 @@ export class GameRepository {
     else return game.player2!.socket!;
   }
 
-  getOpponent(gameId: string) {
+  getOpponent(gameId: string, playerId: string) {
     const game = this.getGameById(gameId)!;
 
-    if (game.isPlayer1Active) return game.player1!.username!;
-    else return game.player2!.username!;
+    if (game.player1.id === playerId) return game.player1!.username!;
+    else if (game.player2?.id === playerId) return game.player2!.username!;
+    else return GameError.INVALID_ID;
   }
 
   getGameState(gameId: string) {

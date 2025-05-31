@@ -117,11 +117,11 @@ socket.on("game-finished", (gameFinished: GameFinished) => {
 
 socket.on("gameName", (gameName: string) => {
   userNameStore.game = gameName;
-})
+});
 
 socket.on("opponent", (opponent: string) => {
   userNameStore.opponent = opponent;
-})
+});
 
 socket.on("current", (currentRes: string) => {
   current.value = currentRes;
