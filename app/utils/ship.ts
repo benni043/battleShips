@@ -45,12 +45,30 @@ export function getShipConnections(
   };
 }
 
-export function getTileSet() {
-  const image = new Image();
-  image.crossOrigin = "anonymous";
-  image.src = shipImg;
+let normalTileSet: HTMLImageElement | undefined = undefined;
+export function getNormalTileSet() {
+  if (normalTileSet) {
+    return normalTileSet;
+  }
 
-  return image;
+  normalTileSet = new Image();
+  normalTileSet.crossOrigin = "anonymous";
+  normalTileSet.src = shipImg;
+
+  return normalTileSet;
+}
+
+let brokenTileSet: HTMLImageElement | undefined = undefined;
+export function getBrokenTileSet() {
+  if (brokenTileSet) {
+    return brokenTileSet;
+  }
+
+  brokenTileSet = new Image();
+  brokenTileSet.crossOrigin = "anonymous";
+  brokenTileSet.src = shipBrokenImg;
+
+  return brokenTileSet;
 }
 
 export function getTileSetIndex(connections: ShipsConnections): number {
