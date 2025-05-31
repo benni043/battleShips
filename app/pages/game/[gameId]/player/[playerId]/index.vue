@@ -87,6 +87,10 @@ function handleError<T>(err: GameError | T): T | undefined {
       toast.error(`Ungültiges Spiel!`);
       return undefined;
     }
+    case GameError.FINISHED: {
+      toast.error(`Spiel ist bereits beendet!!`);
+      return undefined;
+    }
     default:
       return err;
   }
