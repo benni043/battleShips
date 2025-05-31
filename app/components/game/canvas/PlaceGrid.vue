@@ -156,6 +156,9 @@ onMounted(() => {
   canvas.value!.addEventListener("mousedown", mouseDown);
   canvas.value!.addEventListener("mousemove", mouseMove);
   canvas.value!.addEventListener("mouseup", mouseUp);
+  canvas.value!.addEventListener("mouseleave", handleLostFocus);
+
+  window.addEventListener("blur", handleLostFocus);
 });
 
 function mouseGridPosition(event: MouseEvent): { x: number; y: number } {
@@ -303,6 +306,8 @@ function placeShipToVisualCord() {
         gridCord: { x: newPos.x, y: newPos.y },
       };
     }
+
+    gridStore.grid = grid.value;
   } else {
     // reset cell to gridCoordinate
     for (const cell of shipCells) {
@@ -313,6 +318,23 @@ function placeShipToVisualCord() {
     toast.warning(`Das Schiff kann hier nicht plaziert werden!`);
   }
 }
+
+const handleLostFocus = () => {
+  console.log("mouseLeave");
+  if (!currentCell) return;
+
+  const shipCells = getShipCells(currentCell);
+
+  for (const cell of shipCells) {
+    cell.visualCord.x = cell.gridCord.x;
+    cell.visualCord.y = cell.gridCord.y;
+  }
+
+  currentCell = undefined;
+  mouseDownPos = undefined;
+
+  draw();
+};
 
 const mouseUp = (event: MouseEvent) => {
   if (!currentCell) return;
@@ -332,8 +354,6 @@ const mouseUp = (event: MouseEvent) => {
   mouseDownPos = undefined;
 
   draw();
-
-  gridStore.grid = grid.value;
 };
 </script>
 

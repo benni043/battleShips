@@ -55,13 +55,6 @@ function getLobbies(initGames: string[]) {
   games.value = initGames;
 }
 
-function setUserName(usernameRes: string) {
-  userNameStore.me = usernameRes;
-  userNameStore.uuid = uuidv4();
-
-  socket.emit("join-lobby", getLobbies);
-}
-
 socket.on("new-game", (lobbyName: string) => {
   games.value.push(lobbyName);
 });
@@ -71,6 +64,13 @@ socket.on("remove-game", (lobbyName: string) => {
 
   if (index !== -1) games.value.splice(index, 1);
 });
+
+function setUserName(usernameRes: string) {
+  userNameStore.me = usernameRes;
+  userNameStore.uuid = uuidv4();
+
+  socket.emit("join-lobby", getLobbies);
+}
 
 if (userNameStore.me.length !== 0) socket.emit("join-lobby", getLobbies);
 
