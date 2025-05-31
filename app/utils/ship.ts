@@ -1,6 +1,7 @@
 import type { Cell } from "#shared/gameTypes";
 import type { ShipsConnections } from "~/utils/types";
 import shipImg from "@/assets/img/ships.png";
+import shipBrokenImg from "@/assets/img/ships-broken.png";
 
 export const gridSize = 10;
 
@@ -45,12 +46,30 @@ export function getShipConnections(
   };
 }
 
-export function getTileSet() {
-  const image = new Image();
-  image.crossOrigin = "anonymous";
-  image.src = shipImg;
+let normalTileSet: HTMLImageElement | undefined = undefined;
+export function getNormalTileSet() {
+  if (normalTileSet) {
+    return normalTileSet;
+  }
 
-  return image;
+  normalTileSet = new Image();
+  normalTileSet.crossOrigin = "anonymous";
+  normalTileSet.src = shipImg;
+
+  return normalTileSet;
+}
+
+let brokenTileSet: HTMLImageElement | undefined = undefined;
+export function getBrokenTileSet() {
+  if (brokenTileSet) {
+    return brokenTileSet;
+  }
+
+  brokenTileSet = new Image();
+  brokenTileSet.crossOrigin = "anonymous";
+  brokenTileSet.src = shipBrokenImg;
+
+  return brokenTileSet;
 }
 
 export function getTileSetIndex(connections: ShipsConnections): number {
@@ -84,6 +103,7 @@ export function drawShip(
   y: number,
   grid: Cell[][],
   ctx: CanvasRenderingContext2D,
+  tileSet: HTMLImageElement,
 ) {
   const rows = grid.length;
   const cols = grid[0]?.length ?? 0;
@@ -96,10 +116,8 @@ export function drawShip(
   const canvasX = ship.visualCord.x * cellSize + labelMargin;
   const canvasY = ship.visualCord.y * cellSize + labelMargin;
 
-  const image = getTileSet();
-
   ctx.drawImage(
-    image,
+    tileSet,
     16 * getTileSetIndex(shipConnections),
     0,
     tileSize,
@@ -151,4 +169,26 @@ export function drawGrid(ctx: CanvasRenderingContext2D) {
       ctx.strokeRect(x, y, cellSize, cellSize);
     }
   }
+}
+
+export function drawHitIcon(
+  i: number,
+  j: number,
+  ctx: CanvasRenderingContext2D,
+  tileSet: HTMLImageElement,
+) {
+  const x = i * cellSize + labelMargin;
+  const y = j * cellSize + labelMargin;
+
+  ctx.drawImage(
+    tileSet,
+    16 * 18,
+    0,
+    tileSize,
+    tileSize,
+    x,
+    y,
+    cellSize,
+    cellSize,
+  );
 }

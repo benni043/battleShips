@@ -2,9 +2,9 @@ import type {
   Cell,
   Cord,
   Game,
-  GameResponse,
   Hit,
   Player,
+  GameResponse,
 } from "#shared/gameTypes";
 import { GameError, GameState } from "#shared/gameTypes";
 import type { Socket } from "socket.io";

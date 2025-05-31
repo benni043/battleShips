@@ -7,7 +7,7 @@ import {
   cellSize,
   drawGrid,
   drawShip,
-  getTileSet,
+  getNormalTileSet,
   gridSize,
   labelMargin,
 } from "~/utils/ship";
@@ -121,7 +121,7 @@ function draw() {
     for (let y = 0; y < gridSize; y++) {
       if (grid.value[x]![y]! !== currentCell) {
         if (!grid.value[x]![y]!.shipData!) continue;
-        drawShip(x, y, grid.value, ctx.value!);
+        drawShip(x, y, grid.value, ctx.value!, getNormalTileSet());
       }
     }
   }
@@ -134,7 +134,7 @@ function draw() {
           grid.value[x]?.[y]?.shipData?.connectsTo ===
           currentCell.shipData?.connectsTo
         ) {
-          drawShip(x, y, grid.value, ctx.value!);
+          drawShip(x, y, grid.value, ctx.value!, getNormalTileSet());
         }
       }
     }
@@ -151,7 +151,7 @@ onMounted(() => {
   gridStore.grid = grid.value;
 
   draw();
-  getTileSet().onload = () => {
+  getNormalTileSet().onload = () => {
     draw();
   };
 
