@@ -129,7 +129,6 @@ socket.emit(
   "post-socket",
   route.params.gameId,
   route.params.playerId,
-  userNameStore.me,
   joined,
 );
 

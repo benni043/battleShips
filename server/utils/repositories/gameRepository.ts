@@ -1,60 +1,62 @@
-import type { Cell, Cord, Game, Hit, Player } from "#shared/gameTypes";
-import { GameError, GameState } from "#shared/gameTypes";
+import {
+  Cell,
+  Cord,
+  Game,
+  GameError,
+  GameState,
+  Hit,
+  Player,
+} from "#shared/gameTypes";
 import type { Socket } from "socket.io";
-import { v4 as uuidv4 } from "uuid";
+import type { LobbyPlayer } from "#shared/lobbyTypes";
 
 export class GameRepository {
   private readonly games = new Map<string, Game>();
 
-  postField(gameName: string, gameId: string, id: string, field: Cell[][]) {
-    if (!this.games.has(gameId)) {
-      const uuid = uuidv4();
-
-      const game: Game = {
-        gameName: "dummy",
-        id: uuid,
-        isPlayer1Active: true,
-        state: GameState.WAITING,
-        player1: {
-          id: id,
-          field: field,
-          socket: undefined,
-        } as Player,
-        player2: undefined,
-      };
-
-      this.games.set(gameId, game);
-
-      return uuid;
-    } else {
-      const game = this.games.get(gameId)!;
-
-      game.player2 = {
-        id: id,
-        field: field,
+  addGame(
+    player1: LobbyPlayer,
+    player2: LobbyPlayer,
+    gameId: string,
+    gameName: string,
+  ) {
+    const game: Game = {
+      gameName: gameName,
+      id: gameId,
+      isPlayer1Active: true,
+      state: GameState.WAITING,
+      player1: {
+        id: player1.id,
+        username: player1.name,
         socket: undefined,
-      } as Player;
+        field: undefined,
+      } as Player,
+      player2: {
+        id: player2.id,
+        username: player2.name,
+        socket: undefined,
+        field: undefined,
+      } as Player,
+    };
 
-      lobbyService.removeLobby(gameId);
+    this.games.set(gameId, game);
 
-      return game.id;
-    }
+    return gameId;
   }
 
-  getAllGames(): string[] {
-    return this.games.keys().toArray();
-  }
-
-  setSocket(id: string, gameId: string, username: string, socket: Socket) {
+  postField(gameId: string, playerId: string, field: Cell[][]) {
     const game = this.games.get(gameId)!;
 
-    if (id === game.player1.id) {
-      game.player1.socket = socket;
-      game.player1.username = username;
-    } else if (id === game.player2!.id) {
-      game.player2!.socket = socket;
-      game.player2!.username = username;
-    } else return GameError.INVALID_ID;
+    if (playerId === game.player1.id) game.player1.field = field;
+    else game.player2!.field = field;
+
+    return game.id;
+  }
+
+  setSocket(playerId: string, gameId: string, socket: Socket) {
+    const game = this.games.get(gameId)!;
+
+    if (playerId === game.player1.id) game.player1.socket = socket;
+    else game.player2!.socket = socket;
 
     if (game.player1.socket && game.player2?.socket)
       game.state = GameState.STARTED;
@@ -138,7 +140,7 @@ export class GameRepository {
     const game = this.getGameById(gameId)!;
 
     if (id === game.player1!.id && game.isPlayer1Active) {
-      const field = game.player2!.field;
+      const field = game.player2!.field!;
 
       if (this.isAlreadyHit(cord, field)) return GameError.ALREADY_HIT;
 
@@ -150,9 +152,11 @@ export class GameRepository {
       game.isPlayer1Active = false;
       const gameFinished = this.isGameFinished(field);
 
+      if (gameFinished) game.state = GameState.FINISHED;
+
       return { gameFinished: gameFinished, shipData: shipData } as Hit;
     } else if (id === game.player2!.id && !game.isPlayer1Active) {
-      const field = game.player1.field;
+      const field = game.player1.field!;
 
       if (this.isAlreadyHit(cord, field)) return GameError.ALREADY_HIT;
 
@@ -163,6 +167,8 @@ export class GameRepository {
 
       game.isPlayer1Active = true;
       const gameFinished = this.isGameFinished(field);
+
+      if (gameFinished) game.state = GameState.FINISHED;
 
       return { gameFinished: gameFinished, shipData: shipData } as Hit;
     }

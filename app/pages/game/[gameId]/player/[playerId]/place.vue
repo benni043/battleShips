@@ -24,14 +24,13 @@ async function start() {
     navigateTo(`/game/${route.params.gameId}/player/${route.params.playerId}`);
   } catch (error) {
     if (error instanceof FetchError) {
-      if (error?.status === 401) {
-        console.error("unauthorized: ", error.statusMessage);
-        toast.error(`Unauthorized: ${error.statusMessage}`);
-      } else if (error?.status === 400) {
-        console.error("illegal request: ", error.statusMessage);
-        toast.error(`Illegal request: ${error.statusMessage}`);
+      if (error?.status === 403) {
+        toast.error(`${error.statusMessage}`);
+      } else if (error?.status === 404) {
+        toast.error(`${error.statusMessage}`);
+      } else if (error?.status === 405) {
+        toast.error(`${error.statusMessage}`);
       } else {
-        console.error("unknown error: ", error);
         toast.error(`Unknown error occurred: ${error.statusMessage}`);
       }
     } else {

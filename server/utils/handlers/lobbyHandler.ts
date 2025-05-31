@@ -2,6 +2,7 @@ import type { Server, Socket } from "socket.io";
 import { lobbyService } from "~~/server/utils/services/lobbyService";
 import type { LobbyResponse } from "#shared/lobbyTypes";
 import { LobbyError } from "#shared/lobbyTypes";
+import { gameService } from "~~/server/utils/services/gameService";
 
 export function handleLobbyEvents(socket: Socket, io: Server) {
   socket.on("join-lobby", (cb) => {
@@ -31,7 +32,16 @@ export function handleLobbyEvents(socket: Socket, io: Server) {
       return;
     }
 
-    cb({ lobbyId: lobby.lobbyId, lobbyName: lobby.lobbyName } as LobbyResponse);
+    cb({ lobbyId: lobby.id, lobbyName: lobby.lobbyName } as LobbyResponse);
     io.to("lobby").emit("remove-game", lobby);
+
+    gameService.addGame(
+      lobby.player1,
+      lobby.player2!,
+      lobby.id,
+      lobby.lobbyName,
+    );
+
+    lobbyService.removeLobby(lobbyId);
   });
 }

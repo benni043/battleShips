@@ -16,7 +16,7 @@ export class LobbyService {
     const lobby = lobbyRepository.getLobbyById(lobbyId);
 
     if (!lobby) return LobbyError.INVALID_GAME;
-    if (lobby.player2Id !== undefined) return LobbyError.FULL;
+    if (lobby.player2 !== undefined) return LobbyError.FULL;
 
     return lobbyRepository.joinLobby(lobbyId, id);
   }
@@ -31,15 +31,6 @@ export class LobbyService {
       lobbyName.length <= maxLength &&
       validNameRegex.test(lobbyName)
     );
-  }
-
-  checkData(lobbyId: string, id: string) {
-    const lobby = lobbyRepository.getLobbyById(lobbyId);
-
-    if (!lobby) return LobbyError.INVALID_GAME;
-
-    if (lobby.player1Id !== id && lobby.player2Id !== id)
-      return LobbyError.INVALID_ID;
   }
 
   removeLobby(lobbyId: string) {

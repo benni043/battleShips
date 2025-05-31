@@ -4,33 +4,26 @@ import type { Cord, GameFinished, HitResponse } from "#shared/gameTypes";
 import { GameError } from "#shared/gameTypes";
 
 export function handleGameEvents(socket: Socket, io: Server) {
-  socket.on(
-    "post-socket",
-    (gameId: string, id: string, username: string, cb) => {
-      const response = gameService.setSocket(id, gameId, username, socket);
+  socket.on("post-socket", (gameId: string, id: string, cb) => {
+    const response = gameService.setSocket(id, gameId, socket);
 
-      socket.join(gameId);
+    socket.join(gameId);
 
-      if (gameService.isGameStarted(gameId)) {
-        const game = gameService.getGameByName(gameId);
+    if (gameService.isGameStarted(gameId)) {
+      const game = gameService.getGameByName(gameId);
 
-        if (game !== GameError.INVALID_GAME) {
-          socket.emit(
-            "opponent",
-            game.player1.username!,
-            game.player1.username!,
-          );
-          game.player1.socket!.emit(
-            "opponent",
-            game.player2!.username!,
-            game.player1.username!,
-          );
-        }
+      if (game !== GameError.INVALID_GAME) {
+        socket.emit("opponent", game.player1.username!, game.player1.username!);
+        game.player1.socket!.emit(
+          "opponent",
+          game.player2!.username!,
+          game.player1.username!,
+        );
       }
+    }
 
-      cb(response);
-    },
-  );
+    cb(response);
+  });
 
   socket.on("click", (id: string, gameId: string, cord: Cord, cb) => {
     if (!gameService.isStarted(gameId)) {
@@ -43,12 +36,16 @@ export function handleGameEvents(socket: Socket, io: Server) {
     if (
       shipData !== GameError.INVALID_CORD &&
       shipData !== GameError.WRONG_PLAYER &&
-      shipData !== GameError.ALREADY_HIT
+      shipData !== GameError.ALREADY_HIT &&
+      shipData !== GameError.INVALID_GAME
     ) {
       const current = gameService.getCurrentPlayer(gameId);
       io.to(gameId).emit("current", current);
 
-      gameService.getOpponentSocket(gameId).emit("hit-response", cord);
+      const opponentSocket = gameService.getOpponentSocket(gameId);
+
+      if (opponentSocket !== GameError.INVALID_GAME)
+        opponentSocket.emit("hit-response", cord);
 
       cb({ cord: cord, shipData: shipData.shipData } as HitResponse);
 

@@ -2,21 +2,47 @@ import type { Cell, Cord } from "#shared/gameTypes";
 import { GameError, GameState } from "#shared/gameTypes";
 import { gameRepository } from "~~/server/utils/repositories/gameRepository";
 import type { Socket } from "socket.io";
+import type { LobbyPlayer } from "#shared/lobbyTypes";
 
 export class GameService {
-  postField(gameName: string, gameId: string, id: string, field: Cell[][]) {
-    return gameRepository.postField(gameName, gameId, id, field);
+  addGame(
+    player1: LobbyPlayer,
+    player2: LobbyPlayer,
+    gameId: string,
+    gameName: string,
+  ) {
+    return gameRepository.addGame(player1, player2, gameId, gameName);
   }
 
-  setSocket(id: string, gameId: string, username: string, socket: Socket) {
-    return gameRepository.setSocket(id, gameId, username, socket);
+  postField(gameId: string, id: string, field: Cell[][]) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (!game) return GameError.INVALID_GAME;
+
+    return gameRepository.postField(gameId, id, field);
+  }
+
+  setSocket(id: string, gameId: string, socket: Socket) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (!game) return GameError.INVALID_GAME;
+
+    return gameRepository.setSocket(id, gameId, socket);
   }
 
   getOpponentSocket(gameId: string) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (!game) return GameError.INVALID_GAME;
+
     return gameRepository.getOpponentSocket(gameId);
   }
 
   handleClick(id: string, gameId: string, cord: Cord) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (!game) return GameError.INVALID_GAME;
+
     return gameRepository.handleClick(id, gameId, cord);
   }
 
@@ -27,6 +53,10 @@ export class GameService {
   }
 
   removeGame(gameId: string) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (!game) return GameError.INVALID_GAME;
+
     return gameRepository.removeGame(gameId);
   }
 
@@ -73,10 +103,6 @@ export class GameService {
     if (!game) return GameError.INVALID_GAME;
 
     return gameRepository.isGameStarted(gameId);
-  }
-
-  getAllGames(): string[] {
-    return gameRepository.getAllGames();
   }
 }
 

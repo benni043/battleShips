@@ -17,8 +17,8 @@ export class LobbyRepository {
     const lobby: Lobby = {
       lobbyName: lobbyName,
       id: uuid,
-      player1Id: id,
-      player2Id: undefined,
+      player1: { id: id, name: id },
+      player2: undefined,
     };
 
     this.lobbies.set(uuid, lobby);
@@ -29,9 +29,9 @@ export class LobbyRepository {
   joinLobby(lobbyId: string, id: string) {
     const lobby = this.lobbies.get(lobbyId)!;
 
-    lobby.player2Id = id;
+    lobby.player2 = { id: id, name: id };
 
-    return { lobbyId: lobbyId, lobbyName: lobby.lobbyName } as LobbyResponse;
+    return lobby;
   }
 
   getLobbyById(lobbyId: string) {

@@ -1,8 +1,7 @@
 import { gameService } from "~~/server/utils/services/gameService";
-import { lobbyService } from "~~/server/utils/services/lobbyService";
 import type { H3Event } from "h3";
 import { createError, readBody, sendError } from "h3";
-import { LobbyError } from "#shared/lobbyTypes";
+import { GameError } from "#shared/gameTypes";
 
 export default defineEventHandler(async (event: H3Event) => {
   try {
@@ -14,7 +13,7 @@ export default defineEventHandler(async (event: H3Event) => {
       return sendError(
         event,
         createError({
-          statusCode: 400,
+          statusCode: 403,
           statusMessage: "Missing required fields: gameId, id, or grid",
         }),
       );
@@ -27,35 +26,23 @@ export default defineEventHandler(async (event: H3Event) => {
       return sendError(
         event,
         createError({
-          statusCode: 400,
+          statusCode: 404,
           statusMessage: "Invalid grid format",
         }),
       );
     }
 
-    const isValid = lobbyService.checkData(gameId, id);
-    switch (isValid) {
-      case LobbyError.INVALID_GAME: {
-        return sendError(
-          event,
-          createError({
-            statusCode: 402,
-            statusMessage: "Invalid game",
-          }),
-        );
-      }
-      case LobbyError.INVALID_ID: {
-        return sendError(
-          event,
-          createError({
-            statusCode: 401,
-            statusMessage: "invalid id",
-          }),
-        );
-      }
-    }
+    const game = gameService.postField(gameId, id, parsedGrid);
 
-    const game = gameService.postField("dummy", gameId, id, parsedGrid);
+    if (game === GameError.INVALID_GAME) {
+      return sendError(
+        event,
+        createError({
+          statusCode: 405,
+          statusMessage: "game not started",
+        }),
+      );
+    }
 
     return {
       statusCode: 200,
