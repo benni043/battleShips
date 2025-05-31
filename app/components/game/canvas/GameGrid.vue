@@ -8,8 +8,10 @@ import {
   canvasHeight,
   cellSize,
   drawShip,
-  getTileSet,
+  getNormalTileSet,
   drawGrid,
+  getBrokenTileSet,
+  drawHitIcon,
 } from "~/utils/ship";
 
 const props = defineProps<{
@@ -48,34 +50,15 @@ function draw() {
 
       const shipData = cell.shipData;
 
-      if (!shipData) {
-        if (cell.isHit) drawRedCross(i, j);
-        continue;
+      const tileset = cell.isHit ? getBrokenTileSet() : getNormalTileSet();
+
+      if (shipData) {
+        drawShip(i, j, props.grid, ctx.value!, tileset);
+      } else if (cell.isHit) {
+        drawHitIcon(i, j, ctx.value!, tileset);
       }
-
-      drawShip(i, j, props.grid, ctx.value!);
-
-      if (cell.isHit && !props.hasListener) drawRedCross(i, j);
     }
   }
-}
-
-function drawRedCross(i: number, j: number) {
-  if (!ctx.value) return;
-
-  const padding = 5;
-  const x = i * cellSize + labelMargin;
-  const y = j * cellSize + labelMargin;
-
-  ctx.value.strokeStyle = "red";
-  ctx.value.lineWidth = 3;
-
-  ctx.value.beginPath();
-  ctx.value.moveTo(x + padding, y + padding);
-  ctx.value.lineTo(x + cellSize - padding, y + cellSize - padding);
-  ctx.value.moveTo(x + cellSize - padding, y + padding);
-  ctx.value.lineTo(x + padding, y + cellSize - padding);
-  ctx.value.stroke();
 }
 
 function click(event: MouseEvent) {
@@ -96,7 +79,10 @@ onMounted(() => {
   ctx.value!.imageSmoothingEnabled = false;
 
   draw();
-  getTileSet().onload = () => {
+  getNormalTileSet().onload = () => {
+    draw();
+  };
+  getBrokenTileSet().onload = () => {
     draw();
   };
 
