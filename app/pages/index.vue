@@ -6,6 +6,7 @@ import { LobbyError, type LobbyResponse } from "#shared/lobbyTypes";
 import Username from "~/components/lobby/Username.vue";
 import { Toaster, toast } from "vue-sonner";
 import "vue-sonner/style.css";
+import { v4 as uuidv4 } from "uuid";
 
 const socket = io({
   path: "/api/socket.io",
@@ -54,6 +55,13 @@ function getLobbies(initGames: string[]) {
   games.value = initGames;
 }
 
+function setUserName(usernameRes: string) {
+  userNameStore.me = usernameRes;
+  userNameStore.uuid = uuidv4();
+
+  socket.emit("join-lobby", getLobbies);
+}
+
 socket.on("new-game", (lobbyName: string) => {
   games.value.push(lobbyName);
 });
@@ -64,28 +72,7 @@ socket.on("remove-game", (lobbyName: string) => {
   if (index !== -1) games.value.splice(index, 1);
 });
 
-function generateUUID() {
-  userNameStore.uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-    /[xy]/g,
-    (char) => {
-      const rand = (Math.random() * 16) | 0;
-      const value = char === "x" ? rand : (rand & 0x3) | 0x8;
-      return value.toString(16);
-    },
-  );
-}
-
-function setUserName(usernameRes: string) {
-  userNameStore.me = usernameRes;
-
-  generateUUID();
-
-  socket.emit("join-lobby", getLobbies);
-}
-
-if (userNameStore.me.length !== 0) {
-  socket.emit("join-lobby", getLobbies);
-}
+if (userNameStore.me.length !== 0) socket.emit("join-lobby", getLobbies);
 
 onBeforeUnmount(() => {
   socket?.disconnect();
