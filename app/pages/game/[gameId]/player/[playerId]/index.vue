@@ -125,12 +125,7 @@ socket.on("current", (currentRes: string) => {
   current.value = currentRes;
 });
 
-socket.emit(
-  "post-socket",
-  route.params.gameId,
-  route.params.playerId,
-  joined,
-);
+socket.emit("post-socket", route.params.gameId, route.params.playerId, joined);
 
 function joined(response: GameError | undefined) {
   handleError(response);
