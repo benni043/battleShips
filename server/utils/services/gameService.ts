@@ -1,5 +1,4 @@
-import type { Cell, Cord } from "#shared/gameTypes";
-import { GameError, GameState } from "#shared/gameTypes";
+import { Cell, Cord, GameError, GameState } from "#shared/gameTypes";
 import { gameRepository } from "~~/server/utils/repositories/gameRepository";
 import type { Socket } from "socket.io";
 import type { LobbyPlayer } from "~~/server/utils/types/lobbyTypes";
@@ -29,7 +28,11 @@ export class GameService {
 
     gameRepository.setSocket(id, gameId, socket);
 
-    if (game.player1.socket && game.player2?.socket)
+    if (
+      game.player1.socket &&
+      game.player2?.socket &&
+      game.state === GameState.WAITING
+    )
       gameRepository.changeGameState(gameId, GameState.STARTED);
   }
 
