@@ -57,6 +57,15 @@ export class GameService {
     return game;
   }
 
+  getOpponent(gameId: string, playerId: string) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (!game) return GameError.INVALID_GAME;
+
+    if (game.player1.id === playerId) return game.player2?.username;
+    else return game.player1.username;
+  }
+
   getCurrentPlayer(gameId: string) {
     const game = gameRepository.getGameById(gameId);
 

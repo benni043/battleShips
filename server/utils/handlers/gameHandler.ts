@@ -16,11 +16,7 @@ export function handleGameEvents(socket: Socket, io: Server) {
 
     const game = gameService.getGameById(gameId) as Game;
 
-    if (game.state === GameState.STARTED) {
-      socket.emit("opponent", game.player2!.username);
-    } else {
-      socket.emit("opponent", game.player1.username);
-    }
+    socket.emit("opponent", gameService.getOpponent(gameId, id));
 
     const current = gameService.getCurrentPlayer(gameId);
 
