@@ -1,7 +1,6 @@
 import type { Cell, Cord, Game, Hit, GameResponse } from "#shared/gameTypes";
 import { GameError, GameState } from "#shared/gameTypes";
 import type { Socket } from "socket.io";
-import type { LobbyPlayer } from "#shared/lobbyTypes";
 import {
   isAlreadyHit,
   isAShipOnCord,
@@ -9,6 +8,7 @@ import {
   setCellHit,
 } from "~~/server/utils/ship";
 import type { Player } from "~~/server/utils/types/gameTypes";
+import type { LobbyPlayer } from "~~/server/utils/types/lobbyTypes";
 
 export class GameRepository {
   private readonly games = new Map<string, Game>();

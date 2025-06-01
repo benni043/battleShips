@@ -7,5 +7,5 @@ export type ShipsConnections = {
 
 export enum PlaceState {
   ROTATE,
-  MOVE
+  MOVE,
 }
