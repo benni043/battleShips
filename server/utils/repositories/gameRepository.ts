@@ -1,14 +1,14 @@
-import type {
-  Cell,
-  Cord,
-  Game,
-  Hit,
-  Player,
-  GameResponse,
-} from "#shared/gameTypes";
+import type { Cell, Cord, Game, Hit, GameResponse } from "#shared/gameTypes";
 import { GameError, GameState } from "#shared/gameTypes";
 import type { Socket } from "socket.io";
 import type { LobbyPlayer } from "#shared/lobbyTypes";
+import {
+  isAlreadyHit,
+  isAShipOnCord,
+  isGameFinished,
+  setCellHit,
+} from "~~/server/utils/ship";
+import type { Player } from "~~/server/utils/types/gameTypes";
 
 export class GameRepository {
   private readonly games = new Map<string, Game>();
@@ -57,9 +57,12 @@ export class GameRepository {
 
     if (playerId === game.player1.id) game.player1.socket = socket;
     else game.player2!.socket = socket;
+  }
 
-    if (game.player1.socket && game.player2?.socket)
-      game.state = GameState.STARTED;
+  changeGameState(gameId: string, state: GameState) {
+    const game = this.games.get(gameId)!;
+
+    game.state = state;
   }
 
   getGameById(gameId: string) {
@@ -71,14 +74,6 @@ export class GameRepository {
 
     if (game.isPlayer1Active) return game.player1!.socket!;
     else return game.player2!.socket!;
-  }
-
-  getOpponent(gameId: string, playerId: string) {
-    const game = this.getGameById(gameId)!;
-
-    if (game.player1.id === playerId) return game.player1!.username!;
-    else if (game.player2?.id === playerId) return game.player2!.username!;
-    else return GameError.INVALID_ID;
   }
 
   getGameState(gameId: string) {
@@ -116,49 +111,21 @@ export class GameRepository {
     }
   }
 
-  private isCordValid(cord: Cord) {
-    return !(cord.y < 0 || cord.y >= 10 || cord.x < 0 || cord.x >= 10);
-  }
-
-  private isAShipOnCord(cord: Cord, grid: Cell[][]) {
-    if (!this.isCordValid(cord)) return GameError.INVALID_CORD;
-
-    return grid[cord.x]![cord.y]!.shipData;
-  }
-
-  private setCellHit(cord: Cord, grid: Cell[][]) {
-    if (!this.isCordValid(cord)) return GameError.INVALID_CORD;
-
-    grid[cord.x]![cord.y]!.isHit = true;
-  }
-
-  private isAlreadyHit(cord: Cord, grid: Cell[][]) {
-    if (!this.isCordValid(cord)) return GameError.INVALID_CORD;
-
-    return grid[cord.x]![cord.y]!.isHit;
-  }
-
-  private isGameFinished(grid: Cell[][]): boolean {
-    return grid.every((row) =>
-      row.every((cell) => cell.shipData === undefined || cell.isHit),
-    );
-  }
-
   handleClick(id: string, gameId: string, cord: Cord) {
     const game = this.getGameById(gameId)!;
 
     if (id === game.player1!.id && game.isPlayer1Active) {
       const field = game.player2!.field!;
 
-      if (this.isAlreadyHit(cord, field)) return GameError.ALREADY_HIT;
+      if (isAlreadyHit(cord, field)) return GameError.ALREADY_HIT;
 
-      const shipData = this.isAShipOnCord(cord, field);
-      this.setCellHit(cord, field);
+      const shipData = isAShipOnCord(cord, field);
+      setCellHit(cord, field);
 
       if (shipData === GameError.INVALID_CORD) return shipData;
 
       game.isPlayer1Active = false;
-      const gameFinished = this.isGameFinished(field);
+      const gameFinished = isGameFinished(field);
 
       if (gameFinished) game.state = GameState.FINISHED;
 
@@ -166,15 +133,15 @@ export class GameRepository {
     } else if (id === game.player2!.id && !game.isPlayer1Active) {
       const field = game.player1.field!;
 
-      if (this.isAlreadyHit(cord, field)) return GameError.ALREADY_HIT;
+      if (isAlreadyHit(cord, field)) return GameError.ALREADY_HIT;
 
-      const shipData = this.isAShipOnCord(cord, field);
-      this.setCellHit(cord, field);
+      const shipData = isAShipOnCord(cord, field);
+      setCellHit(cord, field);
 
       if (shipData === GameError.INVALID_CORD) return shipData;
 
       game.isPlayer1Active = true;
-      const gameFinished = this.isGameFinished(field);
+      const gameFinished = isGameFinished(field);
 
       if (gameFinished) game.state = GameState.FINISHED;
 

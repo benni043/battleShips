@@ -1,30 +1,30 @@
-import type { Socket } from "socket.io";
+import type { Player } from "~~/server/utils/types/gameTypes";
 
-export interface Cell {
+export type Cell = {
   shipData: ShipData | undefined;
   isHit: boolean;
   visualCord: Cord;
   gridCord: Cord;
-}
+};
 
-export interface ShipData {
+export type ShipData = {
   connectsTo: number;
-}
+};
 
-export interface Cord {
+export type Cord = {
   x: number;
   y: number;
-}
+};
 
-export interface Hit {
+export type Hit = {
   shipData: ShipData | undefined;
   gameFinished: boolean;
-}
+};
 
-export interface HitResponse {
+export type HitResponse = {
   cord: Cord;
   shipData: ShipData | undefined;
-}
+};
 
 export enum GameError {
   WRONG_PLAYER = "WRONG_PLAYER",
@@ -36,9 +36,9 @@ export enum GameError {
   FINISHED = "FINISHED",
 }
 
-export interface GameFinished {
+export type GameFinished = {
   winner: string;
-}
+};
 
 export type GameResponse = {
   gameId: string;
@@ -58,11 +58,4 @@ export enum GameState {
   WAITING,
   STARTED,
   FINISHED,
-}
-
-export interface Player {
-  id: string;
-  username: string;
-  field: Cell[][] | undefined;
-  socket: Socket | undefined;
 }

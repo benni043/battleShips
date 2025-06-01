@@ -1,5 +1,6 @@
-import type { Lobby, LobbyResponse } from "#shared/lobbyTypes";
+import type { LobbyResponse } from "#shared/lobbyTypes";
 import { v4 as uuidv4 } from "uuid";
+import type { Lobby } from "~~/server/utils/types/lobbyTypes";
 
 export class LobbyRepository {
   private readonly lobbies = new Map<string, Lobby>();

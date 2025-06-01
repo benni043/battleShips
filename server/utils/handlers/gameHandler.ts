@@ -64,8 +64,6 @@ export function handleGameEvents(socket: Socket, io: Server) {
         io.to(gameId).emit("game-finished", {
           winner: gameService.getWinner(gameId),
         } as GameFinished);
-
-        // gameService.removeGame(gameId);
       }
 
       return;
