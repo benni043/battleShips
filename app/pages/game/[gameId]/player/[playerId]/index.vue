@@ -8,7 +8,7 @@ import {
 } from "#shared/gameTypes";
 import { io } from "socket.io-client";
 import { useUserNameStore } from "~/stores/data";
-import { Toaster, toast } from "vue-sonner";
+import { toast, Toaster } from "vue-sonner";
 import "vue-sonner/style.css";
 import GridLayout from "~/components/game/layout/GridLayout.vue";
 import GameGrid from "~/components/game/canvas/GameGrid.vue";
@@ -24,7 +24,7 @@ const userNameStore = useUserNameStore();
 const gridStore = useMyGridStore();
 const gridSize = 10;
 
-const myGrid: Ref<Cell[][]> = ref(gridStore.grid);
+const myGrid: Ref<Cell[][]> = ref(initGrid());
 const opponentsGrid: Ref<Cell[][]> = ref(initGrid());
 
 const isGameFinished = ref(false);
@@ -107,7 +107,7 @@ function hitResponseCallBack(data: HitResponse | GameError) {
 }
 
 function leave() {
-  navigateTo(`/`);
+  navigateTo(`/lobby`);
 }
 
 socket.on("hit-response", (cord: Cord) => {
@@ -130,6 +130,34 @@ socket.on("opponent", (opponent: string) => {
 socket.on("current", (currentRes: string) => {
   current.value = currentRes;
 });
+
+socket.on("opponents-grid", (opponentGrid: string) => {
+  const newGrid = JSON.parse(opponentGrid) as Cell[][];
+
+  for (let y = 0; y < opponentsGrid.value.length; y++) {
+    for (let x = 0; x < opponentsGrid.value[y]!.length; x++) {
+      opponentsGrid.value[y]![x]!.shipData = newGrid[y]![x]!.shipData;
+      opponentsGrid.value[y]![x]!.isHit = newGrid[y]![x]!.isHit;
+    }
+  }
+});
+
+socket.on("my-grid", (grid: string) => {
+  const newGrid = JSON.parse(grid) as Cell[][];
+
+  for (let y = 0; y < myGrid.value.length; y++) {
+    for (let x = 0; x < myGrid.value[y]!.length; x++) {
+      myGrid.value[y]![x]!.shipData = newGrid[y]![x]!.shipData;
+      myGrid.value[y]![x]!.isHit = newGrid[y]![x]!.isHit;
+      myGrid.value[y]![x]!.gridCord = newGrid[y]![x]!.gridCord;
+      myGrid.value[y]![x]!.visualCord = newGrid[y]![x]!.visualCord;
+    }
+  }
+});
+
+if (gridStore.grid.length > 0) {
+  myGrid.value = gridStore.grid;
+}
 
 socket.emit("post-socket", route.params.gameId, route.params.playerId, joined);
 
@@ -179,7 +207,7 @@ function disconnect() {
 
     <div id="fields" class="flex w-full items-center justify-around">
       <div>
-        <GridLayout :header="userNameStore.me">
+        <GridLayout :header="userNameStore.getMe()!">
           <GameGrid
             :has-listener="false"
             :grid="myGrid"

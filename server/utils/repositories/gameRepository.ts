@@ -9,6 +9,7 @@ import {
 } from "~~/server/utils/ship";
 import type { Player } from "~~/server/utils/types/gameTypes";
 import type { LobbyPlayer } from "~~/server/utils/types/lobbyTypes";
+import type { LobbyResponse } from "#shared/lobbyTypes";
 
 export class GameRepository {
   private readonly games = new Map<string, Game>();
@@ -18,7 +19,7 @@ export class GameRepository {
     player2: LobbyPlayer,
     gameId: string,
     gameName: string,
-  ) {
+  ): GameResponse {
     const game: Game = {
       gameName: gameName,
       id: gameId,
@@ -40,7 +41,7 @@ export class GameRepository {
 
     this.games.set(gameId, game);
 
-    return { gameId, gameName } as GameResponse;
+    return { gameId, gameName };
   }
 
   postField(gameId: string, playerId: string, field: Cell[][]) {
@@ -52,11 +53,63 @@ export class GameRepository {
     return game.id;
   }
 
+  getMyField(gameId: string, playerId: string) {
+    const me = this.getPlayerById(gameId, playerId)!;
+
+    return me.field;
+  }
+
+  getOpponentField(gameId: string, playerId: string) {
+    const opponent = this.getOpponent(gameId, playerId)!;
+
+    return opponent.field!.map((row) =>
+      row.map((cell) => ({
+        ...cell,
+        shipData: cell.isHit ? cell.shipData : undefined,
+      })),
+    );
+  }
+
+  getPlayerById(gameId: string, playerId: string) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (game.player1.id === playerId) return game.player1;
+    else return game.player2;
+  }
+
+  getOpponent(gameId: string, playerId: string) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (game.player1.id === playerId) return game.player2;
+    else return game.player1;
+  }
+
+  getOpponentUserName(gameId: string, playerId: string) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (game.player1.id === playerId) return game.player2?.username;
+    else return game.player1.username;
+  }
+
   setSocket(playerId: string, gameId: string, socket: Socket) {
     const game = this.games.get(gameId)!;
 
     if (playerId === game.player1.id) game.player1.socket = socket;
     else game.player2!.socket = socket;
+  }
+
+  getAllRunningGamesForPlayer(playerId: string): LobbyResponse[] {
+    const games: LobbyResponse[] = [];
+
+    this.games.forEach((game: Game) => {
+      if (game.player1.id === playerId || game.player2?.id === playerId)
+        games.push({
+          lobbyId: game.id,
+          lobbyName: game.gameName,
+        });
+    });
+
+    return games;
   }
 
   changeGameState(gameId: string, state: GameState) {

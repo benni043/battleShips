@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import type { User } from "~/utils/types";
+import { v4 as uuidv4 } from "uuid";
 
 const emit = defineEmits(["submit"]);
 
@@ -18,7 +20,7 @@ function handleSubmit() {
     return;
   }
 
-  emit("submit", username.value);
+  emit("submit", { userName: username.value, uuid: uuidv4() } as User);
 }
 </script>
 
