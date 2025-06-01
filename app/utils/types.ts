@@ -4,3 +4,8 @@ export type ShipsConnections = {
   top: boolean;
   bottom: boolean;
 };
+
+export enum PlaceState {
+  ROTATE,
+  MOVE
+}

@@ -12,6 +12,7 @@ import {
   labelMargin,
 } from "~/utils/ship";
 import { toast } from "vue-sonner";
+import { PlaceState } from "~/utils/types";
 
 const gridStore = useMyGridStore();
 
@@ -236,7 +237,7 @@ function handleClick() {
     cell.visualCord.y = cell.gridCord.x - pivotX + pivotY;
   }
 
-  placeShipToVisualCord();
+  placeShipToVisualCord(PlaceState.ROTATE);
 }
 
 function getShipCells(cell: Cell): Cell[] {
@@ -255,7 +256,7 @@ function getShipCells(cell: Cell): Cell[] {
   return shipCells;
 }
 
-function placeShipToVisualCord() {
+function placeShipToVisualCord(placeState: PlaceState) {
   if (!currentCell) return;
 
   const shipCells = getShipCells(currentCell);
@@ -317,7 +318,9 @@ function placeShipToVisualCord() {
       cell.visualCord.y = cell.gridCord.y;
     }
 
-    toast.warning(`Das Schiff kann hier nicht plaziert werden!`);
+    if (placeState === PlaceState.MOVE)
+      toast.warning(`Das Schiff kann hier nicht plaziert werden!`);
+    else toast.warning(`Es ist nicht genug Platz zum rotieren!`);
   }
 }
 
@@ -348,7 +351,7 @@ const mouseUp = (event: MouseEvent) => {
   ) {
     handleClick();
   } else {
-    placeShipToVisualCord();
+    placeShipToVisualCord(PlaceState.MOVE);
   }
 
   currentCell = undefined;
