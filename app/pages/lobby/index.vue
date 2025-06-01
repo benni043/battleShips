@@ -33,7 +33,6 @@ function joinLobby(lobbyId: string) {
 }
 
 function rejoinLobby(lobbyId: string) {
-  console.log(lobbyId);
   navigateTo(`/game/${lobbyId}/player/${localStorage.getItem("uuid")}`);
 }
 

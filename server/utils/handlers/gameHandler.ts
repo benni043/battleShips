@@ -23,6 +23,9 @@ export function handleGameEvents(socket: Socket, io: Server) {
     const gameState = gameService.getGameState(gameId);
 
     if (gameState === GameState.STARTED) {
+      socket.emit("my-grid",
+        JSON.stringify(gameService.getMyField(gameId, id)),
+      );
       socket.emit("opponents-grid",
         JSON.stringify(gameService.getOpponentField(gameId, id)),
       );

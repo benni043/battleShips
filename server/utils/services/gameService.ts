@@ -61,6 +61,14 @@ export class GameService {
     return game;
   }
 
+  getMyField(gameId: string, playerId: string) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (!game) return GameError.INVALID_GAME;
+
+    return gameRepository.getMyField(gameId, playerId);
+  }
+
   getOpponentField(gameId: string, playerId: string) {
     const game = gameRepository.getGameById(gameId);
 

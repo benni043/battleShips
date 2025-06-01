@@ -53,6 +53,12 @@ export class GameRepository {
     return game.id;
   }
 
+  getMyField(gameId: string, playerId: string) {
+    const me = this.getPlayerById(gameId, playerId)!;
+
+    return me.field;
+  }
+
   getOpponentField(gameId: string, playerId: string) {
     const opponent = this.getOpponent(gameId, playerId)!;
 
@@ -62,6 +68,13 @@ export class GameRepository {
         shipData: cell.isHit ? cell.shipData : undefined,
       })),
     );
+  }
+
+  getPlayerById(gameId: string, playerId: string) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (game.player1.id === playerId) return game.player1;
+    else return game.player2;
   }
 
   getOpponent(gameId: string, playerId: string) {

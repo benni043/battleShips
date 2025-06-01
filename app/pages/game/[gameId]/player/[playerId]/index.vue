@@ -24,7 +24,7 @@ const userNameStore = useUserNameStore();
 const gridStore = useMyGridStore();
 const gridSize = 10;
 
-const myGrid: Ref<Cell[][]> = ref(gridStore.grid);
+const myGrid: Ref<Cell[][]> = ref(initGrid());
 const opponentsGrid: Ref<Cell[][]> = ref(initGrid());
 
 const isGameFinished = ref(false);
@@ -132,12 +132,32 @@ socket.on("current", (currentRes: string) => {
 });
 
 socket.on("opponents-grid", (opponentGrid: string) => {
-  console.log(JSON.parse(opponentGrid));
-  console.log();
-  console.log(opponentsGrid.value);
-  //todo does not rerender
-  // opponentsGrid.value = JSON.parse(opponentGrid) as Cell[][];
+  const newGrid = JSON.parse(opponentGrid) as Cell[][];
+
+  for (let y = 0; y < opponentsGrid.value.length; y++) {
+    for (let x = 0; x < opponentsGrid.value[y]!.length; x++) {
+      opponentsGrid.value[y]![x]!.shipData = newGrid[y]![x]!.shipData;
+      opponentsGrid.value[y]![x]!.isHit = newGrid[y]![x]!.isHit;
+    }
+  }
 });
+
+socket.on("my-grid", (grid: string) => {
+  const newGrid = JSON.parse(grid) as Cell[][];
+
+  for (let y = 0; y < myGrid.value.length; y++) {
+    for (let x = 0; x < myGrid.value[y]!.length; x++) {
+      myGrid.value[y]![x]!.shipData = newGrid[y]![x]!.shipData;
+      myGrid.value[y]![x]!.isHit = newGrid[y]![x]!.isHit;
+      myGrid.value[y]![x]!.gridCord = newGrid[y]![x]!.gridCord;
+      myGrid.value[y]![x]!.visualCord = newGrid[y]![x]!.visualCord;
+    }
+  }
+});
+
+if (gridStore.grid.length > 0) {
+  myGrid.value = gridStore.grid;
+}
 
 socket.emit("post-socket", route.params.gameId, route.params.playerId, joined);
 
