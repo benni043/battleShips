@@ -8,7 +8,7 @@ import {
 } from "#shared/gameTypes";
 import { io } from "socket.io-client";
 import { useUserNameStore } from "~/stores/data";
-import { Toaster, toast } from "vue-sonner";
+import { toast, Toaster } from "vue-sonner";
 import "vue-sonner/style.css";
 import GridLayout from "~/components/game/layout/GridLayout.vue";
 import GameGrid from "~/components/game/canvas/GameGrid.vue";
@@ -131,6 +131,14 @@ socket.on("current", (currentRes: string) => {
   current.value = currentRes;
 });
 
+socket.on("opponents-grid", (opponentGrid: string) => {
+  console.log(JSON.parse(opponentGrid));
+  console.log();
+  console.log(opponentsGrid.value);
+  //todo does not rerender
+  // opponentsGrid.value = JSON.parse(opponentGrid) as Cell[][];
+});
+
 socket.emit("post-socket", route.params.gameId, route.params.playerId, joined);
 
 function joined(response: GameError) {
@@ -179,7 +187,7 @@ function disconnect() {
 
     <div id="fields" class="flex w-full items-center justify-around">
       <div>
-        <GridLayout :header="userNameStore.me">
+        <GridLayout :header="userNameStore.getMe()!">
           <GameGrid
             :has-listener="false"
             :grid="myGrid"

@@ -20,7 +20,7 @@ function handleSubmit() {
     return;
   }
 
-  emit("submit", {userName: username.value, uuid: uuidv4()} as User);
+  emit("submit", { userName: username.value, uuid: uuidv4() } as User);
 }
 </script>
 

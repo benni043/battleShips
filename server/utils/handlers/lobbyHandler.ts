@@ -25,7 +25,6 @@ export function handleLobbyEvents(socket: Socket, io: Server) {
   });
 
   socket.on("get-running-games", (playerId: string, cb) => {
-    console.log("hier");
     const response = gameService.getAllRunningGamesForPlayer(playerId);
 
     cb(response);

@@ -15,13 +15,19 @@ export function handleGameEvents(socket: Socket, io: Server) {
     socket.join(gameId);
 
     const game = gameService.getGameById(gameId) as Game;
-
-    socket.emit("opponent", gameService.getOpponent(gameId, id));
-
-    const current = gameService.getCurrentPlayer(gameId);
-
-    socket.emit("current", current);
     socket.emit("gameName", game.gameName);
+
+    socket.emit("current", gameService.getCurrentPlayer(gameId));
+    socket.emit("opponent", gameService.getOpponentUserName(gameId, id));
+
+    const gameState = gameService.getGameState(gameId);
+
+    if (gameState === GameState.STARTED) {
+      socket.emit("opponents-grid",
+        JSON.stringify(gameService.getOpponentField(gameId, id)),
+      );
+    }
+
   });
 
   socket.on("click", (id: string, gameId: string, cord: Cord, cb) => {

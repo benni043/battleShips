@@ -61,13 +61,20 @@ export class GameService {
     return game;
   }
 
-  getOpponent(gameId: string, playerId: string) {
+  getOpponentField(gameId: string, playerId: string) {
     const game = gameRepository.getGameById(gameId);
 
     if (!game) return GameError.INVALID_GAME;
 
-    if (game.player1.id === playerId) return game.player2?.username;
-    else return game.player1.username;
+    return gameRepository.getOpponentField(gameId, playerId);
+  }
+
+  getOpponentUserName(gameId: string, playerId: string) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (!game) return GameError.INVALID_GAME;
+
+    return gameRepository.getOpponentUserName(gameId, playerId);
   }
 
   getCurrentPlayer(gameId: string) {

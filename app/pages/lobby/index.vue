@@ -34,6 +34,7 @@ function joinLobby(lobbyId: string) {
 
 function rejoinLobby(lobbyId: string) {
   console.log(lobbyId);
+  navigateTo(`/game/${lobbyId}/player/${localStorage.getItem("uuid")}`);
 }
 
 function lobbyResponse(response: LobbyResponse | LobbyError) {

@@ -2,8 +2,6 @@ import type { User } from "~/utils/types";
 
 export const useUserNameStore = defineStore("userName", {
   state: () => ({
-    me: "",
-    uuid: "",
     opponent: "",
     game: "",
   }),
@@ -17,6 +15,11 @@ export const useUserNameStore = defineStore("userName", {
     isLoggedIn() {
       if (typeof window !== "undefined") {
         return localStorage.getItem("uuid") !== null;
+      }
+    },
+    getMe() {
+      if (typeof window !== "undefined") {
+        return localStorage.getItem("userName");
       }
     },
   },
