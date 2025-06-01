@@ -9,3 +9,8 @@ export enum PlaceState {
   ROTATE,
   MOVE,
 }
+
+export type User = {
+  userName: string;
+  uuid: string;
+};

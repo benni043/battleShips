@@ -107,7 +107,7 @@ function hitResponseCallBack(data: HitResponse | GameError) {
 }
 
 function leave() {
-  navigateTo(`/`);
+  navigateTo(`/lobby`);
 }
 
 socket.on("hit-response", (cord: Cord) => {
