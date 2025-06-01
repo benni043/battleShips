@@ -41,6 +41,10 @@ export class GameService {
     return gameRepository.getOpponentSocket(gameId);
   }
 
+  getAllRunningGamesForPlayer(playerId: string) {
+    return gameRepository.getAllRunningGamesForPlayer(playerId);
+  }
+
   handleClick(id: string, gameId: string, cord: Cord) {
     const game = gameRepository.getGameById(gameId);
 

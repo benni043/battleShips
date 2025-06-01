@@ -9,9 +9,8 @@ const socket = io({
   path: "/api/socket.io",
 });
 
-const userNameStore = useUserNameStore();
-
 const games: Ref<LobbyResponse[]> = ref([]);
+const myGames: Ref<LobbyResponse[]> = ref([]);
 
 function createLobby(lobbyName: string) {
   socket.emit(
@@ -31,6 +30,10 @@ function joinLobby(lobbyId: string) {
     localStorage.getItem("userName"),
     lobbyResponse,
   );
+}
+
+function rejoinLobby(lobbyId: string) {
+  console.log(lobbyId);
 }
 
 function lobbyResponse(response: LobbyResponse | LobbyError) {
@@ -60,6 +63,10 @@ function getLobbies(initGames: LobbyResponse[]) {
   games.value = initGames;
 }
 
+function getOwnGames(games: LobbyResponse[]) {
+  myGames.value = games;
+}
+
 socket.on("new-game", (lobbyData: LobbyResponse) => {
   games.value.push(lobbyData);
 });
@@ -71,6 +78,7 @@ socket.on("remove-game", (removalId: string) => {
 });
 
 socket.emit("join-lobby", getLobbies);
+socket.emit("get-running-games", localStorage.getItem("uuid"), getOwnGames);
 
 onBeforeUnmount(() => {
   socket?.disconnect();
@@ -87,11 +95,26 @@ onBeforeUnmount(() => {
       class="mb-6 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
       @submit="(args) => createLobby(args)"
     />
-    <LobbyList
-      :games="games"
-      class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
-      @submit="(args) => joinLobby(args)"
-    />
+
+    <div class="flex items-center justify-center">
+      <div class="flex w-full flex-col items-center justify-center">
+        <h1 class="pb-4 text-2xl font-semibold text-gray-800">Lobbies</h1>
+        <LobbyList
+          :games="games"
+          class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
+          @submit="(args) => joinLobby(args)"
+        />
+      </div>
+
+      <div class="flex w-full flex-col items-center justify-center">
+        <h1 class="pb-4 text-2xl font-semibold text-gray-800">Meine Lobbies</h1>
+        <LobbyList
+          :games="myGames"
+          class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-md"
+          @submit="(args) => rejoinLobby(args)"
+        />
+      </div>
+    </div>
   </div>
 </template>
 

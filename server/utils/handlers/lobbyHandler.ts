@@ -24,6 +24,13 @@ export function handleLobbyEvents(socket: Socket, io: Server) {
     io.to("lobby").emit("new-game", lobby);
   });
 
+  socket.on("get-running-games", (playerId: string, cb) => {
+    console.log("hier");
+    const response = gameService.getAllRunningGamesForPlayer(playerId);
+
+    cb(response);
+  });
+
   socket.on("join-game", (lobbyId, id, name, cb) => {
     const lobby = lobbyService.joinLobby(lobbyId, id, name);
 

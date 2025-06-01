@@ -9,6 +9,7 @@ import {
 } from "~~/server/utils/ship";
 import type { Player } from "~~/server/utils/types/gameTypes";
 import type { LobbyPlayer } from "~~/server/utils/types/lobbyTypes";
+import { LobbyResponse } from "#shared/lobbyTypes";
 
 export class GameRepository {
   private readonly games = new Map<string, Game>();
@@ -18,7 +19,7 @@ export class GameRepository {
     player2: LobbyPlayer,
     gameId: string,
     gameName: string,
-  ) {
+  ): GameResponse {
     const game: Game = {
       gameName: gameName,
       id: gameId,
@@ -40,7 +41,7 @@ export class GameRepository {
 
     this.games.set(gameId, game);
 
-    return { gameId, gameName } as GameResponse;
+    return { gameId, gameName };
   }
 
   postField(gameId: string, playerId: string, field: Cell[][]) {
@@ -57,6 +58,24 @@ export class GameRepository {
 
     if (playerId === game.player1.id) game.player1.socket = socket;
     else game.player2!.socket = socket;
+  }
+
+  getAllRunningGamesForPlayer(playerId: string): LobbyResponse[] {
+    const games: LobbyResponse[] = [];
+
+    console.log(playerId);
+
+    this.games.forEach((game: Game) => {
+      console.log(game.player1.id);
+      console.log(game.player2?.id);
+      if (game.player1.id === playerId || game.player2?.id === playerId)
+        games.push({
+          lobbyId: game.id,
+          lobbyName: game.gameName,
+        });
+    });
+
+    return games;
   }
 
   changeGameState(gameId: string, state: GameState) {
