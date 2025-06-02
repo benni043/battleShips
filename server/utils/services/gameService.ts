@@ -1,4 +1,5 @@
-import { Cell, Cord, GameError, GameState } from "#shared/gameTypes";
+import type { Cell, Cord } from "#shared/gameTypes";
+import { GameError, GameState } from "#shared/gameTypes";
 import { gameRepository } from "~~/server/utils/repositories/gameRepository";
 import type { Socket } from "socket.io";
 import type { LobbyPlayer } from "~~/server/utils/types/lobbyTypes";
