@@ -109,13 +109,14 @@ export class GameService {
     const game = gameRepository.getGameById(gameId);
 
     if (!game) return GameError.INVALID_GAME;
-    if (
-      socket.id !== game.player1.socket?.id &&
-      socket.id !== game.player2!.socket?.id
-    )
-      return GameError.INVALID_ID;
+    //todo with login
+    // if (
+    //   socket.id !== game.player1.socket?.id &&
+    //   socket.id !== game.player2!.socket?.id
+    // )
+    //   return GameError.INVALID_ID;
 
-    gameRepository.tryRemove(gameId, socket);
+    return gameRepository.tryRemove(gameId, socket);
   }
 
   getGameState(gameId: string) {

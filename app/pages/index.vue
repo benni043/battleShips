@@ -4,15 +4,17 @@ import { Toaster } from "vue-sonner";
 import "vue-sonner/style.css";
 import type { User } from "~/utils/types";
 
-const userNameStore = useUserNameStore();
+const uuidCookie = useCookie("uuid");
+const userNameCookie = useCookie("userName");
 
 function setUserName(userData: User) {
-  userNameStore.saveToCookies(userData);
+  uuidCookie.value = userData.uuid;
+  userNameCookie.value = userData.userName;
 
   navigateTo(`/lobby`);
 }
 
-if (userNameStore.isLoggedIn()) navigateTo(`/lobby`);
+if (userNameCookie.value !== null) navigateTo(`/lobby`);
 </script>
 
 <template>

@@ -20,6 +20,7 @@ const socket = io({
 const route = useRoute();
 
 const userNameStore = useUserNameStore();
+const userNameCookie = useCookie("userName");
 
 const gridStore = useMyGridStore();
 const gridSize = 10;
@@ -202,7 +203,7 @@ onBeforeUnmount(() => {
 
     <div id="fields" class="flex w-full items-center justify-around">
       <div>
-        <GridLayout :header="userNameStore.getMe()!">
+        <GridLayout :header="userNameCookie!">
           <GameGrid
             :has-listener="false"
             :grid="myGrid"

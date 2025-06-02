@@ -19,8 +19,8 @@ function createLobby(lobbyName: string) {
   socket.emit(
     "create-game",
     lobbyName,
-    uuidCookie,
-    userNameCookie,
+    uuidCookie.value,
+    userNameCookie.value,
     lobbyResponse,
   );
 }
@@ -29,14 +29,14 @@ function joinLobby(lobbyId: string) {
   socket.emit(
     "join-game",
     lobbyId,
-    uuidCookie,
-    userNameCookie,
+    uuidCookie.value,
+    userNameCookie.value,
     lobbyResponse,
   );
 }
 
 function rejoinLobby(lobbyId: string) {
-  navigateTo(`/game/${lobbyId}/player/${localStorage.getItem("uuid")}`);
+  navigateTo(`/game/${lobbyId}/player/${uuidCookie.value}`);
 }
 
 function lobbyResponse(response: LobbyResponse | LobbyError) {
@@ -54,9 +54,7 @@ function lobbyResponse(response: LobbyResponse | LobbyError) {
       break;
     }
     default: {
-      navigateTo(
-        `/game/${response.lobbyId}/player/${uuidCookie}/place`,
-      );
+      navigateTo(`/game/${response.lobbyId}/player/${uuidCookie.value}/place`);
       break;
     }
   }
@@ -74,14 +72,14 @@ socket.on("new-game", (lobbyData: LobbyResponse) => {
   games.value.push(lobbyData);
 });
 
-socket.on("remove-game", (removalId: string) => {
+socket.on("remove-game", (lobbyId: string) => {
   for (let i = 0; i < games.value.length; i++) {
-    if (games.value[i]!.lobbyId === removalId) games.value.splice(i, 1);
+    if (games.value[i]!.lobbyId === lobbyId) games.value.splice(i, 1);
   }
 });
 
 socket.emit("join-lobby", getLobbies);
-socket.emit("get-running-games", uuidCookie, getOwnGames);
+socket.emit("get-running-games", uuidCookie.value, getOwnGames);
 
 onBeforeUnmount(() => {
   socket?.disconnect();

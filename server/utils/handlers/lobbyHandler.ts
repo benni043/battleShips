@@ -39,7 +39,7 @@ export function handleLobbyEvents(socket: Socket, io: Server) {
     }
 
     cb({ lobbyId: lobby.id, lobbyName: lobby.lobbyName } as LobbyResponse);
-    io.to("lobby").emit("remove-game", lobby);
+    io.to("lobby").emit("remove-game", lobby.id);
 
     gameService.addGame(
       lobby.player1,

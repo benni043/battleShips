@@ -39,7 +39,9 @@ async function start() {
 socket.emit("place", route.params.gameId);
 
 socket.on("opponent-disconnected", () => {
-  console.log("gegner is wegge");
+  console.log("opponent left");
+
+  socket.disconnect();
   navigateTo("/lobby");
 });
 

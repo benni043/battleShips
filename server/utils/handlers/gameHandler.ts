@@ -84,10 +84,7 @@ export function handleGameEvents(socket: Socket, io: Server) {
   });
 
   socket.on("manual-disconnect", (gameId: string) => {
-    console.log("manual remove");
     const removed = gameService.tryRemove(gameId, socket);
-
-    console.log(removed);
 
     if (removed) {
       socket.to(gameId).emit("opponent-disconnected");
