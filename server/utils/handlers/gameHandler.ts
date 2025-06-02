@@ -4,6 +4,11 @@ import type { Cord, Game, GameFinished, HitResponse } from "#shared/gameTypes";
 import { GameState, GameError } from "#shared/gameTypes";
 
 export function handleGameEvents(socket: Socket, io: Server) {
+  socket.on("place", (gameId: string) => {
+    console.log(gameId);
+    socket.join(gameId);
+  });
+
   socket.on("post-socket", (gameId: string, id: string, cb) => {
     const response = gameService.setSocket(id, gameId, socket);
 
@@ -78,7 +83,14 @@ export function handleGameEvents(socket: Socket, io: Server) {
     cb(shipData);
   });
 
-  socket.on("manual-disconnect", (gameName: string) => {
-    gameService.tryRemove(gameName, socket);
+  socket.on("manual-disconnect", (gameId: string) => {
+    console.log("manual remove");
+    const removed = gameService.tryRemove(gameId, socket);
+
+    console.log(removed);
+
+    if (removed) {
+      socket.to(gameId).emit("opponent-disconnected");
+    }
   });
 }

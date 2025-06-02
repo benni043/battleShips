@@ -166,13 +166,8 @@ function joined(response: GameError) {
 }
 
 onBeforeUnmount(() => {
-  socket.emit("manual-disconnect", route.params.gameId, disconnect);
+  socket.emit("manual-disconnect", route.params.gameId);
 });
-
-function disconnect() {
-  console.log("disconnect");
-  socket?.disconnect();
-}
 </script>
 
 <template>

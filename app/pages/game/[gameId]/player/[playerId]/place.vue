@@ -6,9 +6,14 @@ import GridLayout from "~/components/game/layout/GridLayout.vue";
 import { FetchError } from "ofetch";
 import { useMyGridStore } from "~/stores/myGrid";
 import PlaceGrid from "~/components/game/canvas/PlaceGrid.vue";
+import { io } from "socket.io-client";
 
 const route = useRoute();
 const gridStore = useMyGridStore();
+
+const socket = io({
+  path: "/api/socket.io",
+});
 
 async function start() {
   try {
@@ -30,6 +35,17 @@ async function start() {
     }
   }
 }
+
+socket.emit("place", route.params.gameId);
+
+socket.on("opponent-disconnected", () => {
+  console.log("gegner is wegge");
+  navigateTo("/lobby");
+});
+
+onBeforeUnmount(() => {
+  socket.emit("manual-disconnect", route.params.gameId);
+});
 </script>
 
 <template>

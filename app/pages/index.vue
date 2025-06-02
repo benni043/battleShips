@@ -7,7 +7,7 @@ import type { User } from "~/utils/types";
 const userNameStore = useUserNameStore();
 
 function setUserName(userData: User) {
-  userNameStore.saveToLocalStorage(userData);
+  userNameStore.saveToCookies(userData);
 
   navigateTo(`/lobby`);
 }

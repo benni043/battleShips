@@ -12,12 +12,15 @@ const socket = io({
 const games: Ref<LobbyResponse[]> = ref([]);
 const myGames: Ref<LobbyResponse[]> = ref([]);
 
+const uuidCookie = useCookie("uuid");
+const userNameCookie = useCookie("username");
+
 function createLobby(lobbyName: string) {
   socket.emit(
     "create-game",
     lobbyName,
-    localStorage.getItem("uuid"),
-    localStorage.getItem("userName"),
+    uuidCookie,
+    userNameCookie,
     lobbyResponse,
   );
 }
@@ -26,8 +29,8 @@ function joinLobby(lobbyId: string) {
   socket.emit(
     "join-game",
     lobbyId,
-    localStorage.getItem("uuid"),
-    localStorage.getItem("userName"),
+    uuidCookie,
+    userNameCookie,
     lobbyResponse,
   );
 }
@@ -52,7 +55,7 @@ function lobbyResponse(response: LobbyResponse | LobbyError) {
     }
     default: {
       navigateTo(
-        `/game/${response.lobbyId}/player/${localStorage.getItem("uuid")}/place`,
+        `/game/${response.lobbyId}/player/${uuidCookie}/place`,
       );
       break;
     }
@@ -78,7 +81,7 @@ socket.on("remove-game", (removalId: string) => {
 });
 
 socket.emit("join-lobby", getLobbies);
-socket.emit("get-running-games", localStorage.getItem("uuid"), getOwnGames);
+socket.emit("get-running-games", uuidCookie, getOwnGames);
 
 onBeforeUnmount(() => {
   socket?.disconnect();

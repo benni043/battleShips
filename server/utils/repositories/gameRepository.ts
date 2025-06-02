@@ -161,7 +161,10 @@ export class GameRepository {
 
     if (!game.player1.socket && !game.player2?.socket) {
       this.removeGame(gameId);
+      return true;
     }
+
+    return false;
   }
 
   handleClick(id: string, gameId: string, cord: Cord) {
