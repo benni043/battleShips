@@ -13,7 +13,7 @@ const games: Ref<LobbyResponse[]> = ref([]);
 const myGames: Ref<LobbyResponse[]> = ref([]);
 
 const uuidCookie = useCookie("uuid");
-const userNameCookie = useCookie("username");
+const userNameCookie = useCookie("userName");
 
 function createLobby(lobbyName: string) {
   socket.emit(

@@ -26,7 +26,7 @@ async function start() {
       },
     });
 
-    navigateTo(`/game/${route.params.gameId}/player/${route.params.playerId}`);
+    socket.emit("ready", route.params.gameId, route.params.playerId);
   } catch (error) {
     if (error instanceof FetchError) {
       toast.error(`Status: ${error.status} - ${error.statusMessage}`);
@@ -36,7 +36,11 @@ async function start() {
   }
 }
 
-socket.emit("place", route.params.gameId);
+socket.emit("join", route.params.gameId);
+
+socket.on("start", () => {
+  navigateTo(`/game/${route.params.gameId}/player/${route.params.playerId}`);
+})
 
 socket.on("opponent-disconnected", () => {
   console.log("opponent left");
@@ -46,7 +50,7 @@ socket.on("opponent-disconnected", () => {
 });
 
 onBeforeUnmount(() => {
-  socket.emit("manual-disconnect", route.params.gameId);
+  socket.emit("place-disconnect", route.params.gameId);
 });
 </script>
 

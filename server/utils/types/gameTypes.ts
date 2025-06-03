@@ -6,4 +6,5 @@ export type Player = {
   username: string;
   field: Cell[][] | undefined;
   socket: Socket | undefined;
+  ready: boolean;
 };

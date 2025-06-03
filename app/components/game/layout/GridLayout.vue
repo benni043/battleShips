@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineProps<{
-  header: string;
+  header: string | null | undefined;
 }>();
 </script>
 

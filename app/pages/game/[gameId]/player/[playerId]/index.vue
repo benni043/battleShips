@@ -126,6 +126,8 @@ socket.on("gameName", (gameName: string) => {
 
 socket.on("opponent", (opponent: string) => {
   userNameStore.opponent = opponent;
+
+  console.log(userNameStore.opponent);
 });
 
 socket.on("current", (currentRes: string) => {
@@ -203,7 +205,7 @@ onBeforeUnmount(() => {
 
     <div id="fields" class="flex w-full items-center justify-around">
       <div>
-        <GridLayout :header="userNameCookie!">
+        <GridLayout :header="userNameCookie">
           <GameGrid
             :has-listener="false"
             :grid="myGrid"

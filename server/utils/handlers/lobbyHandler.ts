@@ -48,6 +48,8 @@ export function handleLobbyEvents(socket: Socket, io: Server) {
       lobby.lobbyName,
     );
 
+    console.log(lobby.player1);
+
     lobbyService.removeLobby(lobbyId);
   });
 }

@@ -14,7 +14,7 @@ function setUserName(userData: User) {
   navigateTo(`/lobby`);
 }
 
-if (userNameCookie.value !== null) navigateTo(`/lobby`);
+if (userNameCookie.value !== undefined) navigateTo(`/lobby`);
 </script>
 
 <template>

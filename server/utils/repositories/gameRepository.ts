@@ -30,12 +30,14 @@ export class GameRepository {
         username: player1.name,
         socket: undefined,
         field: undefined,
+        ready: false,
       } as Player,
       player2: {
         id: player2.id,
         username: player2.name,
         socket: undefined,
         field: undefined,
+        ready: false,
       } as Player,
     };
 
@@ -89,6 +91,19 @@ export class GameRepository {
 
     if (game.player1.id === playerId) return game.player2?.username;
     else return game.player1.username;
+  }
+
+  setReady(gameId: string, playerId: string) {
+    const game = this.games.get(gameId)!;
+
+    if (playerId === game.player1.id) game.player1.ready = true;
+    else game.player2!.ready = true;
+  }
+
+  getReady(gameId: string) {
+    const game = this.games.get(gameId)!;
+
+    return game.player1.ready && game.player2!.ready;
   }
 
   setSocket(playerId: string, gameId: string, socket: Socket) {

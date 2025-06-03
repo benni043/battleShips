@@ -4,11 +4,6 @@ import type { Cord, Game, GameFinished, HitResponse } from "#shared/gameTypes";
 import { GameState, GameError } from "#shared/gameTypes";
 
 export function handleGameEvents(socket: Socket, io: Server) {
-  socket.on("place", (gameId: string) => {
-    console.log(gameId);
-    socket.join(gameId);
-  });
-
   socket.on("post-socket", (gameId: string, id: string, cb) => {
     const response = gameService.setSocket(id, gameId, socket);
 
@@ -21,6 +16,8 @@ export function handleGameEvents(socket: Socket, io: Server) {
 
     const game = gameService.getGameById(gameId) as Game;
     socket.emit("gameName", game.gameName);
+
+    console.log(gameService.getOpponentUserName(gameId, id));
 
     socket.emit("current", gameService.getCurrentPlayer(gameId));
     socket.emit("opponent", gameService.getOpponentUserName(gameId, id));
