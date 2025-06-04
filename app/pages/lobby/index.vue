@@ -66,7 +66,7 @@ function getLobbies(initGames: LobbyResponse[]) {
 
 socket.on("get-own-games", (games: LobbyResponse[]) => {
   myGames.value = games;
-})
+});
 
 socket.on("new-game", (lobbyData: LobbyResponse) => {
   games.value.push(lobbyData);

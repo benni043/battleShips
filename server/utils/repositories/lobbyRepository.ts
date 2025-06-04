@@ -18,19 +18,32 @@ export class LobbyRepository {
     const lobby: Lobby = {
       lobbyName: lobbyName,
       id: uuid,
-      player1: { id: id, name: name },
+      player1: { id: id, name: name, ready: false },
       player2: undefined,
     };
 
     this.lobbies.set(uuid, lobby);
 
-    return { lobbyId: uuid, lobbyName: lobby.lobbyName } as LobbyResponse;
+    return lobby;
+  }
+
+  setReady(lobbyId: string, playerId: string) {
+    const lobby = this.lobbies.get(lobbyId)!;
+
+    if (playerId === lobby.player1.id) lobby.player1.ready = true;
+    else lobby.player2!.ready = true;
+  }
+
+  getReady(lobbyId: string) {
+    const lobby = this.lobbies.get(lobbyId)!;
+
+    return lobby.player1.ready && lobby.player2?.ready;
   }
 
   joinLobby(lobbyId: string, id: string, name: string) {
     const lobby = this.lobbies.get(lobbyId)!;
 
-    lobby.player2 = { id: id, name: name };
+    lobby.player2 = { id: id, name: name, ready: false };
 
     return lobby;
   }

@@ -1,5 +1,6 @@
 import type { Namespace, Socket } from "socket.io";
 import { gameService } from "~~/server/utils/services/gameService";
+import { lobbyService } from "~~/server/utils/services/lobbyService";
 
 export function handlePlaceEvents(socket: Socket, io: Namespace) {
   socket.on("join", (gameId: string) => {
@@ -9,14 +10,18 @@ export function handlePlaceEvents(socket: Socket, io: Namespace) {
   });
 
   socket.on("ready", (gameId: string, playerId: string) => {
-    gameService.setReady(gameId, playerId);
+    lobbyService.setReady(gameId, playerId);
 
-    if (gameService.getReady(gameId)) io.to(gameId).emit("start");
+    if (lobbyService.getReady(gameId)) {
+      io.to(gameId).emit("start");
+      lobbyService.removeLobby(gameId);
+    }
   });
 
   socket.on("manuel-disconnect", (gameId: string) => {
-    if (!gameService.getReady(gameId)) {
+    if (!lobbyService.getReady(gameId)) {
       gameService.remove(gameId);
+      lobbyService.removeLobby(gameId);
       socket.to(gameId).emit("opponent-disconnected");
     }
   });

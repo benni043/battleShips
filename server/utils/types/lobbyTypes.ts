@@ -8,4 +8,5 @@ export type Lobby = {
 export type LobbyPlayer = {
   name: string;
   id: string;
+  ready: boolean;
 };

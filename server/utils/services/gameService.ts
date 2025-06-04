@@ -22,24 +22,6 @@ export class GameService {
     return gameRepository.postField(gameId, id, field);
   }
 
-  setReady(gameId: string, playerId: string) {
-    const game = gameRepository.getGameById(gameId);
-
-    console.log(game);
-
-    if (!game) return GameError.INVALID_GAME;
-
-    return gameRepository.setReady(gameId, playerId);
-  }
-
-  getReady(gameId: string) {
-    const game = gameRepository.getGameById(gameId);
-
-    if (!game) return GameError.INVALID_GAME;
-
-    return gameRepository.getReady(gameId);
-  }
-
   setSocket(id: string, gameId: string, socket: Socket) {
     const game = gameRepository.getGameById(gameId);
 

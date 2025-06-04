@@ -12,6 +12,22 @@ export class LobbyService {
     return lobbyRepository.createLobby(lobbyName, id, name);
   }
 
+  setReady(lobbyId: string, playerId: string) {
+    const lobby = lobbyRepository.getLobbyById(lobbyId);
+
+    if (!lobby) return LobbyError.INVALID_GAME;
+
+    return lobbyRepository.setReady(lobbyId, playerId);
+  }
+
+  getReady(lobbyId: string) {
+    const lobby = lobbyRepository.getLobbyById(lobbyId);
+
+    if (!lobby) return LobbyError.INVALID_GAME;
+
+    return lobbyRepository.getReady(lobbyId);
+  }
+
   joinLobby(lobbyId: string, id: string, name: string) {
     const lobby = lobbyRepository.getLobbyById(lobbyId);
 
@@ -35,6 +51,14 @@ export class LobbyService {
 
   removeLobby(lobbyId: string) {
     lobbyRepository.removeLobby(lobbyId);
+  }
+
+  getLobbyById(lobbyId: string) {
+    const lobbyById = lobbyRepository.getLobbyById(lobbyId);
+
+    if (!lobbyById) return LobbyError.INVALID_GAME;
+
+    return lobbyById;
   }
 }
 
