@@ -5,12 +5,20 @@ import { LobbyError } from "#shared/lobbyTypes";
 import { gameService } from "~~/server/utils/services/gameService";
 
 export function handleLobbyEvents(socket: Socket, io: Namespace) {
-  socket.on("join", (cb) => {
+  socket.on("join", () => {
     console.log(`User: ${socket.id} connected to lobby`);
 
     socket.join("lobby");
-    cb(lobbyService.getAvailableLobbies());
+
+    io.to("lobby").emit("lobbies", lobbyService.getAvailableLobbies());
+    io.to("lobby").emit("request")
   });
+
+  socket.on("reload", (playerId: string) => {
+    const response = gameService.getAllRunningGamesForPlayer(playerId);
+
+    socket.emit("get-own-games", response);
+  })
 
   socket.on("get-own-games", (playerId: string) => {
     const response = gameService.getAllRunningGamesForPlayer(playerId);

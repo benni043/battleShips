@@ -60,10 +60,6 @@ function lobbyResponse(response: LobbyResponse | LobbyError) {
   }
 }
 
-function getLobbies(initGames: LobbyResponse[]) {
-  games.value = initGames;
-}
-
 socket.on("get-own-games", (games: LobbyResponse[]) => {
   myGames.value = games;
 });
@@ -78,7 +74,15 @@ socket.on("remove-game", (lobbyId: string) => {
   }
 });
 
-socket.emit("join", getLobbies);
+socket.on("lobbies", (initGames: LobbyResponse[]) => {
+  games.value = initGames;
+});
+
+socket.on("request", () => {
+  socket.emit("reload", uuidCookie.value);
+});
+
+socket.emit("join");
 socket.emit("get-own-games", uuidCookie.value);
 
 onBeforeUnmount(() => {
