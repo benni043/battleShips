@@ -1,5 +1,6 @@
 import { Server, type ServerOptions, type Socket } from "socket.io";
 import type { H3Event } from "h3";
+import { handleLobbyEvents } from "~~/server/utils/handlers/lobbyHandler";
 
 const options: Partial<ServerOptions> = {
   path: "/api/socket.io",
@@ -13,7 +14,15 @@ export function initSocket(event: H3Event) {
   // @ts-ignore
   io.attach(event.node.res.socket?.server);
 
-  io.on("connection", (socket: Socket) => {
-    registerConnectionHandlers(socket, io);
+  io.of("/lobby").on("connection", (socket: Socket) => {
+    handleLobbyEvents(socket, io.of("/lobby"));
+  });
+
+  io.of("/place").on("connection", (socket: Socket) => {
+    handlePlaceEvents(socket, io.of("/place"));
+  });
+
+  io.of("/game").on("connection", (socket: Socket) => {
+    handleGameEvents(socket, io.of("/game"));
   });
 }

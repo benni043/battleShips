@@ -121,6 +121,14 @@ export class GameService {
     return gameRepository.getWinner(gameId);
   }
 
+  remove(gameId: string) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (!game) return GameError.INVALID_GAME;
+
+    return gameRepository.removeGame(gameId);
+  }
+
   tryRemove(gameId: string, socket: Socket) {
     const game = gameRepository.getGameById(gameId);
 

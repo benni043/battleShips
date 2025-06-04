@@ -11,7 +11,7 @@ import { io } from "socket.io-client";
 const route = useRoute();
 const gridStore = useMyGridStore();
 
-const socket = io({
+const socket = io("/place", {
   path: "/api/socket.io",
 });
 
@@ -43,14 +43,12 @@ socket.on("start", () => {
 })
 
 socket.on("opponent-disconnected", () => {
-  console.log("opponent left");
-
   socket.disconnect();
   navigateTo("/lobby");
 });
 
 onBeforeUnmount(() => {
-  socket.emit("place-disconnect", route.params.gameId);
+  socket.emit("manuel-disconnect", route.params.gameId);
 });
 </script>
 

@@ -13,7 +13,7 @@ import "vue-sonner/style.css";
 import GridLayout from "~/components/game/layout/GridLayout.vue";
 import GameGrid from "~/components/game/canvas/GameGrid.vue";
 
-const socket = io({
+const socket = io("/game", {
   path: "/api/socket.io",
 });
 
@@ -126,8 +126,6 @@ socket.on("gameName", (gameName: string) => {
 
 socket.on("opponent", (opponent: string) => {
   userNameStore.opponent = opponent;
-
-  console.log(userNameStore.opponent);
 });
 
 socket.on("current", (currentRes: string) => {

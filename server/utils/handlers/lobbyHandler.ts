@@ -1,11 +1,11 @@
-import type { Server, Socket } from "socket.io";
+import type { Namespace, Socket } from "socket.io";
 import { lobbyService } from "~~/server/utils/services/lobbyService";
 import type { LobbyResponse } from "#shared/lobbyTypes";
 import { LobbyError } from "#shared/lobbyTypes";
 import { gameService } from "~~/server/utils/services/gameService";
 
-export function handleLobbyEvents(socket: Socket, io: Server) {
-  socket.on("join-lobby", (cb) => {
+export function handleLobbyEvents(socket: Socket, io: Namespace) {
+  socket.on("join", (cb) => {
     console.log(`User: ${socket.id} connected to lobby`);
 
     socket.join("lobby");
@@ -47,8 +47,6 @@ export function handleLobbyEvents(socket: Socket, io: Server) {
       lobby.id,
       lobby.lobbyName,
     );
-
-    console.log(lobby.player1);
 
     lobbyService.removeLobby(lobbyId);
   });

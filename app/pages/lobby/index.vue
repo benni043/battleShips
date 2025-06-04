@@ -5,7 +5,7 @@ import { LobbyError, type LobbyResponse } from "#shared/lobbyTypes";
 import { toast, Toaster } from "vue-sonner";
 import { io } from "socket.io-client";
 
-const socket = io({
+const socket = io("/lobby",{
   path: "/api/socket.io",
 });
 
@@ -78,7 +78,7 @@ socket.on("remove-game", (lobbyId: string) => {
   }
 });
 
-socket.emit("join-lobby", getLobbies);
+socket.emit("join", getLobbies);
 socket.emit("get-running-games", uuidCookie.value, getOwnGames);
 
 onBeforeUnmount(() => {

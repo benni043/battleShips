@@ -1,10 +1,12 @@
-import type { Server, Socket } from "socket.io";
+import type { Namespace, Socket } from "socket.io";
 import { gameService } from "~~/server/utils/services/gameService";
 import type { Cord, Game, GameFinished, HitResponse } from "#shared/gameTypes";
 import { GameState, GameError } from "#shared/gameTypes";
 
-export function handleGameEvents(socket: Socket, io: Server) {
+export function handleGameEvents(socket: Socket, io: Namespace) {
   socket.on("post-socket", (gameId: string, id: string, cb) => {
+    console.log(`User: ${socket.id} connected to ${gameId}`);
+
     const response = gameService.setSocket(id, gameId, socket);
 
     if (response === GameError.INVALID_GAME) {
@@ -16,8 +18,6 @@ export function handleGameEvents(socket: Socket, io: Server) {
 
     const game = gameService.getGameById(gameId) as Game;
     socket.emit("gameName", game.gameName);
-
-    console.log(gameService.getOpponentUserName(gameId, id));
 
     socket.emit("current", gameService.getCurrentPlayer(gameId));
     socket.emit("opponent", gameService.getOpponentUserName(gameId, id));
