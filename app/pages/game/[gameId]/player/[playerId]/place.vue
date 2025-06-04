@@ -11,21 +11,15 @@ import { io } from "socket.io-client";
 const route = useRoute();
 const gridStore = useMyGridStore();
 
+const ready = ref(false);
+
 const socket = io("/place", {
   path: "/api/socket.io",
 });
 
-async function start() {
+function start() {
   try {
-    await $fetch("/api/place", {
-      method: "POST",
-      body: {
-        gameId: route.params.gameId,
-        id: route.params.playerId,
-        grid: JSON.stringify(gridStore.grid),
-      },
-    });
-
+    ready.value = true;
     socket.emit("ready", route.params.gameId, route.params.playerId);
   } catch (error) {
     if (error instanceof FetchError) {
@@ -38,9 +32,18 @@ async function start() {
 
 socket.emit("join", route.params.gameId);
 
-socket.on("start", () => {
+socket.on("start", async () => {
+  await $fetch("/api/place", {
+    method: "POST",
+    body: {
+      gameId: route.params.gameId,
+      id: route.params.playerId,
+      grid: JSON.stringify(gridStore.grid),
+    },
+  });
+
   navigateTo(`/game/${route.params.gameId}/player/${route.params.playerId}`);
-})
+});
 
 socket.on("opponent-disconnected", () => {
   socket.disconnect();
@@ -63,10 +66,11 @@ onBeforeUnmount(() => {
     </GridLayout>
 
     <button
-      class="mt-6 w-40 rounded-xl border border-gray-400 bg-blue-600 py-3 text-white transition hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-green-500"
+      class="mt-6 w-40 rounded-xl border border-gray-400 bg-blue-600 py-3 text-white transition hover:cursor-pointer hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:text-gray-200"
+      :disabled="ready"
       @click="start()"
     >
-      Start Game
+      {{ ready ? "Bitte warten..." : "Bereit" }}
     </button>
   </div>
 </template>

@@ -24,10 +24,10 @@ export function handleLobbyEvents(socket: Socket, io: Namespace) {
     io.to("lobby").emit("new-game", lobby);
   });
 
-  socket.on("get-running-games", (playerId: string, cb) => {
+  socket.on("get-own-games", (playerId: string) => {
     const response = gameService.getAllRunningGamesForPlayer(playerId);
 
-    cb(response);
+    socket.emit("get-own-games", response);
   });
 
   socket.on("join-game", (lobbyId, id, name, cb) => {

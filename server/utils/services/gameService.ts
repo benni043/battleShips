@@ -25,6 +25,8 @@ export class GameService {
   setReady(gameId: string, playerId: string) {
     const game = gameRepository.getGameById(gameId);
 
+    console.log(game);
+
     if (!game) return GameError.INVALID_GAME;
 
     return gameRepository.setReady(gameId, playerId);

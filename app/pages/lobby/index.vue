@@ -5,7 +5,7 @@ import { LobbyError, type LobbyResponse } from "#shared/lobbyTypes";
 import { toast, Toaster } from "vue-sonner";
 import { io } from "socket.io-client";
 
-const socket = io("/lobby",{
+const socket = io("/lobby", {
   path: "/api/socket.io",
 });
 
@@ -64,9 +64,9 @@ function getLobbies(initGames: LobbyResponse[]) {
   games.value = initGames;
 }
 
-function getOwnGames(games: LobbyResponse[]) {
+socket.on("get-own-games", (games: LobbyResponse[]) => {
   myGames.value = games;
-}
+})
 
 socket.on("new-game", (lobbyData: LobbyResponse) => {
   games.value.push(lobbyData);
@@ -79,7 +79,7 @@ socket.on("remove-game", (lobbyId: string) => {
 });
 
 socket.emit("join", getLobbies);
-socket.emit("get-running-games", uuidCookie.value, getOwnGames);
+socket.emit("get-own-games", uuidCookie.value);
 
 onBeforeUnmount(() => {
   socket?.disconnect();
