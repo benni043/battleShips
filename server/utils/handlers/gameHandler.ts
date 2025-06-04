@@ -1,7 +1,9 @@
 import type { Namespace, Socket } from "socket.io";
 import { gameService } from "~~/server/utils/services/gameService";
-import type { Cord, Game, GameFinished, HitResponse } from "#shared/gameTypes";
-import { GameState, GameError } from "#shared/gameTypes";
+import type { Cord, GameFinished, HitResponse } from "#shared/gameTypes";
+import { GameError } from "#shared/gameTypes";
+import type { Game } from "~~/server/utils/types/gameTypes";
+import { GameState } from "~~/server/utils/types/gameTypes";
 
 export function handleGameEvents(socket: Socket, io: Namespace) {
   socket.on("post-socket", (gameId: string, id: string, cb) => {
@@ -55,7 +57,10 @@ export function handleGameEvents(socket: Socket, io: Namespace) {
       shipData !== GameError.INVALID_CORD &&
       shipData !== GameError.WRONG_PLAYER &&
       shipData !== GameError.ALREADY_HIT &&
-      shipData !== GameError.INVALID_GAME
+      shipData !== GameError.INVALID_GAME &&
+      shipData !== GameError.FINISHED &&
+      shipData !== GameError.NOT_STARTED &&
+      shipData !== GameError.INVALID_ID
     ) {
       const current = gameService.getCurrentPlayer(gameId);
 
@@ -63,7 +68,10 @@ export function handleGameEvents(socket: Socket, io: Namespace) {
 
       const opponentSocket = gameService.getOpponentSocket(gameId);
 
-      if (opponentSocket !== GameError.INVALID_GAME)
+      if (
+        opponentSocket !== GameError.INVALID_GAME &&
+        opponentSocket !== undefined
+      )
         opponentSocket.emit("hit-response", cord);
 
       cb({ cord: cord, shipData: shipData.shipData } as HitResponse);

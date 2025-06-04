@@ -1,8 +1,19 @@
 import type { Cell, Cord } from "#shared/gameTypes";
-import { GameError, GameState } from "#shared/gameTypes";
-import { gameRepository } from "~~/server/utils/repositories/gameRepository";
+import { GameError } from "#shared/gameTypes";
+import { gameRepository } from "~~/server/utils/repositories/game/gameRepository";
 import type { Socket } from "socket.io";
 import type { LobbyPlayer } from "~~/server/utils/types/lobbyTypes";
+import { GameState } from "~~/server/utils/types/gameTypes";
+
+import {
+  getMyField,
+  getOpponentField,
+  getOpponentUserName,
+  getOpponentSocket,
+  getCurrentPlayer,
+  getWinner,
+  getGameState,
+} from "~~/server/utils/repositories/game/gameSelectors";
 
 export class GameService {
   addGame(
@@ -42,7 +53,7 @@ export class GameService {
 
     if (!game) return GameError.INVALID_GAME;
 
-    return gameRepository.getOpponentSocket(gameId);
+    return getOpponentSocket(game);
   }
 
   getAllRunningGamesForPlayer(playerId: string) {
@@ -70,7 +81,7 @@ export class GameService {
 
     if (!game) return GameError.INVALID_GAME;
 
-    return gameRepository.getMyField(gameId, playerId);
+    return getMyField(game, playerId);
   }
 
   getOpponentField(gameId: string, playerId: string) {
@@ -78,7 +89,7 @@ export class GameService {
 
     if (!game) return GameError.INVALID_GAME;
 
-    return gameRepository.getOpponentField(gameId, playerId);
+    return getOpponentField(game, playerId);
   }
 
   getOpponentUserName(gameId: string, playerId: string) {
@@ -86,7 +97,7 @@ export class GameService {
 
     if (!game) return GameError.INVALID_GAME;
 
-    return gameRepository.getOpponentUserName(gameId, playerId);
+    return getOpponentUserName(game, playerId);
   }
 
   getCurrentPlayer(gameId: string) {
@@ -94,7 +105,7 @@ export class GameService {
 
     if (!game) return GameError.INVALID_GAME;
 
-    return gameRepository.getCurrentPlayer(gameId);
+    return getCurrentPlayer(game);
   }
 
   getWinner(gameId: string) {
@@ -102,7 +113,7 @@ export class GameService {
 
     if (!game) return GameError.INVALID_GAME;
 
-    return gameRepository.getWinner(gameId);
+    return getWinner(game);
   }
 
   remove(gameId: string) {
@@ -132,7 +143,7 @@ export class GameService {
 
     if (!game) return GameError.INVALID_GAME;
 
-    return gameRepository.getGameState(gameId);
+    return getGameState(game);
   }
 }
 

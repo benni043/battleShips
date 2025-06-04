@@ -7,3 +7,18 @@ export type Player = {
   field: Cell[][] | undefined;
   socket: Socket | undefined;
 };
+
+export type Game = {
+  player1: Player;
+  player2: Player;
+  gameName: string;
+  id: string;
+  state: GameState;
+  isPlayer1Active: boolean;
+};
+
+export enum GameState {
+  WAITING,
+  STARTED,
+  FINISHED,
+}

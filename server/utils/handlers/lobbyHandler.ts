@@ -37,7 +37,6 @@ export function handleLobbyEvents(socket: Socket, io: Namespace) {
 
   socket.on("join-game", (lobbyId, id, name, cb) => {
     const lobby = lobbyService.joinLobby(lobbyId, id, name);
-    console.log(lobby);
 
     if (lobby === LobbyError.INVALID_GAME || lobby === LobbyError.FULL) {
       cb(lobby);

@@ -1,5 +1,3 @@
-import type { Player } from "~~/server/utils/types/gameTypes";
-
 export type Cell = {
   shipData: ShipData | undefined;
   isHit: boolean;
@@ -44,18 +42,3 @@ export type GameResponse = {
   gameId: string;
   gameName: string;
 };
-
-export type Game = {
-  player1: Player;
-  player2: Player | undefined;
-  gameName: string;
-  id: string;
-  state: GameState;
-  isPlayer1Active: boolean;
-};
-
-export enum GameState {
-  WAITING,
-  STARTED,
-  FINISHED,
-}
