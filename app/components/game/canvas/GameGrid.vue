@@ -7,12 +7,7 @@ import {
   canvasWidth,
   canvasHeight,
   cellSize,
-  drawShip,
-  getNormalTileSet,
-  drawGrid,
-  getBrokenTileSet,
-  drawHitIcon,
-} from "~/utils/ship";
+} from "~/utils/rendering";
 
 const props = defineProps<{
   hasListener: boolean;
@@ -22,11 +17,8 @@ const props = defineProps<{
 const emit = defineEmits(["clicked"]);
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null);
-const ctx: Ref<CanvasRenderingContext2D | null> = ref(null);
 
-watch(props.grid, () => {
-  draw();
-});
+useDrawGrid(props.grid, undefined, canvas);
 
 watch(
   () => props.hasListener,
@@ -34,32 +26,6 @@ watch(
     if (!newVal) canvas.value!.removeEventListener("mousedown", click);
   },
 );
-
-function draw() {
-  if (!ctx.value) return;
-
-  ctx.value.clearRect(0, 0, canvasWidth, canvasHeight);
-
-  drawGrid(ctx.value);
-
-  // draw ships and hits
-  for (let i = 0; i < gridSize; i++) {
-    for (let j = 0; j < gridSize; j++) {
-      const cell = props.grid[i]?.[j];
-      if (!cell) continue;
-
-      const shipData = cell.shipData;
-
-      const tileset = cell.isHit ? getBrokenTileSet() : getNormalTileSet();
-
-      if (shipData) {
-        drawShip(i, j, props.grid, ctx.value!, tileset);
-      } else if (cell.isHit) {
-        drawHitIcon(i, j, ctx.value!, tileset);
-      }
-    }
-  }
-}
 
 function click(event: MouseEvent) {
   const rect = canvas.value!.getBoundingClientRect();
@@ -75,17 +41,6 @@ function click(event: MouseEvent) {
 }
 
 onMounted(() => {
-  ctx.value = canvas.value!.getContext("2d");
-  ctx.value!.imageSmoothingEnabled = false;
-
-  draw();
-  getNormalTileSet().onload = () => {
-    draw();
-  };
-  getBrokenTileSet().onload = () => {
-    draw();
-  };
-
   if (props.hasListener) canvas.value!.addEventListener("mousedown", click);
 });
 </script>

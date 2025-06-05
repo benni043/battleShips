@@ -5,12 +5,9 @@ import {
   canvasHeight,
   canvasWidth,
   cellSize,
-  drawGrid,
-  drawShip,
-  getNormalTileSet,
   gridSize,
   labelMargin,
-} from "~/utils/ship";
+} from "~/utils/rendering";
 import { initNormal, initRussian } from "~/utils/initShips";
 import { toast } from "vue-sonner";
 import { GameMode, PlaceState } from "~/utils/types";
@@ -18,12 +15,13 @@ import { GameMode, PlaceState } from "~/utils/types";
 const gridStore = useMyGridStore();
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null);
-const ctx: Ref<CanvasRenderingContext2D | null> = ref(null);
 
 const grid: Ref<Cell[][]> = ref([]);
+const currentCell: Ref<Cell | undefined> = ref(undefined);
 
-let currentCell: Cell | undefined;
 let mouseDownPos: { x: number; y: number } | undefined;
+
+useDrawGrid(grid, currentCell, canvas);
 
 const gameMode = GameMode.RUSSIAN;
 
@@ -54,51 +52,11 @@ function initShips() {
   }
 }
 
-function draw() {
-  if (!ctx.value) return;
-
-  ctx.value.clearRect(0, 0, canvasWidth, canvasHeight);
-
-  drawGrid(ctx.value);
-
-  // Draw all ships except the one being moved
-  for (let x = 0; x < gridSize; x++) {
-    for (let y = 0; y < gridSize; y++) {
-      if (grid.value[x]![y]! !== currentCell) {
-        if (!grid.value[x]![y]!.shipData!) continue;
-        drawShip(x, y, grid.value, ctx.value!, getNormalTileSet());
-      }
-    }
-  }
-
-  // Draw the currently moved ship last
-  if (currentCell) {
-    for (let x = 0; x < gridSize; x++) {
-      for (let y = 0; y < gridSize; y++) {
-        if (
-          grid.value[x]?.[y]?.shipData?.connectsTo ===
-          currentCell.shipData?.connectsTo
-        ) {
-          drawShip(x, y, grid.value, ctx.value!, getNormalTileSet());
-        }
-      }
-    }
-  }
-}
-
 initGrid();
 initShips();
 
 onMounted(() => {
-  ctx.value = canvas.value!.getContext("2d");
-  ctx.value!.imageSmoothingEnabled = false;
-
   gridStore.grid = grid.value;
-
-  draw();
-  getNormalTileSet().onload = () => {
-    draw();
-  };
 
   canvas.value!.addEventListener("mousedown", mouseDown);
   canvas.value!.addEventListener("mousemove", mouseMove);
@@ -121,10 +79,8 @@ function mouseGridPosition(event: MouseEvent): { x: number; y: number } {
 }
 
 const mouseDown = (event: MouseEvent) => {
-  currentCell = undefined;
+  currentCell.value = undefined;
   mouseDownPos = undefined;
-
-  draw();
 
   const mousePos = mouseGridPosition(event);
 
@@ -137,12 +93,12 @@ const mouseDown = (event: MouseEvent) => {
 
   if (!grid.value[x]![y]!.shipData) return;
 
-  currentCell = grid.value[x]![y];
+  currentCell.value = grid.value[x]![y];
   mouseDownPos = mousePos;
 };
 
 const mouseMove = (event: MouseEvent) => {
-  if (!currentCell) return;
+  if (!currentCell.value) return;
 
   const mousePos = mouseGridPosition(event);
 
@@ -153,7 +109,7 @@ const mouseMove = (event: MouseEvent) => {
     for (let y1 = 0; y1 < gridSize; y1++) {
       if (
         grid.value[x1]?.[y1]?.shipData?.connectsTo !==
-        currentCell.shipData?.connectsTo
+        currentCell.value.shipData?.connectsTo
       )
         continue;
 
@@ -163,17 +119,15 @@ const mouseMove = (event: MouseEvent) => {
         grid.value[x1]![y1]!.gridCord.y + diffY!;
     }
   }
-
-  draw();
 };
 
 function handleClick() {
-  if (!currentCell) return;
+  if (!currentCell.value) return;
 
-  const shipCells = getShipCells(currentCell);
+  const shipCells = getShipCells(currentCell.value);
 
-  const pivotX = currentCell.gridCord.x;
-  const pivotY = currentCell.gridCord.y;
+  const pivotX = currentCell.value.gridCord.x;
+  const pivotY = currentCell.value.gridCord.y;
 
   for (const cell of shipCells) {
     // rotate 90° -> x=-y y=x
@@ -201,9 +155,9 @@ function getShipCells(cell: Cell): Cell[] {
 }
 
 function placeShipToVisualCord(placeState: PlaceState) {
-  if (!currentCell) return;
+  if (!currentCell.value) return;
 
-  const shipCells = getShipCells(currentCell);
+  const shipCells = getShipCells(currentCell.value);
 
   let isValidMove = true;
 
@@ -223,7 +177,7 @@ function placeShipToVisualCord(placeState: PlaceState) {
       newY >= gridSize ||
       (grid.value[newX]![newY]!.shipData !== undefined &&
         grid.value[newX]![newY]!.shipData!.connectsTo !==
-          currentCell.shipData!.connectsTo)
+          currentCell.value.shipData!.connectsTo)
     ) {
       isValidMove = false;
     }
@@ -269,23 +223,21 @@ function placeShipToVisualCord(placeState: PlaceState) {
 }
 
 const handleLostFocus = () => {
-  if (!currentCell) return;
+  if (!currentCell.value) return;
 
-  const shipCells = getShipCells(currentCell);
+  const shipCells = getShipCells(currentCell.value);
 
   for (const cell of shipCells) {
     cell.visualCord.x = cell.gridCord.x;
     cell.visualCord.y = cell.gridCord.y;
   }
 
-  currentCell = undefined;
+  currentCell.value = undefined;
   mouseDownPos = undefined;
-
-  draw();
 };
 
 const mouseUp = (event: MouseEvent) => {
-  if (!currentCell) return;
+  if (!currentCell.value) return;
 
   const mousePos = mouseGridPosition(event);
 
@@ -298,10 +250,8 @@ const mouseUp = (event: MouseEvent) => {
     placeShipToVisualCord(PlaceState.MOVE);
   }
 
-  currentCell = undefined;
+  currentCell.value = undefined;
   mouseDownPos = undefined;
-
-  draw();
 };
 </script>
 
