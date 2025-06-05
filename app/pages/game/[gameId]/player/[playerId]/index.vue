@@ -12,6 +12,7 @@ import { toast, Toaster } from "vue-sonner";
 import "vue-sonner/style.css";
 import GridLayout from "~/components/game/layout/GridLayout.vue";
 import GameGrid from "~/components/game/canvas/GameGrid.vue";
+import { FetchError } from "ofetch";
 
 const socket = io("/game", {
   path: "/api/socket.io",
@@ -92,6 +93,10 @@ function handleError<T>(err: GameError | T): T | undefined {
       toast.error(`Spiel ist bereits beendet!`);
       return undefined;
     }
+    case GameError.ALREADY_JOINED: {
+      toast.error(`Du bist bereits in diesem Spiel!`);
+      return undefined;
+    }
     default:
       return err;
   }
@@ -160,14 +165,45 @@ if (gridStore.grid.length > 0) {
   myGrid.value = gridStore.grid;
 }
 
-socket.emit("post-socket", route.params.gameId, route.params.playerId, joined);
+try {
+  await $fetch("/api/isLobbyFree/", {
+    method: "GET",
+    query: {
+      gameId: route.params.gameId,
+      playerId: route.params.playerId,
+    },
+  });
+
+  socket.emit(
+    "post-socket",
+    route.params.gameId,
+    route.params.playerId,
+    joined,
+  );
+} catch (error) {
+  if (error instanceof FetchError) {
+    toast.error(`Status: ${error.status} - ${error.statusMessage}`);
+  } else {
+    console.error("unknown error: ", error);
+  }
+
+  navigateTo(`/lobby`);
+}
 
 function joined(response: GameError) {
   handleError(response);
 }
 
 onBeforeUnmount(() => {
-  socket.emit("manual-disconnect", route.params.gameId);
+  socket.emit("manuel-disconnect", route.params.gameId);
+});
+
+const handleBeforeUnload = () => {
+  socket.emit("manuel-disconnect", route.params.gameId);
+};
+
+onMounted(() => {
+  window.addEventListener("beforeunload", handleBeforeUnload);
 });
 </script>
 

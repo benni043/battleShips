@@ -4,6 +4,7 @@ import LobbyList from "~/components/lobby/LobbyList.vue";
 import { LobbyError, type LobbyResponse } from "#shared/lobbyTypes";
 import { toast, Toaster } from "vue-sonner";
 import { io } from "socket.io-client";
+import { FetchError } from "ofetch";
 
 const socket = io("/lobby", {
   path: "/api/socket.io",
@@ -56,8 +57,24 @@ function lobbyResponse(response: LobbyResponse | LobbyError) {
   }
 }
 
-function rejoinLobby(lobbyId: string) {
-  navigateTo(`/game/${lobbyId}/player/${uuidCookie.value}`);
+async function rejoinLobby(lobbyId: string) {
+  try {
+    await $fetch("/api/isLobbyFree/", {
+      method: "GET",
+      query: {
+        gameId: lobbyId,
+        playerId: uuidCookie.value,
+      },
+    });
+
+    navigateTo(`/game/${lobbyId}/player/${uuidCookie.value}`);
+  } catch (error) {
+    if (error instanceof FetchError) {
+      toast.error(`Status: ${error.status} - ${error.statusMessage}`);
+    } else {
+      console.error("unknown error: ", error);
+    }
+  }
 }
 
 socket.on("new-game", (lobbyData: LobbyResponse) => {

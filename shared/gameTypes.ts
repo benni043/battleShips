@@ -32,6 +32,7 @@ export enum GameError {
   ALREADY_HIT = "ALREADY_HIT",
   NOT_STARTED = "NOT_STARTED",
   FINISHED = "FINISHED",
+  ALREADY_JOINED = "ALREADY_JOINED",
 }
 
 export type GameFinished = {

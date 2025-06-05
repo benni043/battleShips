@@ -78,6 +78,7 @@ export class GameRepository {
 
   tryRemove(gameId: string, socket: Socket): boolean {
     const game = this.getGameById(gameId);
+
     if (socket.id === game.player1.socket?.id) game.player1.socket = undefined;
     else game.player2!.socket = undefined;
 

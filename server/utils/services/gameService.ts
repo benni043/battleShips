@@ -12,6 +12,7 @@ import {
   getOpponentField,
   getOpponentSocket,
   getOpponentUserName,
+  getPlayerById,
   getWinner,
 } from "~~/server/utils/repositories/game/gameSelectors";
 
@@ -30,13 +31,31 @@ export class GameService {
 
     if (!game) return GameError.INVALID_GAME;
 
+    const player = getPlayerById(game, id);
+
+    if (player.socket !== undefined) return GameError.ALREADY_JOINED;
+
     return gameRepository.postField(gameId, id, field);
+  }
+
+  isAlreadyInGame(gameId: string, playerId: string) {
+    const game = gameRepository.getGameById(gameId);
+
+    if (!game) return GameError.INVALID_GAME;
+
+    const player = getPlayerById(game, playerId);
+
+    if (player.socket !== undefined) return GameError.ALREADY_JOINED;
   }
 
   setSocket(id: string, gameId: string, socket: Socket) {
     const game = gameRepository.getGameById(gameId);
 
     if (!game) return GameError.INVALID_GAME;
+
+    const player = getPlayerById(game, id);
+
+    if (player.socket !== undefined) return GameError.ALREADY_JOINED;
 
     gameRepository.setSocket(id, gameId, socket);
 

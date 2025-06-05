@@ -19,8 +19,6 @@ export function handlePlaceEvents(socket: Socket, lobbyIO: Namespace) {
   });
 
   socket.on("manuel-disconnect", (gameId: string) => {
-    console.log("dis");
-
     if (!lobbyService.getReady(gameId)) {
       io.of("lobby").emit("fetch");
 

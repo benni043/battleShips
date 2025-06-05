@@ -18,9 +18,24 @@ const socket = io("/place", {
 });
 
 function start() {
+  ready.value = true;
+  socket.emit("ready", route.params.gameId, route.params.playerId);
+}
+
+socket.emit("join", route.params.gameId);
+
+socket.on("start", async () => {
   try {
-    ready.value = true;
-    socket.emit("ready", route.params.gameId, route.params.playerId);
+    await $fetch("/api/place", {
+      method: "POST",
+      body: {
+        gameId: route.params.gameId,
+        id: route.params.playerId,
+        grid: JSON.stringify(gridStore.grid),
+      },
+    });
+
+    navigateTo(`/game/${route.params.gameId}/player/${route.params.playerId}`);
   } catch (error) {
     if (error instanceof FetchError) {
       toast.error(`Status: ${error.status} - ${error.statusMessage}`);
@@ -28,21 +43,6 @@ function start() {
       console.error("unknown error: ", error);
     }
   }
-}
-
-socket.emit("join", route.params.gameId);
-
-socket.on("start", async () => {
-  await $fetch("/api/place", {
-    method: "POST",
-    body: {
-      gameId: route.params.gameId,
-      id: route.params.playerId,
-      grid: JSON.stringify(gridStore.grid),
-    },
-  });
-
-  navigateTo(`/game/${route.params.gameId}/player/${route.params.playerId}`);
 });
 
 socket.on("opponent-disconnected", () => {

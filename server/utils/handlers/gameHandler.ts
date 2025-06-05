@@ -11,7 +11,10 @@ export function handleGameEvents(socket: Socket, gameIO: Namespace) {
 
     const response = gameService.setSocket(id, gameId, socket);
 
-    if (response === GameError.INVALID_GAME) {
+    if (
+      response === GameError.INVALID_GAME ||
+      response === GameError.ALREADY_JOINED
+    ) {
       cb(response);
       return;
     }
@@ -71,7 +74,7 @@ export function handleGameEvents(socket: Socket, gameIO: Namespace) {
     gameIO.to(gameId).emit("current", current);
   });
 
-  socket.on("manual-disconnect", (gameId: string) => {
+  socket.on("manuel-disconnect", (gameId: string) => {
     const removed = gameService.tryRemove(gameId, socket);
 
     if (removed) {
