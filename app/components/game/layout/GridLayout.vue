@@ -9,12 +9,12 @@ defineProps<{
     {{ header }}
   </h1>
 
-  <div class="m-[40px]">
-    <div class="ml-[40px] flex">
+  <div class="mt-10">
+    <div class="ml-10 flex">
       <div
         v-for="n in 10"
         :key="'top-' + n"
-        class="flex h-[40px] w-[40px] items-center justify-center pb-7 text-xl font-medium text-gray-700"
+        class="flex h-10 w-10 items-center justify-center pb-7 text-xl font-medium text-gray-700"
       >
         {{ String.fromCharCode(64 + n) }}
       </div>
@@ -25,7 +25,7 @@ defineProps<{
         <div
           v-for="n in 10"
           :key="'top-' + n"
-          class="flex h-[40px] w-[40px] items-center justify-center pr-7 text-xl font-medium text-gray-700"
+          class="flex h-10 w-10 items-center justify-center pr-7 text-xl font-medium text-gray-700"
         >
           {{ n }}
         </div>

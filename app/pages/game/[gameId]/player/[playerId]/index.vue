@@ -169,6 +169,8 @@ function joined(response: GameError) {
 onBeforeUnmount(() => {
   socket.emit("manual-disconnect", route.params.gameId);
 });
+
+const showOwnGrid = ref(false);
 </script>
 
 <template>
@@ -201,8 +203,28 @@ onBeforeUnmount(() => {
       </h1>
     </div>
 
-    <div id="fields" class="flex w-full items-center justify-around">
-      <div>
+    <div
+      id="fields"
+      class="flex w-full items-center justify-around not-lg:flex-col"
+    >
+      <div class="flex gap-2 lg:hidden">
+        <button
+          :disabled="showOwnGrid"
+          class="rounded border border-black px-2 text-black transition not-disabled:cursor-pointer hover:bg-neutral-400 disabled:bg-black disabled:text-white"
+          @click="showOwnGrid = true"
+        >
+          Eigenes
+        </button>
+        <button
+          :disabled="!showOwnGrid"
+          class="rounded border border-black px-2 text-black transition not-disabled:cursor-pointer hover:bg-neutral-400 disabled:bg-black disabled:text-white"
+          @click="showOwnGrid = false"
+        >
+          Gegner
+        </button>
+      </div>
+
+      <div :data-hidden="!showOwnGrid" class="not-lg:data-[hidden=true]:hidden">
         <GridLayout :header="userNameCookie">
           <GameGrid
             :has-listener="false"
@@ -212,7 +234,7 @@ onBeforeUnmount(() => {
         </GridLayout>
       </div>
 
-      <div>
+      <div :data-hidden="showOwnGrid" class="not-lg:data-[hidden=true]:hidden">
         <GridLayout :header="userNameStore.opponent">
           <GameGrid
             :has-listener="true"
