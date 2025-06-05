@@ -14,3 +14,8 @@ export type User = {
   userName: string;
   uuid: string;
 };
+
+export enum GameMode {
+  NORMAL,
+  RUSSIAN,
+}

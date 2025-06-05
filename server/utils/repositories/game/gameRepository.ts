@@ -1,4 +1,4 @@
-import type { Cell, Cord, Hit, GameResponse } from "#shared/gameTypes";
+import type { Cell, Cord, GameResponse } from "#shared/gameTypes";
 import { GameError } from "#shared/gameTypes";
 import type { Socket } from "socket.io";
 import {

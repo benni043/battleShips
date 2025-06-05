@@ -11,14 +11,14 @@ export function handleLobbyEvents(socket: Socket, io: Namespace) {
     socket.join("lobby");
 
     io.to("lobby").emit("lobbies", lobbyService.getAvailableLobbies());
-    io.to("lobby").emit("request")
+    io.to("lobby").emit("request");
   });
 
   socket.on("reload", (playerId: string) => {
     const response = gameService.getAllRunningGamesForPlayer(playerId);
 
     socket.emit("get-own-games", response);
-  })
+  });
 
   socket.on("get-own-games", (playerId: string) => {
     const response = gameService.getAllRunningGamesForPlayer(playerId);
