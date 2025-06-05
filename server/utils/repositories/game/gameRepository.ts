@@ -88,7 +88,7 @@ export class GameRepository {
     return false;
   }
 
-  handleClick(id: string, gameId: string, cord: Cord): Hit | GameError {
+  handleClick(id: string, gameId: string, cord: Cord) {
     const game = this.getGameById(gameId);
 
     const isPlayer1 = id === game.player1.id;
@@ -104,9 +104,10 @@ export class GameRepository {
 
     setCellHit(cord, targetField);
 
+    game.isPlayer1Active = !game.isPlayer1Active;
+
     const gameFinished = isGameFinished(targetField);
     if (gameFinished) game.state = GameState.FINISHED;
-    else game.isPlayer1Active = !game.isPlayer1Active;
 
     return { gameFinished, shipData };
   }

@@ -31,6 +31,7 @@ export function handleGameEvents(socket: Socket, io: Namespace) {
         "my-grid",
         JSON.stringify(gameService.getMyField(gameId, id)),
       );
+
       socket.emit(
         "opponents-grid",
         JSON.stringify(gameService.getOpponentField(gameId, id)),
@@ -39,60 +40,40 @@ export function handleGameEvents(socket: Socket, io: Namespace) {
   });
 
   socket.on("click", (id: string, gameId: string, cord: Cord, cb) => {
-    const gameState = gameService.getGameState(gameId);
-
-    if (gameState === GameState.WAITING) {
-      cb(GameError.NOT_STARTED);
-      return;
-    }
-
-    if (gameState === GameState.FINISHED) {
-      cb(GameError.FINISHED);
-      return;
-    }
-
     const shipData = gameService.handleClick(id, gameId, cord);
 
     if (
-      shipData !== GameError.INVALID_CORD &&
-      shipData !== GameError.WRONG_PLAYER &&
-      shipData !== GameError.ALREADY_HIT &&
-      shipData !== GameError.INVALID_GAME &&
-      shipData !== GameError.FINISHED &&
-      shipData !== GameError.NOT_STARTED &&
-      shipData !== GameError.INVALID_ID
+      shipData === GameError.NOT_STARTED ||
+      shipData === GameError.FINISHED ||
+      shipData === GameError.INVALID_GAME ||
+      shipData === GameError.INVALID_CORD ||
+      shipData === GameError.ALREADY_HIT ||
+      shipData === GameError.WRONG_PLAYER
     ) {
-      const current = gameService.getCurrentPlayer(gameId);
+      cb(shipData);
+      return;
+    }
 
-      io.to(gameId).emit("current", current);
+    const opponentSocket = gameService.getOpponentSocket(gameId);
+    (opponentSocket as Socket).emit("hit-response", cord);
 
-      const opponentSocket = gameService.getOpponentSocket(gameId);
+    cb({ cord: cord, shipData: shipData.shipData } as HitResponse);
 
-      if (
-        opponentSocket !== GameError.INVALID_GAME &&
-        opponentSocket !== undefined
-      )
-        opponentSocket.emit("hit-response", cord);
-
-      cb({ cord: cord, shipData: shipData.shipData } as HitResponse);
-
-      if (shipData.gameFinished) {
-        io.to(gameId).emit("game-finished", {
-          winner: gameService.getWinner(gameId),
-        } as GameFinished);
-      }
+    if (shipData.gameFinished) {
+      io.to(gameId).emit("game-finished", {
+        winner: gameService.getWinner(gameId),
+      } as GameFinished);
 
       return;
     }
 
-    cb(shipData);
+    const current = gameService.getCurrentPlayer(gameId);
+    io.to(gameId).emit("current", current);
   });
 
   socket.on("manual-disconnect", (gameId: string) => {
     const removed = gameService.tryRemove(gameId, socket);
 
-    if (removed) {
-      socket.to(gameId).emit("opponent-disconnected");
-    }
+    if (removed) socket.to(gameId).emit("opponent-disconnected");
   });
 }

@@ -1,18 +1,17 @@
-import type { Cell, Cord } from "#shared/gameTypes";
-import { GameError } from "#shared/gameTypes";
+import { Cell, Cord, GameError } from "#shared/gameTypes";
 import { gameRepository } from "~~/server/utils/repositories/game/gameRepository";
 import type { Socket } from "socket.io";
 import type { LobbyPlayer } from "~~/server/utils/types/lobbyTypes";
 import { GameState } from "~~/server/utils/types/gameTypes";
 
 import {
+  getCurrentPlayer,
+  getGameState,
   getMyField,
   getOpponentField,
-  getOpponentUserName,
   getOpponentSocket,
-  getCurrentPlayer,
+  getOpponentUserName,
   getWinner,
-  getGameState,
 } from "~~/server/utils/repositories/game/gameSelectors";
 
 export class GameService {
@@ -64,6 +63,8 @@ export class GameService {
     const game = gameRepository.getGameById(gameId);
 
     if (!game) return GameError.INVALID_GAME;
+    if (game.state === GameState.WAITING) return GameError.NOT_STARTED;
+    if (game.state === GameState.FINISHED) return GameError.FINISHED;
 
     return gameRepository.handleClick(id, gameId, cord);
   }
