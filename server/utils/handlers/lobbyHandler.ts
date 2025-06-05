@@ -7,17 +7,10 @@ import { gameService } from "~~/server/utils/services/gameService";
 export function handleLobbyEvents(socket: Socket, io: Namespace) {
   socket.on("join", () => {
     console.log(`User: ${socket.id} connected to lobby`);
-
-    socket.join("lobby");
-
-    io.to("lobby").emit("lobbies", lobbyService.getAvailableLobbies());
-    io.to("lobby").emit("request");
   });
 
-  socket.on("reload", (playerId: string) => {
-    const response = gameService.getAllRunningGamesForPlayer(playerId);
-
-    socket.emit("get-own-games", response);
+  socket.on("get-games", () => {
+    socket.emit("get-games", lobbyService.getAvailableLobbies());
   });
 
   socket.on("get-own-games", (playerId: string) => {
@@ -40,7 +33,7 @@ export function handleLobbyEvents(socket: Socket, io: Namespace) {
     } as LobbyResponse;
 
     cb(lobbyData);
-    io.to("lobby").emit("new-game", lobbyData);
+    io.emit("new-game", lobbyData);
   });
 
   socket.on("join-game", (lobbyId, id, name, cb) => {
@@ -52,7 +45,7 @@ export function handleLobbyEvents(socket: Socket, io: Namespace) {
     }
 
     cb({ lobbyId: lobby.id, lobbyName: lobby.lobbyName } as LobbyResponse);
-    io.to("lobby").emit("remove-game", lobby.id);
+    io.emit("remove-game", lobby.id);
 
     gameService.addGame(
       lobby.player1,

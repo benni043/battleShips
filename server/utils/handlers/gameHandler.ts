@@ -5,7 +5,7 @@ import { GameError } from "#shared/gameTypes";
 import type { Game } from "~~/server/utils/types/gameTypes";
 import { GameState } from "~~/server/utils/types/gameTypes";
 
-export function handleGameEvents(socket: Socket, io: Namespace) {
+export function handleGameEvents(socket: Socket, gameIO: Namespace) {
   socket.on("post-socket", (gameId: string, id: string, cb) => {
     console.log(`User: ${socket.id} connected to ${gameId}`);
 
@@ -60,7 +60,7 @@ export function handleGameEvents(socket: Socket, io: Namespace) {
     cb({ cord: cord, shipData: shipData.shipData } as HitResponse);
 
     if (shipData.gameFinished) {
-      io.to(gameId).emit("game-finished", {
+      gameIO.to(gameId).emit("game-finished", {
         winner: gameService.getWinner(gameId),
       } as GameFinished);
 
@@ -68,12 +68,14 @@ export function handleGameEvents(socket: Socket, io: Namespace) {
     }
 
     const current = gameService.getCurrentPlayer(gameId);
-    io.to(gameId).emit("current", current);
+    gameIO.to(gameId).emit("current", current);
   });
 
   socket.on("manual-disconnect", (gameId: string) => {
     const removed = gameService.tryRemove(gameId, socket);
 
-    if (removed) socket.to(gameId).emit("opponent-disconnected");
+    if (removed) {
+      io.of("lobby").emit("fetch");
+    }
   });
 }

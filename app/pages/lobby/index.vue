@@ -35,10 +35,6 @@ function joinLobby(lobbyId: string) {
   );
 }
 
-function rejoinLobby(lobbyId: string) {
-  navigateTo(`/game/${lobbyId}/player/${uuidCookie.value}`);
-}
-
 function lobbyResponse(response: LobbyResponse | LobbyError) {
   switch (response) {
     case LobbyError.INVALID_GAME: {
@@ -60,9 +56,9 @@ function lobbyResponse(response: LobbyResponse | LobbyError) {
   }
 }
 
-socket.on("get-own-games", (games: LobbyResponse[]) => {
-  myGames.value = games;
-});
+function rejoinLobby(lobbyId: string) {
+  navigateTo(`/game/${lobbyId}/player/${uuidCookie.value}`);
+}
 
 socket.on("new-game", (lobbyData: LobbyResponse) => {
   games.value.push(lobbyData);
@@ -74,16 +70,25 @@ socket.on("remove-game", (lobbyId: string) => {
   }
 });
 
-socket.on("lobbies", (initGames: LobbyResponse[]) => {
+socket.on("get-own-games", (games: LobbyResponse[]) => {
+  myGames.value = games;
+});
+
+socket.on("get-games", (initGames: LobbyResponse[]) => {
   games.value = initGames;
 });
 
-socket.on("request", () => {
-  socket.emit("reload", uuidCookie.value);
+socket.on("fetch", () => {
+  fetch();
 });
 
+function fetch() {
+  socket.emit("get-games");
+  socket.emit("get-own-games", uuidCookie.value);
+}
+
 socket.emit("join");
-socket.emit("get-own-games", uuidCookie.value);
+fetch();
 
 onBeforeUnmount(() => {
   socket?.disconnect();

@@ -53,6 +53,14 @@ socket.on("opponent-disconnected", () => {
 onBeforeUnmount(() => {
   socket.emit("manuel-disconnect", route.params.gameId);
 });
+
+const handleBeforeUnload = () => {
+  socket.emit("manuel-disconnect", route.params.gameId);
+};
+
+onMounted(() => {
+  window.addEventListener("beforeunload", handleBeforeUnload);
+});
 </script>
 
 <template>
