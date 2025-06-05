@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { useMyGridStore } from "~/stores/myGrid";
 import type { Cell } from "#shared/gameTypes";
-import {
-  canvasHeight,
-  canvasWidth,
-  cellSize,
-  gridSize,
-  labelMargin,
-} from "~/utils/rendering";
+import { gridSize } from "~/utils/rendering";
 import { initNormal, initRussian } from "~/utils/initShips";
 import { toast } from "vue-sonner";
 import { GameMode, PlaceState } from "~/utils/types";
@@ -21,7 +15,7 @@ const currentCell: Ref<Cell | undefined> = ref(undefined);
 
 let mouseDownPos: { x: number; y: number } | undefined;
 
-useDrawGrid(grid, currentCell, canvas);
+const { cellSize } = useDrawGrid(grid, currentCell, canvas);
 
 const gameMode = GameMode.RUSSIAN;
 
@@ -69,12 +63,12 @@ onMounted(() => {
 function mouseGridPosition(event: MouseEvent): { x: number; y: number } {
   const rect = canvas.value!.getBoundingClientRect();
 
-  const calcX = event.clientX - rect.left - labelMargin;
-  const calcY = event.clientY - rect.top - labelMargin;
+  const calcX = event.clientX - rect.left;
+  const calcY = event.clientY - rect.top;
 
   return {
-    x: calcX / cellSize,
-    y: calcY / cellSize,
+    x: calcX / cellSize.value,
+    y: calcY / cellSize.value,
   };
 }
 
@@ -256,12 +250,7 @@ const mouseUp = (event: MouseEvent) => {
 </script>
 
 <template>
-  <canvas
-    ref="canvas"
-    :width="canvasWidth"
-    :height="canvasHeight"
-    class="z-1"
-  />
+  <canvas ref="canvas" class="z-1 aspect-square w-[400px]" />
 </template>
 
 <style scoped></style>

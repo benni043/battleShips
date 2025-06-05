@@ -5,13 +5,6 @@ import shipBrokenImg from "@/assets/img/ships-broken.png";
 
 export const gridSize = 10;
 
-export const labelMargin = 0;
-export const baseSize = 400;
-
-export const canvasWidth = baseSize + labelMargin;
-export const canvasHeight = baseSize + labelMargin;
-export const cellSize = baseSize / gridSize;
-
 const tileSize = 16;
 
 export function getShipConnections(
@@ -104,6 +97,7 @@ export function drawShip(
   grid: Cell[][],
   ctx: CanvasRenderingContext2D,
   tileSet: HTMLImageElement,
+  cellSize: number,
 ) {
   const rows = grid.length;
   const cols = grid[0]?.length ?? 0;
@@ -113,8 +107,8 @@ export function drawShip(
 
   const ship = grid[x]![y]!;
 
-  const canvasX = ship.visualCord.x * cellSize + labelMargin;
-  const canvasY = ship.visualCord.y * cellSize + labelMargin;
+  const canvasX = ship.visualCord.x * cellSize;
+  const canvasY = ship.visualCord.y * cellSize;
 
   ctx.drawImage(
     tileSet,
@@ -129,42 +123,43 @@ export function drawShip(
   );
 }
 
-export function drawHeaderOfGrid(ctx: CanvasRenderingContext2D) {
+export function drawHeaderOfGrid(
+  ctx: CanvasRenderingContext2D,
+  cellSize: number,
+) {
   ctx.font = "18px sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
-      const x = i * cellSize + labelMargin;
-      const y = j * cellSize + labelMargin;
+      const x = i * cellSize;
+      const y = j * cellSize;
 
       // number axis
       if (i === 0) {
         ctx.fillStyle = "black";
-        ctx.fillText((j + 1).toString(), labelMargin / 2, y + cellSize / 2);
+        ctx.fillText((j + 1).toString(), 0, y + cellSize / 2);
       }
 
       // letter axis
       if (j === 0) {
         ctx.fillStyle = "black";
         const char = String.fromCharCode(65 + i); // 'A' = 65
-        ctx.fillText(char, x + cellSize / 2, labelMargin / 2);
+        ctx.fillText(char, x + cellSize / 2, 0);
       }
     }
   }
 }
 
-export function drawGrid(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = "#249fde";
-  ctx.fillRect(labelMargin, labelMargin, canvasWidth, canvasHeight);
+export function drawGrid(ctx: CanvasRenderingContext2D, cellSize: number) {
+  ctx.strokeStyle = "#285cc4";
 
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
-      const x = i * cellSize + labelMargin;
-      const y = j * cellSize + labelMargin;
+      const x = i * cellSize;
+      const y = j * cellSize;
 
-      ctx.strokeStyle = "#285cc4";
       ctx.lineWidth = 1;
       ctx.strokeRect(x, y, cellSize, cellSize);
     }
@@ -176,9 +171,10 @@ export function drawHitIcon(
   j: number,
   ctx: CanvasRenderingContext2D,
   tileSet: HTMLImageElement,
+  cellSize: number,
 ) {
-  const x = i * cellSize + labelMargin;
-  const y = j * cellSize + labelMargin;
+  const x = i * cellSize;
+  const y = j * cellSize;
 
   ctx.drawImage(
     tileSet,

@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from "vue";
 import type { Cell, Cord } from "#shared/gameTypes";
-import {
-  gridSize,
-  labelMargin,
-  canvasWidth,
-  canvasHeight,
-  cellSize,
-} from "~/utils/rendering";
+import { gridSize } from "~/utils/rendering";
 
 const props = defineProps<{
   hasListener: boolean;
@@ -18,7 +12,7 @@ const emit = defineEmits(["clicked"]);
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null);
 
-useDrawGrid(props.grid, undefined, canvas);
+const { cellSize } = useDrawGrid(props.grid, undefined, canvas);
 
 watch(
   () => props.hasListener,
@@ -29,11 +23,11 @@ watch(
 
 function click(event: MouseEvent) {
   const rect = canvas.value!.getBoundingClientRect();
-  const x = event.clientX - rect.left - labelMargin;
-  const y = event.clientY - rect.top - labelMargin;
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
 
-  const i = Math.floor(x / cellSize);
-  const j = Math.floor(y / cellSize);
+  const i = Math.floor(x / cellSize.value);
+  const j = Math.floor(y / cellSize.value);
 
   if (i >= 0 && i < gridSize && j >= 0 && j < gridSize) {
     emit("clicked", { x: i, y: j } as Cord);
@@ -46,12 +40,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <canvas
-    ref="canvas"
-    :width="canvasWidth"
-    :height="canvasHeight"
-    class="z-1"
-  />
+  <canvas ref="canvas" class="z-1 aspect-square w-[400px]" />
 </template>
 
 <style scoped>

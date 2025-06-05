@@ -1,3 +1,4 @@
+import { gridSize } from "~/utils/rendering";
 import type { Cell } from "~~/shared/gameTypes";
 
 export function useDrawGrid(
@@ -9,9 +10,16 @@ export function useDrawGrid(
   const currentCellRef = toRef(currentCell);
 
   const canvasRef = toRef(canvas);
+  const canvasSize = computed(() => canvasRef.value?.clientWidth ?? 0);
+  watch(canvasSize, () => {
+    canvasRef.value!.height = canvasSize.value;
+    canvasRef.value!.width = canvasSize.value;
+  });
+  const cellSize = computed(() => canvasSize.value / gridSize);
+
   let ctx: CanvasRenderingContext2D | null = null;
 
-  onMounted(() => {
+  watch(canvasRef, () => {
     ctx = canvasRef.value!.getContext("2d");
     ctx!.imageSmoothingEnabled = false;
 
@@ -27,9 +35,9 @@ export function useDrawGrid(
   function draw() {
     if (!ctx) return;
 
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    ctx.clearRect(0, 0, canvasSize.value, canvasSize.value);
 
-    drawGrid(ctx);
+    drawGrid(ctx, cellSize.value);
 
     // Draw all ships except the one being moved
     for (let x = 0; x < gridSize; x++) {
@@ -43,9 +51,9 @@ export function useDrawGrid(
           const tileset = cell.isHit ? getBrokenTileSet() : getNormalTileSet();
 
           if (shipData) {
-            drawShip(x, y, gridRef.value, ctx!, tileset);
+            drawShip(x, y, gridRef.value, ctx!, tileset, cellSize.value);
           } else if (cell.isHit) {
-            drawHitIcon(x, y, ctx!, tileset);
+            drawHitIcon(x, y, ctx!, tileset, cellSize.value);
           }
         }
       }
@@ -59,7 +67,14 @@ export function useDrawGrid(
             gridRef.value[x]?.[y]?.shipData?.connectsTo ===
             currentCellRef.value.shipData?.connectsTo
           ) {
-            drawShip(x, y, gridRef.value, ctx!, getNormalTileSet());
+            drawShip(
+              x,
+              y,
+              gridRef.value,
+              ctx!,
+              getNormalTileSet(),
+              cellSize.value,
+            );
           }
         }
       }
@@ -67,10 +82,12 @@ export function useDrawGrid(
   }
 
   watch(
-    gridRef,
+    [gridRef, cellSize],
     () => {
       draw();
     },
     { deep: true },
   );
+
+  return { cellSize };
 }
