@@ -52,15 +52,15 @@ initShips();
 onMounted(() => {
   gridStore.grid = grid.value;
 
-  canvas.value!.addEventListener("mousedown", mouseDown);
-  canvas.value!.addEventListener("mousemove", mouseMove);
-  canvas.value!.addEventListener("mouseup", mouseUp);
-  canvas.value!.addEventListener("mouseleave", handleLostFocus);
+  canvas.value!.addEventListener("pointerdown", pointerDown);
+  canvas.value!.addEventListener("pointermove", pointerMove);
+  canvas.value!.addEventListener("pointerup", pointerUp);
+  canvas.value!.addEventListener("pointerleave", handleLostFocus);
 
   window.addEventListener("blur", handleLostFocus);
 });
 
-function mouseGridPosition(event: MouseEvent): { x: number; y: number } {
+function mouseGridPosition(event: PointerEvent): { x: number; y: number } {
   const rect = canvas.value!.getBoundingClientRect();
 
   const calcX = event.clientX - rect.left;
@@ -72,7 +72,7 @@ function mouseGridPosition(event: MouseEvent): { x: number; y: number } {
   };
 }
 
-const mouseDown = (event: MouseEvent) => {
+function pointerDown(event: PointerEvent) {
   currentCell.value = undefined;
   mouseDownPos = undefined;
 
@@ -89,9 +89,9 @@ const mouseDown = (event: MouseEvent) => {
 
   currentCell.value = grid.value[x]![y];
   mouseDownPos = mousePos;
-};
+}
 
-const mouseMove = (event: MouseEvent) => {
+function pointerMove(event: PointerEvent) {
   if (!currentCell.value) return;
 
   const mousePos = mouseGridPosition(event);
@@ -113,7 +113,7 @@ const mouseMove = (event: MouseEvent) => {
         grid.value[x1]![y1]!.gridCord.y + diffY!;
     }
   }
-};
+}
 
 function handleClick() {
   if (!currentCell.value) return;
@@ -216,7 +216,7 @@ function placeShipToVisualCord(placeState: PlaceState) {
   }
 }
 
-const handleLostFocus = () => {
+function handleLostFocus() {
   if (!currentCell.value) return;
 
   const shipCells = getShipCells(currentCell.value);
@@ -228,9 +228,9 @@ const handleLostFocus = () => {
 
   currentCell.value = undefined;
   mouseDownPos = undefined;
-};
+}
 
-const mouseUp = (event: MouseEvent) => {
+function pointerUp(event: PointerEvent) {
   if (!currentCell.value) return;
 
   const mousePos = mouseGridPosition(event);
@@ -246,11 +246,11 @@ const mouseUp = (event: MouseEvent) => {
 
   currentCell.value = undefined;
   mouseDownPos = undefined;
-};
+}
 </script>
 
 <template>
-  <canvas ref="canvas" class="z-1 aspect-square" />
+  <canvas ref="canvas" class="z-1 aspect-square touch-none" />
 </template>
 
 <style scoped></style>

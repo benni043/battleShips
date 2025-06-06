@@ -17,11 +17,11 @@ const { cellSize } = useDrawGrid(props.grid, undefined, canvas);
 watch(
   () => props.hasListener,
   (newVal) => {
-    if (!newVal) canvas.value!.removeEventListener("mousedown", click);
+    if (!newVal) canvas.value!.removeEventListener("pointerdown", click);
   },
 );
 
-function click(event: MouseEvent) {
+function click(event: PointerEvent) {
   const rect = canvas.value!.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
@@ -35,12 +35,12 @@ function click(event: MouseEvent) {
 }
 
 onMounted(() => {
-  if (props.hasListener) canvas.value!.addEventListener("mousedown", click);
+  if (props.hasListener) canvas.value!.addEventListener("pointerdown", click);
 });
 </script>
 
 <template>
-  <canvas ref="canvas" class="z-1 aspect-square" />
+  <canvas ref="canvas" class="z-1 aspect-square touch-none" />
 </template>
 
 <style scoped>
