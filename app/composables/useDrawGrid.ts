@@ -16,7 +16,6 @@ export function useDrawGrid(
     () => canvasRef.value?.parentElement,
     (entries) => {
       const { width } = entries[0]!.contentRect;
-      console.log(width);
       canvasSize.value = width;
     },
   );

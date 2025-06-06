@@ -101,7 +101,7 @@ onBeforeUnmount(() => {
       @submit="(args) => createLobby(args)"
     />
 
-    <div class="flex items-center justify-center">
+    <div class="flex items-center justify-center gap-5">
       <div class="flex w-full flex-col items-center justify-center">
         <h1 class="pb-4 text-2xl font-semibold text-gray-800">Lobbies</h1>
         <LobbyList

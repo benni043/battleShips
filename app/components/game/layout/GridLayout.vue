@@ -5,7 +5,9 @@ defineProps<{
 </script>
 
 <template>
-  <h1 class="h-6 text-center text-xl leading-6 font-semibold text-gray-700">
+  <h1
+    class="mb-2 h-6 text-center text-xl leading-6 font-semibold text-gray-700"
+  >
     {{ header }}
   </h1>
 

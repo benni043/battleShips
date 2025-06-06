@@ -129,7 +129,13 @@ socket.on("opponent", (opponent: string) => {
 });
 
 socket.on("current", (currentRes: string) => {
-  current.value = currentRes;
+  if (currentRes !== userNameStore.opponent) {
+    current.value = "Du";
+  } else {
+    current.value = currentRes;
+  }
+
+  // showOwnGrid.value = current.value === userNameStore.opponent;
 });
 
 socket.on("opponents-grid", (opponentGrid: string) => {
@@ -179,20 +185,25 @@ const showOwnGrid = ref(false);
   >
     <Toaster close-button rich-colors position="top-right" />
 
-    <button
-      class="absolute top-6 left-6 rounded border border-red-600 bg-red-500 px-4 py-2 text-white transition hover:cursor-pointer hover:bg-red-600"
-      @click="leave()"
-    >
-      Verlassen
-    </button>
-
-    <div>
-      <h1 class="mb-8 text-center text-3xl font-bold text-gray-800">
+    <div class="flex w-full items-center justify-between pr-5 pl-5">
+      <h1 class="text-center text-3xl font-bold text-gray-800">
         Lobby: {{ userNameStore.game }}
       </h1>
 
-      <h1 class="mb-8 text-center text-3xl font-bold text-gray-800">
-        {{ current }} ist an der Reihe!
+      <button
+        class="h-min rounded border border-red-600 bg-red-500 px-4 py-2 text-white transition hover:cursor-pointer hover:bg-red-600"
+        @click="leave()"
+      >
+        Verlassen
+      </button>
+    </div>
+
+    <div>
+      <h1 class="m-5 text-center text-xl font-bold text-gray-800">
+        <span v-if="current === 'Du'">{{ current }} bist an der Reihe!</span>
+        <span v-if="current === userNameStore.opponent"
+          >{{ current }} ist an der Reihe!</span
+        >
       </h1>
 
       <h1
@@ -207,7 +218,7 @@ const showOwnGrid = ref(false);
       id="fields"
       class="flex w-full items-center justify-around not-lg:flex-col"
     >
-      <div class="flex gap-2 lg:hidden">
+      <div class="m-5 flex gap-5 lg:hidden">
         <button
           :disabled="showOwnGrid"
           class="rounded border border-black px-2 text-black transition not-disabled:cursor-pointer hover:bg-neutral-400 disabled:bg-black disabled:text-white"
