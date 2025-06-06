@@ -134,7 +134,13 @@ socket.on("opponent", (opponent: string) => {
 });
 
 socket.on("current", (currentRes: string) => {
-  current.value = currentRes;
+  if (currentRes !== userNameStore.opponent) {
+    current.value = "Du";
+  } else {
+    current.value = currentRes;
+  }
+
+  // showOwnGrid.value = current.value === userNameStore.opponent;
 });
 
 socket.on("opponents-grid", (opponentGrid: string) => {
@@ -205,28 +211,35 @@ const handleBeforeUnload = () => {
 onMounted(() => {
   window.addEventListener("beforeunload", handleBeforeUnload);
 });
+
+const showOwnGrid = ref(false);
 </script>
 
 <template>
   <div
-    class="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 px-6 py-12"
+    class="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100"
   >
     <Toaster close-button rich-colors position="top-right" />
 
-    <button
-      class="absolute top-6 left-6 rounded border border-red-600 bg-red-500 px-4 py-2 text-white transition hover:cursor-pointer hover:bg-red-600"
-      @click="leave()"
-    >
-      Verlassen
-    </button>
-
-    <div>
-      <h1 class="mb-8 text-center text-3xl font-bold text-gray-800">
+    <div class="flex w-full items-center justify-between pr-5 pl-5">
+      <h1 class="text-center text-3xl font-bold text-gray-800">
         Lobby: {{ userNameStore.game }}
       </h1>
 
-      <h1 class="mb-8 text-center text-3xl font-bold text-gray-800">
-        {{ current }} ist an der Reihe!
+      <button
+        class="h-min rounded border border-red-600 bg-red-500 px-4 py-2 text-white transition hover:cursor-pointer hover:bg-red-600"
+        @click="leave()"
+      >
+        Verlassen
+      </button>
+    </div>
+
+    <div>
+      <h1 class="m-5 text-center text-xl font-bold text-gray-800">
+        <span v-if="current === 'Du'">{{ current }} bist an der Reihe!</span>
+        <span v-if="current === userNameStore.opponent"
+          >{{ current }} ist an der Reihe!</span
+        >
       </h1>
 
       <h1
@@ -237,8 +250,28 @@ onMounted(() => {
       </h1>
     </div>
 
-    <div id="fields" class="flex w-full items-center justify-around">
-      <div>
+    <div
+      id="fields"
+      class="flex w-full items-center justify-around not-lg:flex-col"
+    >
+      <div class="m-5 flex gap-5 lg:hidden">
+        <button
+          :disabled="showOwnGrid"
+          class="rounded border border-black px-2 text-black transition not-disabled:cursor-pointer hover:bg-neutral-400 disabled:bg-black disabled:text-white"
+          @click="showOwnGrid = true"
+        >
+          Eigenes
+        </button>
+        <button
+          :disabled="!showOwnGrid"
+          class="rounded border border-black px-2 text-black transition not-disabled:cursor-pointer hover:bg-neutral-400 disabled:bg-black disabled:text-white"
+          @click="showOwnGrid = false"
+        >
+          Gegner
+        </button>
+      </div>
+
+      <div :data-hidden="!showOwnGrid" class="not-lg:data-[hidden=true]:hidden">
         <GridLayout :header="userNameCookie">
           <GameGrid
             :has-listener="false"
@@ -248,7 +281,7 @@ onMounted(() => {
         </GridLayout>
       </div>
 
-      <div>
+      <div :data-hidden="showOwnGrid" class="not-lg:data-[hidden=true]:hidden">
         <GridLayout :header="userNameStore.opponent">
           <GameGrid
             :has-listener="true"

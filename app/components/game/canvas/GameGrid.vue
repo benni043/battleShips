@@ -1,18 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from "vue";
 import type { Cell, Cord } from "#shared/gameTypes";
-import {
-  gridSize,
-  labelMargin,
-  canvasWidth,
-  canvasHeight,
-  cellSize,
-  drawShip,
-  getNormalTileSet,
-  drawGrid,
-  getBrokenTileSet,
-  drawHitIcon,
-} from "~/utils/ship";
+import { gridSize } from "~/utils/rendering";
 
 const props = defineProps<{
   hasListener: boolean;
@@ -22,52 +11,23 @@ const props = defineProps<{
 const emit = defineEmits(["clicked"]);
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null);
-const ctx: Ref<CanvasRenderingContext2D | null> = ref(null);
 
-watch(props.grid, () => {
-  draw();
-});
+const { cellSize } = useDrawGrid(props.grid, undefined, canvas);
 
 watch(
   () => props.hasListener,
   (newVal) => {
-    if (!newVal) canvas.value!.removeEventListener("mousedown", click);
+    if (!newVal) canvas.value!.removeEventListener("pointerdown", click);
   },
 );
 
-function draw() {
-  if (!ctx.value) return;
-
-  ctx.value.clearRect(0, 0, canvasWidth, canvasHeight);
-
-  drawGrid(ctx.value);
-
-  // draw ships and hits
-  for (let i = 0; i < gridSize; i++) {
-    for (let j = 0; j < gridSize; j++) {
-      const cell = props.grid[i]?.[j];
-      if (!cell) continue;
-
-      const shipData = cell.shipData;
-
-      const tileset = cell.isHit ? getBrokenTileSet() : getNormalTileSet();
-
-      if (shipData) {
-        drawShip(i, j, props.grid, ctx.value!, tileset);
-      } else if (cell.isHit) {
-        drawHitIcon(i, j, ctx.value!, tileset);
-      }
-    }
-  }
-}
-
-function click(event: MouseEvent) {
+function click(event: PointerEvent) {
   const rect = canvas.value!.getBoundingClientRect();
-  const x = event.clientX - rect.left - labelMargin;
-  const y = event.clientY - rect.top - labelMargin;
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
 
-  const i = Math.floor(x / cellSize);
-  const j = Math.floor(y / cellSize);
+  const i = Math.floor(x / cellSize.value);
+  const j = Math.floor(y / cellSize.value);
 
   if (i >= 0 && i < gridSize && j >= 0 && j < gridSize) {
     emit("clicked", { x: i, y: j } as Cord);
@@ -75,28 +35,12 @@ function click(event: MouseEvent) {
 }
 
 onMounted(() => {
-  ctx.value = canvas.value!.getContext("2d");
-  ctx.value!.imageSmoothingEnabled = false;
-
-  draw();
-  getNormalTileSet().onload = () => {
-    draw();
-  };
-  getBrokenTileSet().onload = () => {
-    draw();
-  };
-
-  if (props.hasListener) canvas.value!.addEventListener("mousedown", click);
+  if (props.hasListener) canvas.value!.addEventListener("pointerdown", click);
 });
 </script>
 
 <template>
-  <canvas
-    ref="canvas"
-    :width="canvasWidth"
-    :height="canvasHeight"
-    class="z-1"
-  />
+  <canvas ref="canvas" class="z-1 aspect-square touch-none" />
 </template>
 
 <style scoped>
