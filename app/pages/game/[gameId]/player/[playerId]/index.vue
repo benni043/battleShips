@@ -175,7 +175,7 @@ const showOwnGrid = ref(false);
 
 <template>
   <div
-    class="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 px-6 py-12"
+    class="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100"
   >
     <Toaster close-button rich-colors position="top-right" />
 

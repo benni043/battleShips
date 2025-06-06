@@ -10,7 +10,7 @@ defineProps<{
   </h1>
 
   <div
-    class="grid aspect-square w-dvw max-w-[500px] grid-cols-11 grid-rows-11 p-2 pr-4"
+    class="grid aspect-square w-dvw max-w-[500px] grid-cols-11 grid-rows-11 overflow-hidden p-2 pr-4"
   >
     <div class="col-span-10 col-start-2 flex w-full">
       <div
