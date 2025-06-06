@@ -10,11 +10,22 @@ export function useDrawGrid(
   const currentCellRef = toRef(currentCell);
 
   const canvasRef = toRef(canvas);
-  const canvasSize = computed(() => canvasRef.value?.clientWidth ?? 0);
+
+  const canvasSize = ref(0);
+  useResizeObserver(
+    () => canvasRef.value?.parentElement,
+    (entries) => {
+      const { width } = entries[0]!.contentRect;
+      console.log(width);
+      canvasSize.value = width;
+    },
+  );
   watch(canvasSize, () => {
     canvasRef.value!.height = canvasSize.value;
     canvasRef.value!.width = canvasSize.value;
+    ctx!.imageSmoothingEnabled = false;
   });
+
   const cellSize = computed(() => canvasSize.value / gridSize);
 
   let ctx: CanvasRenderingContext2D | null = null;

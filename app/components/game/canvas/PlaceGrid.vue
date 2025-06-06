@@ -250,7 +250,7 @@ const mouseUp = (event: MouseEvent) => {
 </script>
 
 <template>
-  <canvas ref="canvas" class="z-1 aspect-square w-[400px]" />
+  <canvas ref="canvas" class="z-1 aspect-square" />
 </template>
 
 <style scoped></style>

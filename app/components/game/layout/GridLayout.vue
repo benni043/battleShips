@@ -9,35 +9,39 @@ defineProps<{
     {{ header }}
   </h1>
 
-  <div class="mt-10">
-    <div class="ml-10 flex">
+  <div
+    class="grid aspect-square w-dvw max-w-[500px] grid-cols-11 grid-rows-11 p-2 pr-4"
+  >
+    <div class="col-span-10 col-start-2 flex w-full">
       <div
         v-for="n in 10"
         :key="'top-' + n"
-        class="flex h-10 w-10 items-center justify-center pb-7 text-xl font-medium text-gray-700"
+        class="xs:text-xl flex flex-1 items-start justify-center font-medium text-gray-700"
       >
         {{ String.fromCharCode(64 + n) }}
       </div>
     </div>
 
-    <div class="flex items-center justify-center">
-      <div class="flex flex-col">
-        <div
-          v-for="n in 10"
-          :key="'top-' + n"
-          class="flex h-10 w-10 items-center justify-center pr-7 text-xl font-medium text-gray-700"
-        >
-          {{ n }}
-        </div>
+    <div class="col-start-1 row-span-10 flex h-full flex-col justify-between">
+      <div
+        v-for="n in 10"
+        :key="'top-' + n"
+        class="xs:text-xl flex flex-1 items-center justify-start font-medium text-gray-700"
+      >
+        {{ n }}
       </div>
+    </div>
 
-      <div class="flex items-center justify-center">
-        <slot></slot>
+    <div
+      class="relative col-span-10 row-span-10 flex flex-1 items-center justify-center"
+    >
+      <slot></slot>
 
+      <div class="absolute w-[120%]">
         <img
           src="../../../assets/img/border.png"
           alt="border"
-          class="absolute h-[480px] w-[480px]"
+          class="w-full"
           style="image-rendering: pixelated"
         />
       </div>
