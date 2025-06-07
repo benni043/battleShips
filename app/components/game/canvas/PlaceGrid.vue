@@ -4,7 +4,7 @@ import type { Cell } from "#shared/gameTypes";
 import { gridSize } from "~/utils/rendering";
 import { initNormal, initRussian } from "~/utils/initShips";
 import { toast } from "vue-sonner";
-import { GameMode, PlaceState } from "~/utils/types";
+import { GameMode, PlaceState } from "~/utils/types/types";
 
 const gridStore = useMyGridStore();
 
@@ -19,21 +19,6 @@ const { cellSize } = useDrawGrid(grid, currentCell, canvas);
 
 const gameMode = GameMode.RUSSIAN;
 
-function initGrid() {
-  for (let x = 0; x < gridSize; x++) {
-    grid.value.push([]);
-
-    for (let y = 0; y < gridSize; y++) {
-      grid.value[x]!.push({
-        shipData: undefined,
-        isHit: false,
-        visualCord: { x: x, y: y },
-        gridCord: { x: x, y: y },
-      } as Cell);
-    }
-  }
-}
-
 function initShips() {
   switch (gameMode) {
     case GameMode.RUSSIAN: {
@@ -46,7 +31,7 @@ function initShips() {
   }
 }
 
-initGrid();
+grid.value = gridStore.initGrid();
 initShips();
 
 onMounted(() => {

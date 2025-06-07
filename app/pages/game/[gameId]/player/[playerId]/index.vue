@@ -13,6 +13,7 @@ import "vue-sonner/style.css";
 import GridLayout from "~/components/game/layout/GridLayout.vue";
 import GameGrid from "~/components/game/canvas/GameGrid.vue";
 import { FetchError } from "ofetch";
+import { handleGameError } from "~/utils/errorHandling";
 
 const socket = io("/game", {
   path: "/api/socket.io",
@@ -24,34 +25,14 @@ const userNameStore = useUserNameStore();
 const userNameCookie = useCookie("userName");
 
 const gridStore = useMyGridStore();
-const gridSize = 10;
 
-const myGrid: Ref<Cell[][]> = ref(initGrid());
-const opponentsGrid: Ref<Cell[][]> = ref(initGrid());
+const myGrid: Ref<Cell[][]> = ref(gridStore.initGrid());
+const opponentsGrid: Ref<Cell[][]> = ref(gridStore.initGrid());
 
 const isGameFinished = ref(false);
 
 const winner = ref("");
 const current = ref("");
-
-function initGrid() {
-  const grid: Cell[][] = [];
-
-  for (let x = 0; x < gridSize; x++) {
-    grid.push([]);
-
-    for (let y = 0; y < gridSize; y++) {
-      grid[x]!.push({
-        shipData: undefined,
-        isHit: false,
-        visualCord: { x: x, y: y },
-        gridCord: { x: x, y: y },
-      } as Cell);
-    }
-  }
-
-  return grid;
-}
 
 function click(cord: Cord) {
   socket.emit(
@@ -63,47 +44,8 @@ function click(cord: Cord) {
   );
 }
 
-function handleError<T>(err: GameError | T): T | undefined {
-  switch (err) {
-    case GameError.WRONG_PLAYER: {
-      toast.warning(`${userNameStore.opponent} ist an der Reihe!`);
-      return undefined;
-    }
-    case GameError.INVALID_CORD: {
-      toast.error(`Ungültige Koordinaten`);
-      return undefined;
-    }
-    case GameError.ALREADY_HIT: {
-      toast.warning(`Auf dieses Feld hast du bereits geschossen!`);
-      return undefined;
-    }
-    case GameError.NOT_STARTED: {
-      toast.error(`Das Spiel hat noch nicht gestartet!`);
-      return undefined;
-    }
-    case GameError.INVALID_ID: {
-      toast.error(`Ungültige ID!`);
-      return undefined;
-    }
-    case GameError.INVALID_GAME: {
-      toast.error(`Ungültiges Spiel!`);
-      return undefined;
-    }
-    case GameError.FINISHED: {
-      toast.error(`Spiel ist bereits beendet!`);
-      return undefined;
-    }
-    case GameError.ALREADY_JOINED: {
-      toast.error(`Du bist bereits in diesem Spiel!`);
-      return undefined;
-    }
-    default:
-      return err;
-  }
-}
-
 function hitResponseCallBack(data: HitResponse | GameError) {
-  const hitResponse = handleError(data);
+  const hitResponse = handleGameError(data);
 
   if (hitResponse) {
     opponentsGrid.value[hitResponse.cord.x]![hitResponse.cord.y]!.isHit = true;

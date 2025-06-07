@@ -1,5 +1,5 @@
 import type { Cell } from "#shared/gameTypes";
-import type { ShipsConnections } from "~/utils/types";
+import type { ShipsConnections } from "~/utils/types/types";
 import shipImg from "@/assets/img/ships.png";
 import shipBrokenImg from "@/assets/img/ships-broken.png";
 

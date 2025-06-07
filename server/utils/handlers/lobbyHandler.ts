@@ -7,6 +7,8 @@ import { gameService } from "~~/server/utils/services/gameService";
 export function handleLobbyEvents(socket: Socket, io: Namespace) {
   socket.on("join", () => {
     console.log(`User: ${socket.id} connected to lobby`);
+
+    socket.emit("fetch");
   });
 
   socket.on("get-games", () => {

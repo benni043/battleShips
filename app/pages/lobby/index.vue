@@ -4,7 +4,6 @@ import LobbyList from "~/components/lobby/LobbyList.vue";
 import { LobbyError, type LobbyResponse } from "#shared/lobbyTypes";
 import { toast, Toaster } from "vue-sonner";
 import { io } from "socket.io-client";
-import { FetchError } from "ofetch";
 
 const socket = io("/lobby", {
   path: "/api/socket.io",
@@ -57,24 +56,8 @@ function lobbyResponse(response: LobbyResponse | LobbyError) {
   }
 }
 
-async function rejoinLobby(lobbyId: string) {
-  try {
-    await $fetch("/api/isLobbyFree/", {
-      method: "GET",
-      query: {
-        gameId: lobbyId,
-        playerId: uuidCookie.value,
-      },
-    });
-
-    navigateTo(`/game/${lobbyId}/player/${uuidCookie.value}`);
-  } catch (error) {
-    if (error instanceof FetchError) {
-      toast.error(`Status: ${error.status} - ${error.statusMessage}`);
-    } else {
-      console.error("unknown error: ", error);
-    }
-  }
+function rejoinLobby(lobbyId: string) {
+  navigateTo(`/game/${lobbyId}/player/${uuidCookie.value}`);
 }
 
 socket.on("new-game", (lobbyData: LobbyResponse) => {
@@ -87,8 +70,8 @@ socket.on("remove-game", (lobbyId: string) => {
   }
 });
 
-socket.on("get-own-games", (games: LobbyResponse[]) => {
-  myGames.value = games;
+socket.on("get-own-games", (ownGames: LobbyResponse[]) => {
+  myGames.value = ownGames;
 });
 
 socket.on("get-games", (initGames: LobbyResponse[]) => {
@@ -104,8 +87,9 @@ function fetch() {
   socket.emit("get-own-games", uuidCookie.value);
 }
 
-socket.emit("join");
-fetch();
+onMounted(() => {
+  socket.emit("join");
+});
 
 onBeforeUnmount(() => {
   socket?.disconnect();

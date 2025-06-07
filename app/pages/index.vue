@@ -2,7 +2,7 @@
 import UserForm from "~/components/lobby/UserForm.vue";
 import { Toaster } from "vue-sonner";
 import "vue-sonner/style.css";
-import type { User } from "~/utils/types";
+import type { User } from "~/utils/types/types";
 
 const uuidCookie = useCookie("uuid");
 const userNameCookie = useCookie("userName");

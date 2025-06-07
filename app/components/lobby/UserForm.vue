@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import type { User } from "~/utils/types";
+import type { User } from "~/utils/types/types";
 import { v4 as uuidv4 } from "uuid";
 
 const emit = defineEmits(["submit"]);
