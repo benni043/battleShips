@@ -17,12 +17,34 @@ const socket = io("/place", {
   path: "/api/socket.io",
 });
 
-function start() {
-  ready.value = true;
-  socket.emit("ready", route.params.gameId, route.params.playerId);
+async function hasPlayerAlreadySentField() {
+  try {
+    const res: { statusCode: number; sent: boolean } = await $fetch(
+      "/api/hasPlayerSentField",
+      {
+        method: "GET",
+        body: {
+          gameId: route.params.gameId,
+          id: route.params.playerId,
+        },
+      },
+    );
+
+    if (res.statusCode === 200) ready.value = true;
+  } catch (error) {
+    if (error instanceof FetchError) {
+      toast.error(`Status: ${error.status} - ${error.statusMessage}`);
+    } else {
+      console.error("unknown error: ", error);
+    }
+  }
 }
 
-socket.emit("join", route.params.gameId);
+function start() {
+  ready.value = true;
+
+  socket.emit("ready", route.params.gameId, route.params.playerId);
+}
 
 socket.on("start", async () => {
   try {
@@ -45,6 +67,17 @@ socket.on("start", async () => {
   }
 });
 
+const handleBeforeUnload = () => {
+  socket.emit("manuel-disconnect", route.params.gameId);
+};
+
+onMounted(() => {
+  socket.emit("join", route.params.gameId);
+  hasPlayerAlreadySentField();
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+});
+
 socket.on("opponent-disconnected", () => {
   socket.disconnect();
   navigateTo("/lobby");
@@ -52,14 +85,6 @@ socket.on("opponent-disconnected", () => {
 
 onBeforeUnmount(() => {
   socket.emit("manuel-disconnect", route.params.gameId);
-});
-
-const handleBeforeUnload = () => {
-  socket.emit("manuel-disconnect", route.params.gameId);
-};
-
-onMounted(() => {
-  window.addEventListener("beforeunload", handleBeforeUnload);
 });
 </script>
 

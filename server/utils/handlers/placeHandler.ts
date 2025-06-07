@@ -14,6 +14,7 @@ export function handlePlaceEvents(socket: Socket, lobbyIO: Namespace) {
 
     if (lobbyService.getReady(gameId)) {
       lobbyIO.to(gameId).emit("start");
+
       lobbyService.removeLobby(gameId);
     }
   });
