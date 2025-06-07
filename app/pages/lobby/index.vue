@@ -21,7 +21,7 @@ function createLobby(lobbyName: string) {
     lobbyName,
     uuidCookie.value,
     userNameCookie.value,
-    lobbyResponse,
+    createOrJoinResponse,
   );
 }
 
@@ -31,12 +31,25 @@ function joinLobby(lobbyId: string) {
     lobbyId,
     uuidCookie.value,
     userNameCookie.value,
-    lobbyResponse,
+    createOrJoinResponse,
   );
 }
 
-function lobbyResponse(response: LobbyResponse | LobbyError) {
-  switch (response) {
+function createOrJoinResponse(
+  error: boolean,
+  lobbyRes: LobbyResponse | LobbyError,
+) {
+  if (error) {
+    handleLobbyError(lobbyRes as LobbyError);
+    return;
+  }
+
+  lobbyRes = lobbyRes as LobbyResponse;
+  navigateTo(`/game/${lobbyRes.lobbyId}/player/${uuidCookie.value}/place`);
+}
+
+function handleLobbyError(error: LobbyError) {
+  switch (error) {
     case LobbyError.INVALID_GAME: {
       toast.warning("Dieser Lobbyname ist nicht erlaubt!");
       break;
@@ -49,15 +62,24 @@ function lobbyResponse(response: LobbyResponse | LobbyError) {
       toast.error("Error: Ungültige ID!");
       break;
     }
-    default: {
-      navigateTo(`/game/${response.lobbyId}/player/${uuidCookie.value}/place`);
-      break;
-    }
   }
 }
 
 function rejoinLobby(lobbyId: string) {
   navigateTo(`/game/${lobbyId}/player/${uuidCookie.value}`);
+}
+
+function setOwnGames(ownGames: LobbyResponse[]) {
+  myGames.value = ownGames;
+}
+
+function setGames(initGames: LobbyResponse[]) {
+  games.value = initGames;
+}
+
+function fetch() {
+  socket.emit("get-games", setGames);
+  socket.emit("get-own-games", uuidCookie.value, setOwnGames);
 }
 
 socket.on("new-game", (lobbyData: LobbyResponse) => {
@@ -70,22 +92,9 @@ socket.on("remove-game", (lobbyId: string) => {
   }
 });
 
-socket.on("get-own-games", (ownGames: LobbyResponse[]) => {
-  myGames.value = ownGames;
-});
-
-socket.on("get-games", (initGames: LobbyResponse[]) => {
-  games.value = initGames;
-});
-
 socket.on("fetch", () => {
   fetch();
 });
-
-function fetch() {
-  socket.emit("get-games");
-  socket.emit("get-own-games", uuidCookie.value);
-}
 
 onMounted(() => {
   socket.emit("join");

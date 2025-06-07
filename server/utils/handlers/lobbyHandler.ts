@@ -11,21 +11,19 @@ export function handleLobbyEvents(socket: Socket, io: Namespace) {
     socket.emit("fetch");
   });
 
-  socket.on("get-games", () => {
-    socket.emit("get-games", lobbyService.getAvailableLobbies());
+  socket.on("get-games", (cb) => {
+    cb(lobbyService.getAvailableLobbies());
   });
 
-  socket.on("get-own-games", (playerId: string) => {
-    const response = gameService.getAllRunningGamesForPlayer(playerId);
-
-    socket.emit("get-own-games", response);
+  socket.on("get-own-games", (playerId: string, cb) => {
+    cb(gameService.getAllRunningGamesForPlayer(playerId));
   });
 
   socket.on("create-game", (lobbyName, id, name, cb) => {
     const lobby = lobbyService.createLobby(lobbyName, id, name);
 
     if (lobby === LobbyError.INVALID_GAME) {
-      cb(lobby);
+      cb(true, lobby);
       return;
     }
 
@@ -34,7 +32,7 @@ export function handleLobbyEvents(socket: Socket, io: Namespace) {
       lobbyName: lobby.lobbyName,
     } as LobbyResponse;
 
-    cb(lobbyData);
+    cb(false, lobbyData);
     io.emit("new-game", lobbyData);
   });
 
@@ -42,11 +40,11 @@ export function handleLobbyEvents(socket: Socket, io: Namespace) {
     const lobby = lobbyService.joinLobby(lobbyId, id, name);
 
     if (lobby === LobbyError.INVALID_GAME || lobby === LobbyError.FULL) {
-      cb(lobby);
+      cb(true, lobby);
       return;
     }
 
-    cb({ lobbyId: lobby.id, lobbyName: lobby.lobbyName } as LobbyResponse);
+    cb(false, { lobbyId: lobby.id, lobbyName: lobby.lobbyName } as LobbyResponse);
     io.emit("remove-game", lobby.id);
 
     gameService.addGame(
